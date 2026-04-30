@@ -355,11 +355,13 @@ function parseVisitCount(value) {
 }
 
 function indicatorTone(value) {
-  const key = normalizeKey(value);
+  const text = String(value || '').trim();
+  if (!text) return 'aviso';
+  const key = normalizeKey(text);
   if (key.includes('verde')) return 'verde';
   if (key.includes('amarelo')) return 'amarelo';
   if (key.includes('vermelho')) return 'vermelho';
-  return String(value || '').trim();
+  return text;
 }
 
 function mergeSupervisorPanelRows(source, rows) {

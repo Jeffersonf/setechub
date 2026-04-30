@@ -1181,7 +1181,14 @@ function supervisorIndicatorClass(value) {
   if (key.includes('verde')) return 'pill-ok';
   if (key.includes('amarelo')) return 'pill-warn';
   if (key.includes('vermelho')) return 'pill-danger';
+  if (key.includes('aviso')) return 'pill-warn';
   return 'pill-info';
+}
+
+function supervisorIndicatorText(value) {
+  const key = normalizeKey(value);
+  if (!key || key.includes('aviso')) return 'AVISO!';
+  return badgeText(value);
 }
 
 function supervisorOfficialMonthlyVisits(supervisor, fallback) {
@@ -1251,8 +1258,8 @@ function renderSupervisors() {
       const monthlyGoal = Number(supervisor.monthlyGoal || item.assignedSchools.length || 1);
       const weeklyVisits = supervisorOfficialWeeklyVisits(supervisor);
       const monthlyVisits = supervisorOfficialMonthlyVisits(supervisor, localCount);
-      const weeklyIndicator = supervisor.weeklyIndicator || (weeklyVisits >= weeklyGoal ? 'verde' : 'amarelo');
-      const monthlyIndicator = supervisor.monthlyIndicator || (monthlyVisits >= monthlyGoal ? 'verde' : 'amarelo');
+      const weeklyIndicator = supervisor.weeklyIndicator || 'aviso';
+      const monthlyIndicator = supervisor.monthlyIndicator || 'aviso';
       return {
         item,
         supervisor,
@@ -1299,8 +1306,8 @@ function renderSupervisors() {
                   <div class="supervisor-sheet-bar"><span style="width:${esc(String(Math.max(4, supervisorGoalPct(row.monthlyVisits, row.monthlyGoal))))}%"></span></div>
                 </td>
                 <td>${esc(String(row.currentWeek || '--'))}</td>
-                <td><span class="diag-pill ${supervisorIndicatorClass(row.weeklyIndicator)}">${esc(badgeText(row.weeklyIndicator))}</span></td>
-                <td><span class="diag-pill ${supervisorIndicatorClass(row.monthlyIndicator)}">${esc(badgeText(row.monthlyIndicator))}</span></td>
+                <td><span class="diag-pill ${supervisorIndicatorClass(row.weeklyIndicator)}">${esc(supervisorIndicatorText(row.weeklyIndicator))}</span></td>
+                <td><span class="diag-pill ${supervisorIndicatorClass(row.monthlyIndicator)}">${esc(supervisorIndicatorText(row.monthlyIndicator))}</span></td>
                 <td><button class="btn btn-g btn-sm" type="button" onclick="event.stopPropagation(); openSupervisorRecord('${esc(row.supervisor.name)}')">Abrir</button></td>
               </tr>
             `).join('')}
@@ -1334,14 +1341,14 @@ function renderSupervisors() {
           const visitedSchools = new Set(monthVisits.map((visit) => visit.school)).size;
           const pending = Math.max(0, item.assignedSchools.length - visitedSchools);
           const goalMet = officialMonthVisits >= monthlyGoal;
-          const monthlyIndicator = item.supervisor.monthlyIndicator || (goalMet ? 'verde' : 'amarelo');
+          const monthlyIndicator = item.supervisor.monthlyIndicator || 'aviso';
           return `
             <div class="setechub-head">
               <div>
                 <strong>${esc(item.supervisor.name)}</strong>
                 <div class="sync-meta">${esc(item.supervisor.email || '')} | ${esc(item.supervisor.phone || '')}</div>
               </div>
-              <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(badgeText(monthlyIndicator))}</span>
+              <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
             </div>
             <div class="school-overview-kpis supervisor-list-kpis">
               <div><span>Mes</span><strong>${esc(String(officialMonthVisits))}/${esc(String(monthlyGoal))}</strong></div>
@@ -1629,8 +1636,8 @@ function renderSupervisorRecord() {
   const weeklyVisitCount = supervisorOfficialWeeklyVisits(supervisor);
   const goalPct = Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100));
   const goalMet = monthlyVisitCount >= monthlyGoal;
-  const monthlyIndicator = supervisor.monthlyIndicator || (goalMet ? 'verde' : 'amarelo');
-  const weeklyIndicator = supervisor.weeklyIndicator || '';
+  const monthlyIndicator = supervisor.monthlyIndicator || 'aviso';
+  const weeklyIndicator = supervisor.weeklyIndicator || 'aviso';
 
   if (select) {
     select.innerHTML = stats.map((item) => `<option value="${esc(item.supervisor.name)}">${esc(item.supervisor.name)}</option>`).join('');
@@ -1657,7 +1664,7 @@ function renderSupervisorRecord() {
           <div class="sync-meta">${esc(supervisor.visitSourceUrl ? `${supervisor.visitSourceLabel || 'Planilha Google'} como fonte principal.` : supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
           ${supervisor.sourceSyncedAt ? `<div class="sync-meta">Ultima leitura online: ${esc(timestampLabel(new Date(supervisor.sourceSyncedAt)))}</div>` : ''}
         </div>
-        <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(badgeText(monthlyIndicator))}</span>
+        <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
       </div>
       ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a><button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar planilha</button></div>` : ''}
     </div>
@@ -1677,11 +1684,11 @@ function renderSupervisorRecord() {
 
   document.getElementById('supervisorRecordMetrics').innerHTML = [
     { label: 'Escolas', value: String(selectedStat.assignedSchools.length), note: 'vinculadas ao supervisor' },
-    { label: 'Semana', value: weeklyGoal ? `${weeklyVisitCount}/${weeklyGoal}` : String(weeklyVisitCount), note: weeklyIndicator ? `indicador ${badgeText(weeklyIndicator)}` : 'visitas da semana' },
+    { label: 'Semana', value: weeklyGoal ? `${weeklyVisitCount}/${weeklyGoal}` : String(weeklyVisitCount), note: `indicador ${supervisorIndicatorText(weeklyIndicator)}` },
     { label: 'Visitadas', value: String(visitedSchoolSet.size), note: 'escolas distintas no mes' },
     { label: 'Faltantes', value: String(pendingSchools.length), note: 'sem visita no mes' },
     { label: 'Chamados', value: String(selectedStat.openCalls), note: 'ativos nas escolas vinculadas' },
-    { label: 'Indicador mes', value: badgeText(monthlyIndicator || 'sem dado'), note: `${monthlyVisitCount}/${monthlyGoal} visita(s)` },
+    { label: 'Indicador mes', value: supervisorIndicatorText(monthlyIndicator), note: `${monthlyVisitCount}/${monthlyGoal} visita(s)` },
     { label: 'Historico', value: String(allVisits.length), note: 'registros importados' }
   ].map((item) => `
     <div class="setechub-monitor-card compact">
