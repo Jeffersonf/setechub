@@ -50,5 +50,6 @@ if (sessionStorage.getItem(SESSION_KEY) === 'ok') {
   await refreshServerHealth();
   await syncFromServerIfUseful();
   await loadServerSnapshots();
+  await syncSupervisorVisitSources();
   await refreshServerHealth();
 })();

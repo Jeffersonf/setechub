@@ -2,11 +2,75 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=./frontend/index.html">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SETECHUB</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #08090d;
+    color: #f5f7fb;
+  }
+  body {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  main {
+    width: min(520px, 100%);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 12px;
+    padding: 28px;
+    background: #11131a;
+    box-shadow: 0 24px 80px rgba(0,0,0,.35);
+  }
+  h1 { margin: 0 0 10px; font-size: 28px; }
+  p { color: #aeb7c8; line-height: 1.55; }
+  a, button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #66e3c4;
+    color: #07100e;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .muted { font-size: 13px; color: #7f8899; }
+</style>
 </head>
 <body>
-<p>Redirecionando para <a href="./frontend/index.html">SETECHUB</a>...</p>
+<main>
+  <h1>SETECHUB</h1>
+  <p id="message">Abrindo o modo local pelo servidor correto...</p>
+  <p>
+    <a id="localLink" href="http://localhost:4173">Abrir modo local</a>
+  </p>
+  <p class="muted">Se esta pagina ficar parada, inicie o servidor com <strong>npm start</strong> e abra novamente.</p>
+</main>
+<script>
+  const localUrl = 'http://localhost:4173';
+  const fallbackUrl = './frontend/index.html';
+  const message = document.getElementById('message');
+  const link = document.getElementById('localLink');
+
+  if (location.protocol === 'file:') {
+    message.textContent = 'Arquivo aberto direto. Redirecionando para o servidor local...';
+    link.href = localUrl;
+    setTimeout(() => location.replace(localUrl), 300);
+  } else if (location.pathname.endsWith('/index.html')) {
+    message.textContent = 'Redirecionando para a aplicacao...';
+    link.href = fallbackUrl;
+    setTimeout(() => location.replace(fallbackUrl), 300);
+  } else {
+    location.replace('/frontend/index.html');
+  }
+</script>
 </body>
 </html>

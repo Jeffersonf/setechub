@@ -56,8 +56,26 @@ function inferImportReviewStatus(item) {
 }
 
 const SCHOOL_ALIASES = {
-  'AGROVILA I': 'PEI EE Idalicio Mendes Lima'
+  'AGROVILA I': 'PEI EE Idalicio Mendes Lima',
+  'EE CINIRA DANIEL DA SILVA': 'PEI EE Professora Cinira Daniel da Silva',
+  'EE DR. RAUL VENTURELLI': 'EE Doutor Raul Venturelli',
+  'EE DR RAUL VENTURELLI': 'EE Doutor Raul Venturelli',
+  'EE JEMINIANO DAVID MUZEL': 'PEI EE Jeminiano David Muzel',
+  'EE JOSE VASQUES FERRARI': 'PEI EE Professor Jose Vasques Ferrari',
+  'EE JOSÉ VASQUES FERRARI': 'PEI EE Professor Jose Vasques Ferrari',
+  'EE NICOTA SOARES': 'PEI EE Professora Nicota Soares'
 };
+
+const SUPERVISOR_VISIT_SOURCES = [
+  {
+    id: 'adilson-google-visitas',
+    supervisor: 'Adilson Fogaca',
+    aliases: ['Adilson Manoel', 'Adilson Fogaca'],
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSkqZydw5EWNLREBCXdG-VpqcoOfuOf-AI2gYawdaeEwDNitR2m37okLvurfscimlSQMtpbHg_H_bzz/pub?output=csv',
+    label: 'Planilha Google - visitas do Adilson',
+    primary: true
+  }
+];
 
 function canonicalSchoolName(value) {
   const text = String(value || '').trim();
@@ -141,7 +159,16 @@ function defaultSupervisors(schools) {
     { name: 'Magda Gisele Silva de Oliveira', email: 'magda.oliveira@educacao.sp.gov.br', phone: '(15) 3526-6232' },
     { name: 'Marcio Nunes da Cruz', email: 'marcio.cruz@educacao.sp.gov.br', phone: '(15) 3526-6208' },
     { name: 'Maria Luiza Brizolla de Queiroz', email: 'maria.queiroz14@educacao.sp.gov.br', phone: '(15) 3526-6216' },
-    { name: 'Adilson Fogaca', email: 'adilson.fogaca@educacao.sp.gov.br', phone: '(15) 3526-6224' }
+    {
+      name: 'Adilson Fogaca',
+      email: 'adilson.fogaca@educacao.sp.gov.br',
+      phone: '(15) 3526-6224',
+      visitSourceId: 'adilson-google-visitas',
+      visitSourceUrl: SUPERVISOR_VISIT_SOURCES[0].url,
+      visitSourceLabel: SUPERVISOR_VISIT_SOURCES[0].label,
+      visitSourcePrimary: true,
+      sourceAliases: SUPERVISOR_VISIT_SOURCES[0].aliases
+    }
   ];
   return supervisorContacts.map((supervisor, index) => ({
     id: `sup-${index + 1}`,
@@ -157,13 +184,14 @@ function defaultSupervisors(schools) {
 function defaultSupervisorVisits(supervisors) {
   const currentYear = new Date().getFullYear();
   return supervisors.flatMap((supervisor, supervisorIndex) =>
-    supervisor.schools.slice(0, 3).map((school, schoolIndex) => ({
+    supervisor.visitSourcePrimary ? [] : supervisor.schools.slice(0, 3).map((school, schoolIndex) => ({
       id: `visit-${supervisorIndex + 1}-${schoolIndex + 1}`,
       supervisor: supervisor.name,
       school,
       date: `${currentYear}-${String((schoolIndex + supervisorIndex) % 12 + 1).padStart(2, '0')}-${String(8 + schoolIndex * 6).padStart(2, '0')}`,
       type: schoolIndex % 2 === 0 ? 'Rotina' : 'Acompanhamento',
-      notes: 'Registro de teste para validar o BI de supervisao.'
+      notes: 'Registro de teste para validar o BI de supervisao.',
+      source: 'teste'
     }))
   );
 }
@@ -247,6 +275,24 @@ function normalizeDefaultUserNames(users) {
     const oldGeneric = ['dirigente', 'seintec', 'ctc'].includes(normalizeKey(user.name)) ||
       ['dirigente', 'seintec', 'ctc'].includes(normalizeKey(user.login));
     return oldGeneric ? { ...user, ...replacement } : user;
+  });
+}
+
+function enrichSupervisorSources(supervisors) {
+  return (supervisors || []).map((supervisor) => {
+    const source = SUPERVISOR_VISIT_SOURCES.find((item) =>
+      normalizeKey(item.supervisor) === normalizeKey(supervisor.name) ||
+      (item.aliases || []).some((alias) => normalizeKey(alias) === normalizeKey(supervisor.name))
+    );
+    if (!source) return supervisor;
+    return {
+      ...supervisor,
+      visitSourceId: supervisor.visitSourceId || source.id,
+      visitSourceUrl: supervisor.visitSourceUrl || source.url,
+      visitSourceLabel: supervisor.visitSourceLabel || source.label,
+      visitSourcePrimary: supervisor.visitSourcePrimary ?? source.primary,
+      sourceAliases: supervisor.sourceAliases || source.aliases || []
+    };
   });
 }
 
@@ -510,7 +556,7 @@ function mergeState(saved) {
     tasks: savedTasks,
     calls: savedCalls,
     schools: mergedSchools,
-    supervisors: mergeUniqueBy(base.supervisors, savedSupervisors, (item) => normalizeKey(item.email || item.name)),
+    supervisors: enrichSupervisorSources(mergeUniqueBy(base.supervisors, savedSupervisors, (item) => normalizeKey(item.email || item.name))),
     supervisorVisits: mergeUniqueBy(
       base.supervisorVisits,
       savedSupervisorVisits,

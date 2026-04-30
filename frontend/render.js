@@ -1225,9 +1225,11 @@ function renderSupervisors() {
           <div>
             <strong>${esc(selectedStat.supervisor.name)}</strong>
             <div class="sync-meta">${esc(selectedStat.supervisor.email || '')} | ${esc(selectedStat.supervisor.phone || '')}</div>
+            ${selectedStat.supervisor.visitSourceUrl ? `<div class="sync-meta">Fonte principal: ${esc(selectedStat.supervisor.visitSourceLabel || 'Planilha Google')}${selectedStat.supervisor.sourceSyncedAt ? ` | atualizada em ${esc(timestampLabel(new Date(selectedStat.supervisor.sourceSyncedAt)))}` : ''}</div>` : ''}
           </div>
           <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
         </div>
+        ${selectedStat.supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(selectedStat.supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a></div>` : ''}
       </div>
       <div class="school-overview-kpis">
         <div><span>Escolas</span><strong>${esc(String(selectedStat.assignedSchools.length))}</strong></div>
@@ -1426,10 +1428,12 @@ function renderSupervisorRecord() {
         <div>
           <strong>${esc(supervisor.name)}</strong>
           <div class="sync-meta">${esc(supervisor.email || '')} | ${esc(supervisor.phone || '')}</div>
-          <div class="sync-meta">${esc(supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
+          <div class="sync-meta">${esc(supervisor.visitSourceUrl ? `${supervisor.visitSourceLabel || 'Planilha Google'} como fonte principal.` : supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
+          ${supervisor.sourceSyncedAt ? `<div class="sync-meta">Ultima leitura online: ${esc(timestampLabel(new Date(supervisor.sourceSyncedAt)))}</div>` : ''}
         </div>
         <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
       </div>
+      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a></div>` : ''}
     </div>
   `;
 

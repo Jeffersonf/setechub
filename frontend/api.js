@@ -200,3 +200,144 @@ async function loadStateFromSupabase() {
     updateSupabaseStatus(`Nao foi possivel carregar do Supabase: ${error.message}`, false);
   }
 }
+
+function parseCsvRows(text) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let quoted = false;
+  const input = String(text || '');
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
+    const next = input[index + 1];
+    if (char === '"' && quoted && next === '"') {
+      value += '"';
+      index += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      row.push(value);
+      value = '';
+    } else if ((char === '\n' || char === '\r') && !quoted) {
+      if (char === '\r' && next === '\n') index += 1;
+      row.push(value);
+      if (row.some((cell) => String(cell || '').trim())) rows.push(row);
+      row = [];
+      value = '';
+    } else {
+      value += char;
+    }
+  }
+  row.push(value);
+  if (row.some((cell) => String(cell || '').trim())) rows.push(row);
+  return rows;
+}
+
+function normalizeCsvHeader(value) {
+  return normalizeKey(repairMojibakeString(value)).replace(/[^a-z0-9]+/g, '');
+}
+
+function csvValue(record, names) {
+  const wanted = names.map(normalizeCsvHeader);
+  const entry = Object.entries(record).find(([key]) => wanted.includes(key));
+  return repairMojibakeString(entry?.[1] || '').trim();
+}
+
+function parseBrazilianDate(value) {
+  const text = String(value || '').trim();
+  const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!match) return '';
+  const [, day, month, year] = match;
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
+function supervisorVisitSourceFor(source) {
+  return (state.supervisors || []).find((supervisor) =>
+    normalizeKey(supervisor.name) === normalizeKey(source.supervisor) ||
+    (source.aliases || []).some((alias) => normalizeKey(alias) === normalizeKey(supervisor.name)) ||
+    (supervisor.sourceAliases || []).some((alias) => normalizeKey(alias) === normalizeKey(source.supervisor))
+  );
+}
+
+function sourceRowBelongsToSupervisor(rowSupervisor, source, supervisor) {
+  const names = [source.supervisor, supervisor?.name, ...(source.aliases || []), ...(supervisor?.sourceAliases || [])];
+  return names.filter(Boolean).some((name) => normalizeKey(name) === normalizeKey(rowSupervisor));
+}
+
+function mergeSupervisorVisitSourceRows(source, rows) {
+  const supervisor = supervisorVisitSourceFor(source);
+  if (!supervisor) return 0;
+  const importedAt = new Date().toISOString();
+  const incoming = rows
+    .map((row) => {
+      const rowSupervisor = csvValue(row, ['Nome do Supervisor', 'Supervisor']);
+      const school = canonicalSchoolName(csvValue(row, ['Escola Visitada', 'Escola']));
+      const date = parseBrazilianDate(csvValue(row, ['Data Da Visita', 'Data da Visita', 'Data']));
+      if (!rowSupervisor || !school || !date || !sourceRowBelongsToSupervisor(rowSupervisor, source, supervisor)) return null;
+      const submittedAt = csvValue(row, ['Carimbo de data/hora', 'Timestamp']);
+      const confirmation = csvValue(row, ['Confirmacao de Visita', 'Confirmacao', 'Confirmação de Visita']);
+      return {
+        id: `${source.id}-${normalizeKey(supervisor.name)}-${normalizeKey(school)}-${date}`,
+        supervisor: supervisor.name,
+        school,
+        date,
+        type: 'Planilha Google',
+        notes: confirmation || `Importado de ${source.label}.`,
+        source: 'google-sheet',
+        sourceId: source.id,
+        sourceLabel: source.label,
+        importedAt,
+        submittedAt,
+        confirmation
+      };
+    })
+    .filter(Boolean);
+  if (!incoming.length) return 0;
+
+  const incomingKeys = new Set(incoming.map((item) => normalizeKey(`${item.supervisor}|${item.school}|${item.date}|${item.type}`)));
+  state.supervisorVisits = [
+    ...(state.supervisorVisits || []).filter((item) => {
+      if (item.sourceId === source.id) return !incomingKeys.has(normalizeKey(`${item.supervisor}|${item.school}|${item.date}|${item.type}`));
+      if (item.supervisor !== supervisor.name) return true;
+      return !(item.source === 'teste' || /^visit-\d+-\d+$/.test(String(item.id || '')) || /registro de teste/i.test(item.notes || ''));
+    }),
+    ...incoming
+  ];
+
+  const schoolsFromSource = [...new Set(incoming.map((item) => item.school))];
+  state.supervisors = (state.supervisors || []).map((item) => {
+    if (item.name !== supervisor.name) return item;
+    return {
+      ...item,
+      schools: [...new Set([...(item.schools || []), ...schoolsFromSource])],
+      monthlyGoal: Math.max(Number(item.monthlyGoal || 0), schoolsFromSource.length || 1),
+      visitSourceId: source.id,
+      visitSourceUrl: source.url,
+      visitSourceLabel: source.label,
+      visitSourcePrimary: source.primary,
+      sourceAliases: source.aliases || [],
+      source: 'google-sheet',
+      sourceSyncedAt: importedAt
+    };
+  });
+  return incoming.length;
+}
+
+async function syncSupervisorVisitSources() {
+  if (!Array.isArray(SUPERVISOR_VISIT_SOURCES) || !SUPERVISOR_VISIT_SOURCES.length) return;
+  let importedCount = 0;
+  for (const source of SUPERVISOR_VISIT_SOURCES) {
+    try {
+      const response = await fetch(source.url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const rows = parseCsvRows(await response.text());
+      const [headers, ...dataRows] = rows;
+      if (!headers?.length) continue;
+      const records = dataRows.map((row) => Object.fromEntries(headers.map((header, index) => [normalizeCsvHeader(header), row[index] || ''])));
+      importedCount += mergeSupervisorVisitSourceRows(source, records);
+    } catch (error) {
+      console.warn(`Nao foi possivel sincronizar ${source.label}:`, error);
+    }
+  }
+  if (importedCount) refreshAll();
+}
