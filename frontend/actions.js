@@ -58,6 +58,55 @@ function toggleUserActive(id) {
   refreshAll();
 }
 
+function findLoginUser(name, pin) {
+  const loginKey = normalizeKey(name);
+  const pinText = String(pin || '').trim();
+  const users = (state.users || []).filter((item) =>
+    item.active !== false &&
+    String(item.pin || '') === pinText
+  );
+  const exact = users.find((item) =>
+    [item.login, item.name, item.supervisorName]
+      .filter(Boolean)
+      .some((value) => normalizeKey(value) === loginKey)
+  );
+  if (exact) return exact;
+  const firstNameMatches = users.filter((item) =>
+    [item.login, item.name, item.supervisorName]
+      .filter(Boolean)
+      .some((value) => normalizeKey(value).split(/\s+/)[0] === loginKey)
+  );
+  return firstNameMatches.length === 1 ? firstNameMatches[0] : null;
+}
+
+function loginNameExists(name) {
+  const loginKey = normalizeKey(name);
+  return (state.users || []).some((item) =>
+    item.active !== false &&
+    [item.login, item.name, item.supervisorName]
+      .filter(Boolean)
+      .some((value) => {
+        const normalized = normalizeKey(value);
+        return normalized === loginKey || normalized.split(/\s+/)[0] === loginKey;
+      })
+  );
+}
+
+function logoutToLogin() {
+  sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(ACTIVE_USER_KEY);
+  const pinInput = document.getElementById('loginPin');
+  const nameInput = document.getElementById('loginName');
+  const error = document.getElementById('loginError');
+  if (pinInput) pinInput.value = '';
+  if (nameInput) nameInput.value = '';
+  if (error) {
+    error.textContent = '';
+    error.classList.remove('show');
+  }
+  setLoginVisible(true);
+}
+
 function restoreState(file) {
   const reader = new FileReader();
   reader.onload = () => {
@@ -815,36 +864,46 @@ function setupEventListeners() {
     refreshAll();
   });
 
-  document.getElementById('loginForm').addEventListener('submit', (event) => {
+  document.getElementById('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = document.getElementById('loginName').value.trim();
     const pin = document.getElementById('loginPin').value.trim();
     const error = document.getElementById('loginError');
-    const user = (state.users || []).find((item) =>
-      item.active !== false &&
-      normalizeKey(item.login || item.name) === normalizeKey(name) &&
-      String(item.pin || '') === pin
-    );
+    let user = findLoginUser(name, pin);
+    if (!user && canUseLocalApi()) {
+      try {
+        const payload = await apiRequest('/api/state');
+        state = mergeState(payload.state || payload);
+        refreshAll();
+        user = findLoginUser(name, pin);
+      } catch {
+        // Login continues with the local browser state when the API is unavailable.
+      }
+    }
     if (user) {
       sessionStorage.setItem(SESSION_KEY, 'ok');
       sessionStorage.setItem(ACTIVE_USER_KEY, user.id);
-      document.getElementById('setup').style.display = 'none';
+      setLoginVisible(false);
       error.textContent = '';
+      error.classList.remove('show');
       currentPage = defaultPageForUser();
       refreshAll();
       showPage(currentPage);
       return;
     }
-    error.textContent = 'Nome ou PIN invalido.';
+    error.textContent = loginNameExists(name)
+      ? 'PIN incorreto para este usuario.'
+      : 'Usuario nao encontrado. Confira o login ou nome cadastrado.';
     error.classList.add('show');
   });
 
   document.getElementById('backupBtn').addEventListener('click', exportJson);
   document.getElementById('exportSummaryBtn').addEventListener('click', exportSummary);
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(ACTIVE_USER_KEY);
-    document.getElementById('setup').style.display = '';
+    logoutToLogin();
+  });
+  document.querySelectorAll('.logout-action').forEach((button) => {
+    button.addEventListener('click', logoutToLogin);
   });
   document.getElementById('resetBtn').addEventListener('click', () => {
     state = createDefaults();
@@ -940,7 +999,9 @@ function setupEventListeners() {
   });
 
   document.querySelectorAll('.nav-item, .fn-item').forEach((button) => {
-    button.addEventListener('click', () => showPage(button.dataset.page));
+    if (button.dataset.page) {
+      button.addEventListener('click', () => showPage(button.dataset.page));
+    }
   });
 
   document.querySelectorAll('[data-task-filter]').forEach((button) => {

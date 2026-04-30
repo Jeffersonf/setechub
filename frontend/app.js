@@ -167,9 +167,10 @@ function showPage(page) {
 function currentUser() {
   const activeId = sessionStorage.getItem(ACTIVE_USER_KEY);
   const users = state.users || [];
-  return users.find((item) => item.id === activeId && item.active !== false) ||
-    users.find((item) => item.role === 'admin' && item.active !== false) ||
-    null;
+  if (activeId) {
+    return users.find((item) => item.id === activeId && item.active !== false) || null;
+  }
+  return users.find((item) => item.role === 'admin' && item.active !== false) || null;
 }
 
 function currentUserRole() {
@@ -236,7 +237,9 @@ function applyAccessControl() {
   document.body.dataset.role = role;
   document.body.classList.toggle('is-read-only', !canEditData());
   document.querySelectorAll('.nav-item, .fn-item').forEach((node) => {
-    node.hidden = !canAccessPage(node.dataset.page);
+    if (node.dataset.page) {
+      node.hidden = !canAccessPage(node.dataset.page);
+    }
   });
   document.querySelectorAll('.sidebar-icon-btn, .sidebar-mini-btn').forEach((node) => {
     const target = node.getAttribute('onclick') || '';
@@ -292,7 +295,6 @@ function updateIdentity() {
   document.getElementById('profileName').value = user.name;
   document.getElementById('profileUnit').value = roleLabel;
   document.getElementById('profilePin').value = user.pin || '';
-  document.getElementById('loginName').value = user.login || user.name;
   document.getElementById('todayLabel').textContent = todayLabel();
   applyAccessControl();
 }

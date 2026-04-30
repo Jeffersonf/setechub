@@ -32,5 +32,6 @@ test('validateStateShape rejects invalid task shape container', () => {
 test('safeResolve keeps frontend root access and blocks traversal', () => {
   const allowed = safeResolve('/frontend/index.html');
   assert.match(allowed, /frontend[\\/]index\.html$/i);
+  assert.match(safeResolve('/login'), /frontend[\\/]index\.html$/i);
   assert.equal(safeResolve('/../../Windows/system32'), null);
 });

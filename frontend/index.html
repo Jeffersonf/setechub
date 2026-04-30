@@ -16,19 +16,19 @@
 <link rel="stylesheet" href="./setechub.css">
 </head>
 <body>
-<div id="setup" class="setup-screen">
+<div id="setup" class="setup-screen" aria-labelledby="loginTitle">
   <div class="setup-box setup-shell">
     <section class="setup-story">
       <div class="setup-head">
         <div class="setup-copy-block">
-          <div class="setup-badge">Operacao tecnica organizada</div>
+          <div class="setup-badge">Acesso operacional</div>
           <div class="slogo"><span style="color:var(--ac)">setec</span><span style="color:var(--tx);font-weight:700">hub</span></div>
-          <div class="stag">Tudo o que aparece no seu dia de trabalho concentrado numa central local e pronta para crescer.</div>
-          <h1 class="setup-title">Seu fluxo tecnico com a cara do Finanza e foco total em SETEC.</h1>
-          <p class="setup-copy">Agenda, chamados, escolas, ativos, relatorios e automacao de redes em uma base unica. Os dados ficam salvos neste navegador e a estrutura ja nasce preparada para evoluir.</p>
+          <div class="stag">Central tecnica da SETEC com entrada local por usuario e PIN.</div>
+          <h1 class="setup-title">Entre para acompanhar escolas, chamados e a rotina do dia.</h1>
+          <p class="setup-copy">A sessao protege o painel neste navegador. Depois do acesso, cada perfil abre somente as areas liberadas para sua funcao.</p>
           <div class="setup-inline-preview">
             <div class="setup-inline-head">
-              <strong>O que entra no seu fluxo</strong>
+              <strong>Resumo antes de entrar</strong>
               <span>Rotina operacional</span>
             </div>
             <div class="setup-inline-grid">
@@ -76,33 +76,33 @@
       </div>
       <div class="setup-feature-grid">
         <article class="setup-feature-card">
-          <strong>Painel operacional</strong>
-          <p>Visao do dia, metricas e foco atual sem espalhar informacao em varias planilhas.</p>
+          <strong>Perfis locais</strong>
+          <p>Administrador, dirigente, SEINTEC, CTC e supervisores com visoes diferentes do painel.</p>
         </article>
         <article class="setup-feature-card">
-          <strong>Automacao de redes</strong>
-          <p>Configuracao, lote, pre-visualizacao e comando pronto para o PowerShell.</p>
+          <strong>Dados protegidos</strong>
+          <p>O bloqueio usa sessao do navegador e mantem a base salva localmente.</p>
         </article>
         <article class="setup-feature-card">
-          <strong>Base local pronta</strong>
-          <p>Salvamento no navegador, exportacao JSON e base organizada para evoluir depois.</p>
+          <strong>Retorno rapido</strong>
+          <p>Ao entrar, o SETECHUB abre direto no painel correto para o seu perfil.</p>
         </article>
       </div>
     </section>
     <aside class="setup-auth">
       <div class="setup-auth-panel">
-        <div class="setup-auth-badge">Acesso local</div>
-        <div class="auth-title">Entrar no SETECHUB</div>
-        <div class="setup-auth-intro">Seu acesso fica salvo apenas neste navegador. Depois voce pode mudar nome, unidade e PIN na area de conta.</div>
+        <div class="setup-auth-badge">Login local</div>
+        <div class="auth-title" id="loginTitle">Entrar no SETECHUB</div>
+        <div class="setup-auth-intro">Use seu nome de acesso e PIN. Voce pode alterar seus dados depois em Conta.</div>
         <form id="loginForm">
           <label class="slbl">Nome</label>
-          <input type="text" class="sinp" id="loginName" value="Jefferson" placeholder="Seu nome">
+          <input type="text" class="sinp" id="loginName" placeholder="Seu nome" autocomplete="username" required>
           <label class="slbl">PIN</label>
-          <input type="password" class="sinp" id="loginPin" value="1234" placeholder="PIN local">
+          <input type="password" class="sinp" id="loginPin" placeholder="PIN local" autocomplete="current-password" inputmode="numeric" required>
           <div id="loginError" class="serr"></div>
           <button class="sbtn" type="submit">Entrar no painel</button>
         </form>
-        <div class="setup-auth-note">Acesso inicial: Jefferson / 1234. Supervisores tambem usam o proprio nome / 1234 ate a troca do PIN.</div>
+        <div class="setup-auth-note">Use o acesso informado pelo administrador. O PIN nao aparece nesta tela por seguranca.</div>
       </div>
     </aside>
   </div>
@@ -114,6 +114,8 @@
   <div class="fn-item" data-page="supervisors"><span class="fni">👥</span>Superv.</div>
   <div class="fn-item" data-page="assets"><span class="fni">💻</span>Invent.</div>
   <div class="fn-item acc-n" data-page="calls"><span class="fni">🔧</span>Cham.</div>
+  <div class="fn-item sl-n" data-page="settings"><span class="fni">⚙️</span>Conta</div>
+  <button class="fn-item fn-logout logout-action" type="button"><span class="fni">↩</span>Sair</button>
 </nav>
 
 <aside class="sidebar">
@@ -166,6 +168,7 @@
           <div class="urole" id="uRole">Operacao SETEC</div>
         </div>
       </div>
+      <button class="acct-logout logout-action" type="button">Sair da conta</button>
     </div>
   </div>
 </aside>

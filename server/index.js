@@ -102,7 +102,7 @@ function validateStateShape(candidate) {
 
 function safeResolve(urlPath) {
   const normalized = decodeURIComponent(urlPath.split('?')[0]);
-  const requested = normalized === '/' ? '/frontend/index.html' : normalized;
+  const requested = ['/', '/login'].includes(normalized) ? '/frontend/index.html' : normalized;
   const resolved = path.resolve(ROOT_DIR, `.${requested}`);
   if (!resolved.startsWith(ROOT_DIR)) return null;
   return resolved;

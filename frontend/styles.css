@@ -109,6 +109,9 @@ body {
   text-rendering: optimizeLegibility;
   transition: background .12s, color .12s;
 }
+body.login-open {
+  overflow: hidden;
+}
 button, input, select, textarea {
   font-family: var(--font-ui);
   letter-spacing: 0;
@@ -226,6 +229,11 @@ body::before {
   position: relative;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+.fn-item.fn-logout {
+  border: 0;
+  background: transparent;
+  font-family: var(--font-ui);
 }
 .fn-item .fni {
   font-size: 24px;
@@ -624,6 +632,21 @@ body::before {
   cursor: pointer; transition: background .15s; width: 100%;
 }
 .acct-btn:hover { background: var(--sf2); }
+.acct-logout {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 8px;
+  border: 1px solid rgba(245,112,90,.25);
+  border-radius: 12px;
+  background: rgba(245,112,90,.08);
+  color: var(--dan);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.acct-logout:hover {
+  background: rgba(245,112,90,.13);
+}
 .uavatar {
   width: 34px; height: 34px; border-radius: 50%;
   background: linear-gradient(135deg, var(--ac), var(--ac2));
@@ -1345,9 +1368,9 @@ select.sel {
   max-width: min(1280px, calc(100vw - 24px));
   padding: 18px;
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 360px);
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 390px);
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 .setup-story {
   min-width: 0;
@@ -1567,15 +1590,17 @@ select.sel {
   line-height: 1.55;
 }
 .setup-auth {
-  padding: 22px 20px;
+  padding: 24px 22px;
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,.035), transparent 32%), var(--sf);
+  background:
+    linear-gradient(180deg, rgba(200,245,90,.07), transparent 34%),
+    var(--sf);
   border: 1px solid color-mix(in srgb, rgba(200,245,90,.22) 50%, var(--bd));
   box-shadow: 0 18px 48px rgba(0,0,0,.18);
   align-self: stretch;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
 }
 .setup-auth-panel {
   width: 100%;
@@ -1623,7 +1648,7 @@ select.sel {
 .slogo { font-family: var(--font-display); font-weight: 800; font-size: 30px; color: var(--ac); margin-bottom: 2px; letter-spacing: 0; }
 .slogo span { color: var(--tx); }
 .stag { color: var(--mt); font-size: 13px; margin-bottom: 20px; }
-.auth-title { font-size: 15px; font-weight: 800; margin-bottom: 12px; font-family: var(--font-display); }
+.auth-title { font-size: 24px; line-height: 1.08; font-weight: 800; margin-bottom: 12px; font-family: var(--font-display); }
 .slbl { display: block; font-size: 10px; font-weight: 700; color: var(--mt); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
 .sinp { width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 14px; padding: 11px 14px; color: var(--tx); font-family: var(--font-ui); font-size: 14px; outline: none; transition: border-color .15s; margin-bottom: 12px; }
 .sinp:focus { border-color: var(--ac); box-shadow: 0 0 0 3px rgba(200,245,90,.1); }
@@ -1738,6 +1763,9 @@ select:focus-visible,
     grid-template-columns: 1fr;
     gap: 14px;
     padding: 0;
+  }
+  .setup-auth {
+    order: -1;
   }
   .setup-story,
   .setup-auth {
