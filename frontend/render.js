@@ -1266,6 +1266,7 @@ function renderSupervisors() {
         monthlyIndicator
       };
     });
+    const syncedCount = sheetRows.filter((row) => row.supervisor.sourceSyncedAt).length;
     panelGrid.innerHTML = `
       <div class="supervisor-sheet-table-wrap">
         <table class="supervisor-sheet-table">
