@@ -18,83 +18,13 @@
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
-  <div class="setup-box setup-shell">
-    <section class="setup-story">
-      <div class="setup-head">
-        <div class="setup-copy-block">
-          <div class="setup-badge">Acesso operacional</div>
-          <div class="slogo"><span style="color:var(--ac)">setec</span><span style="color:var(--tx);font-weight:700">hub</span></div>
-          <div class="stag">Central tecnica da SETEC com entrada local por usuario e PIN.</div>
-          <h1 class="setup-title">Entre para acompanhar escolas, chamados e a rotina do dia.</h1>
-          <p class="setup-copy">A sessao protege o painel neste navegador. Depois do acesso, cada perfil abre somente as areas liberadas para sua funcao.</p>
-          <div class="setup-inline-preview">
-            <div class="setup-inline-head">
-              <strong>Resumo antes de entrar</strong>
-              <span>Rotina operacional</span>
-            </div>
-            <div class="setup-inline-grid">
-              <div class="setup-inline-card">
-                <span>Hoje</span>
-                <strong id="setupTaskCount">0 tarefas</strong>
-                <small>prioridades e rota do dia</small>
-              </div>
-              <div class="setup-inline-card">
-                <span>Chamados</span>
-                <strong id="setupCallCount">0 em aberto</strong>
-                <small>fila de atendimento tecnico</small>
-              </div>
-              <div class="setup-inline-card">
-                <span>Atencao</span>
-                <strong id="setupSchoolCount">0 escolas</strong>
-                <small>visitas, ativos e alertas</small>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="setup-preview">
-          <div class="setup-preview-head">
-            <span class="setup-dot"></span><span class="setup-dot"></span><span class="setup-dot"></span>
-            <strong>Painel do dia</strong>
-          </div>
-          <div class="setup-kpis">
-            <div class="setup-kpi"><span>Checklist</span><strong id="setupChecklistCount">0 itens</strong></div>
-            <div class="setup-kpi"><span>Ativos</span><strong id="setupAssetCount">0 em observacao</strong></div>
-            <div class="setup-kpi"><span>Banco de horas</span><strong id="setupHours">0h</strong></div>
-          </div>
-          <div class="setup-rail">
-            <div class="setup-rail-card">
-              <div class="setup-rail-title">Fluxo principal</div>
-              <div class="setup-rail-line"><span>Organizar</span><strong>agenda e rota</strong></div>
-              <div class="setup-rail-line"><span>Atender</span><strong>chamados e escolas</strong></div>
-              <div class="setup-rail-line"><span>Fechar</span><strong>relatorio e backup</strong></div>
-            </div>
-            <div class="setup-rail-card accent">
-              <div class="setup-rail-title">Automacao</div>
-              <div class="setup-flow"><span>Receber</span><span>Padronizar</span><span>Exportar</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="setup-feature-grid">
-        <article class="setup-feature-card">
-          <strong>Perfis locais</strong>
-          <p>Administrador, dirigente, SEINTEC, CTC e supervisores com visoes diferentes do painel.</p>
-        </article>
-        <article class="setup-feature-card">
-          <strong>Dados protegidos</strong>
-          <p>O bloqueio usa sessao do navegador e mantem a base salva localmente.</p>
-        </article>
-        <article class="setup-feature-card">
-          <strong>Retorno rapido</strong>
-          <p>Ao entrar, o SETECHUB abre direto no painel correto para o seu perfil.</p>
-        </article>
-      </div>
-    </section>
+  <div class="setup-box setup-shell login-only">
     <aside class="setup-auth">
       <div class="setup-auth-panel">
-        <div class="setup-auth-badge">Login local</div>
+        <div class="slogo"><span style="color:var(--ac)">setec</span><span style="color:var(--tx);font-weight:700">hub</span></div>
+        <div class="setup-auth-badge">Login</div>
         <div class="auth-title" id="loginTitle">Entrar no SETECHUB</div>
-        <div class="setup-auth-intro">Use seu nome de acesso e PIN. Voce pode alterar seus dados depois em Conta.</div>
+        <div class="setup-auth-intro">Use seu nome de acesso e PIN. A base online vai substituir o armazenamento local nas proximas etapas.</div>
         <form id="loginForm">
           <label class="slbl">Nome</label>
           <input type="text" class="sinp" id="loginName" placeholder="Seu nome" autocomplete="username" required>
@@ -103,7 +33,7 @@
           <div id="loginError" class="serr"></div>
           <button class="sbtn" type="submit">Entrar no painel</button>
         </form>
-        <div class="setup-auth-note">Use o acesso informado pelo administrador. O PIN nao aparece nesta tela por seguranca.</div>
+        <div class="setup-auth-note">Use o acesso informado pelo administrador.</div>
       </div>
     </aside>
   </div>

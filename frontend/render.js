@@ -569,12 +569,18 @@ function renderInventoryWorkspace() {
 }
 
 function renderSetupStats() {
-  document.getElementById('setupTaskCount').textContent = `${state.tasks.filter((item) => !item.done).length} tarefas`;
-  document.getElementById('setupCallCount').textContent = `${state.calls.filter((item) => item.status !== 'resolvido').length} em aberto`;
-  document.getElementById('setupSchoolCount').textContent = `${visibleSchools().filter((item) => item.status !== 'estavel').length} escolas`;
-  document.getElementById('setupChecklistCount').textContent = `${state.checklist.length} itens`;
-  document.getElementById('setupAssetCount').textContent = `${state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length} em observacao`;
-  document.getElementById('setupHours').textContent = bankHours();
+  const values = {
+    setupTaskCount: `${state.tasks.filter((item) => !item.done).length} tarefas`,
+    setupCallCount: `${state.calls.filter((item) => item.status !== 'resolvido').length} em aberto`,
+    setupSchoolCount: `${visibleSchools().filter((item) => item.status !== 'estavel').length} escolas`,
+    setupChecklistCount: `${state.checklist.length} itens`,
+    setupAssetCount: `${state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length} em observacao`,
+    setupHours: bankHours()
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = value;
+  });
 }
 
 function renderMetrics() {
