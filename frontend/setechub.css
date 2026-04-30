@@ -392,6 +392,57 @@
   line-height: 1.35;
 }
 
+.supervisor-sheet-table .diag-pill,
+.supervisor-list-card .diag-pill,
+#supervisorRecordProfile .diag-pill,
+#supervisorRecordMetrics .diag-pill {
+  min-width: 96px;
+  justify-content: center;
+  border-width: 1px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.16);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.supervisor-sheet-table .pill-ok,
+.supervisor-list-card .pill-ok,
+#supervisorRecordProfile .pill-ok,
+#supervisorRecordMetrics .pill-ok {
+  color: #062b18;
+  border-color: rgba(74,222,128,.78);
+  background: linear-gradient(180deg, #6ee78d, #30c765);
+}
+
+.supervisor-sheet-table .pill-warn,
+.supervisor-list-card .pill-warn,
+#supervisorRecordProfile .pill-warn,
+#supervisorRecordMetrics .pill-warn {
+  color: #382600;
+  border-color: rgba(250,204,21,.82);
+  background: linear-gradient(180deg, #ffe66b, #f6b91f);
+}
+
+.supervisor-sheet-table .pill-danger,
+.supervisor-list-card .pill-danger,
+#supervisorRecordProfile .pill-danger,
+#supervisorRecordMetrics .pill-danger {
+  color: #fff5f3;
+  border-color: rgba(248,113,113,.86);
+  background: linear-gradient(180deg, #ff776d, #df2f2f);
+}
+
+.supervisor-sheet-row:has(.pill-danger) {
+  box-shadow: inset 4px 0 0 #ef4444;
+}
+
+.supervisor-sheet-row:has(.pill-warn):not(:has(.pill-danger)) {
+  box-shadow: inset 4px 0 0 #facc15;
+}
+
+.supervisor-sheet-row:has(.pill-ok):not(:has(.pill-warn)):not(:has(.pill-danger)) {
+  box-shadow: inset 4px 0 0 #22c55e;
+}
+
 .supervisor-sheet-row {
   cursor: pointer;
 }
