@@ -746,6 +746,100 @@
     </div>
   </div>
 
+  <div class="page" id="page-supervisor-record">
+    <div class="ph">
+      <div>
+        <div class="pt" id="supervisorRecordTitle">Pagina do supervisor</div>
+        <div class="ps" id="supervisorRecordSubtitle">Meta, calendario, visitas e escolas vinculadas.</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-g btn-sm" type="button" onclick="showPage('supervisors')">Voltar para supervisores</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordVisitForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Registrar visita</button>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bh">
+        <div><div class="ct">Selecionar supervisor</div><div class="cs">Cada supervisor tem uma pagina propria de acompanhamento.</div></div>
+      </div>
+      <div class="setechub-form setechub-form-school-detail">
+        <select class="fi" id="supervisorRecordSelect"></select>
+        <button class="btn btn-p" type="button" id="openSupervisorSelectedBtn">Abrir supervisor</button>
+      </div>
+      <div class="school-record-nav">
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordProfile')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Resumo</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordCalendar')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Calendario</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordVisited')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Visitadas</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordPending')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Faltantes</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordVisitTable')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Registros</button>
+      </div>
+      <div id="supervisorRecordProfile" class="stack-list"></div>
+    </div>
+    <div class="setechub-two-col">
+      <div class="box">
+        <div class="bh">
+          <div><div class="ct">Meta mensal</div><div class="cs">Se cumpriu a meta de visitas do mes atual.</div></div>
+        </div>
+        <div id="supervisorRecordGoal" class="stack-list"></div>
+      </div>
+      <div class="box">
+        <div class="bh">
+          <div><div class="ct">Indicadores do supervisor</div><div class="cs">Responsabilidade, cobertura, chamados e alertas.</div></div>
+        </div>
+        <div id="supervisorRecordMetrics" class="setechub-monitor-grid compact-grid"></div>
+      </div>
+    </div>
+    <div class="box" id="supervisorRecordCalendar">
+      <div class="bh">
+        <div><div class="ct">Calendario de visitas</div><div class="cs">Dias com registro de visita para este supervisor.</div></div>
+      </div>
+      <div id="supervisorRecordCalendarGrid" class="supervisor-calendar-grid"></div>
+    </div>
+    <div class="setechub-two-col">
+      <div class="box" id="supervisorRecordVisited">
+        <div class="bh">
+          <div><div class="ct">Escolas visitadas</div><div class="cs">Unidades vinculadas com visita no mes atual.</div></div>
+        </div>
+        <div id="supervisorRecordVisitedSchools" class="stack-list"></div>
+      </div>
+      <div class="box" id="supervisorRecordPending">
+        <div class="bh">
+          <div><div class="ct">Faltam visitas</div><div class="cs">Unidades vinculadas sem visita registrada no mes.</div></div>
+        </div>
+        <div id="supervisorRecordPendingSchools" class="stack-list"></div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bh">
+        <div><div class="ct">Todas as escolas vinculadas</div><div class="cs">Mapa completo de responsabilidade do supervisor.</div></div>
+      </div>
+      <div id="supervisorRecordSchoolMatrix" class="supervisor-school-matrix"></div>
+    </div>
+    <div class="box" id="supervisorRecordVisitForm">
+      <div class="bh">
+        <div><div class="ct">Registrar visita</div><div class="cs">Registro rapido ja preso ao supervisor desta pagina.</div></div>
+      </div>
+      <form id="supervisorRecordVisitFormElement" class="setechub-form setechub-form-wide">
+        <select class="fi" id="recordVisitSchoolSelect"></select>
+        <input class="fi" id="recordVisitDate" type="date">
+        <select class="fi" id="recordVisitType">
+          <option value="Rotina">Rotina</option>
+          <option value="Acompanhamento">Acompanhamento</option>
+          <option value="Busca ativa">Busca ativa</option>
+          <option value="Formacao">Formacao</option>
+          <option value="Emergencial">Emergencial</option>
+        </select>
+        <input class="fi" id="recordVisitNotes" placeholder="Observacao da visita">
+        <button class="btn btn-p" type="submit">Salvar visita</button>
+      </form>
+    </div>
+    <div class="box" id="supervisorRecordVisitTable">
+      <div class="bh">
+        <div><div class="ct">Historico de visitas</div><div class="cs">Registros deste supervisor em ordem de data.</div></div>
+      </div>
+      <div id="supervisorRecordVisitsTable" class="setechub-table-wrap"></div>
+    </div>
+  </div>
+
   <div class="page" id="page-assets">
     <div class="ph">
       <div>

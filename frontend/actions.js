@@ -200,6 +200,14 @@ function selectSupervisor(name) {
   saveUiContext();
 }
 
+function openSupervisorRecord(name) {
+  currentSupervisorDetail = name;
+  currentSupervisorFilter = normalizeKey(name);
+  showPage('supervisor-record');
+  renderSupervisorRecord();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function removeSchoolImport(id) {
   const target = state.schoolImports.find((item) => item.id === id);
   if (target) logSchoolEvent(target.school, 'import', `Importacao removida: ${target.label || target.filename || 'arquivo'}.`);
@@ -738,6 +746,20 @@ function setupEventListeners() {
     refreshAll();
   });
 
+  document.getElementById('supervisorRecordVisitFormElement')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!currentSupervisorDetail) return;
+    const school = document.getElementById('recordVisitSchoolSelect').value;
+    const date = document.getElementById('recordVisitDate').value || new Date().toISOString().slice(0, 10);
+    const type = document.getElementById('recordVisitType').value;
+    const notes = document.getElementById('recordVisitNotes').value.trim();
+    if (!school) return;
+    state.supervisorVisits.unshift({ id: uid(), supervisor: currentSupervisorDetail, school, date, type, notes });
+    event.target.reset();
+    renderSupervisorRecord();
+    refreshAll();
+  });
+
   document.getElementById('loginForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const name = document.getElementById('loginName').value.trim();
@@ -869,12 +891,18 @@ function setupEventListeners() {
   });
 
   document.getElementById('supervisorFilterSelect')?.addEventListener('change', (event) => {
-    currentSupervisorFilter = event.target.value;
-    renderSupervisors();
-    saveUiContext();
+    const supervisor = (state.supervisors || []).find((item) => normalizeKey(item.name) === event.target.value);
+    if (supervisor) openSupervisorRecord(supervisor.name);
   });
 
   document.getElementById('visitSupervisorSelect')?.addEventListener('change', renderSupervisors);
+  document.getElementById('openSupervisorSelectedBtn')?.addEventListener('click', () => {
+    const name = document.getElementById('supervisorRecordSelect')?.value;
+    if (name) openSupervisorRecord(name);
+  });
+  document.getElementById('supervisorRecordSelect')?.addEventListener('change', (event) => {
+    openSupervisorRecord(event.target.value);
+  });
 
   document.querySelectorAll('[data-directory-filter]').forEach((button) => {
     button.addEventListener('click', () => {

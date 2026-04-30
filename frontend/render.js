@@ -1069,7 +1069,7 @@ function renderSupervisors() {
   const selectorList = document.getElementById('supervisorSelectorList');
   if (selectorList) {
     selectorList.innerHTML = stats.map((item) => `
-      <button class="supervisor-selector-btn ${normalizeKey(item.supervisor.name) === currentSupervisorFilter ? 'active' : ''}" type="button" onclick="selectSupervisor('${esc(item.supervisor.name)}')">
+      <button class="supervisor-selector-btn ${normalizeKey(item.supervisor.name) === currentSupervisorFilter ? 'active' : ''}" type="button" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
         <span>${esc(item.supervisor.name)}</span>
         <strong>${esc(String(item.visits))} visita(s)</strong>
       </button>
@@ -1256,6 +1256,185 @@ function renderSupervisors() {
       </table>
     ` : '<div class="sync-empty">Nenhuma visita registrada neste recorte.</div>';
   }
+}
+
+function renderSupervisorRecord() {
+  const select = document.getElementById('supervisorRecordSelect');
+  if (!select) return;
+  const stats = supervisorStats();
+  if (!stats.length) {
+    document.getElementById('supervisorRecordProfile').innerHTML = '<div class="sync-empty">Nenhum supervisor cadastrado.</div>';
+    return;
+  }
+  if (!currentSupervisorDetail || !stats.some((item) => item.supervisor.name === currentSupervisorDetail)) {
+    currentSupervisorDetail = stats[0].supervisor.name;
+  }
+  currentSupervisorFilter = normalizeKey(currentSupervisorDetail);
+  const selectedStat = stats.find((item) => item.supervisor.name === currentSupervisorDetail) || stats[0];
+  const supervisor = selectedStat.supervisor;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const allVisits = (state.supervisorVisits || []).filter((visit) => visit.supervisor === supervisor.name);
+  const monthVisits = allVisits.filter((visit) => {
+    const date = new Date(`${visit.date}T00:00:00`);
+    return date.getFullYear() === year && date.getMonth() === month;
+  });
+  const visitedSchoolSet = new Set(monthVisits.map((visit) => visit.school));
+  const pendingSchools = selectedStat.assignedSchools.filter((school) => !visitedSchoolSet.has(school));
+  const monthlyGoal = Number(supervisor.monthlyGoal || selectedStat.assignedSchools.length || 1);
+  const monthlyVisitCount = monthVisits.length;
+  const goalPct = Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100));
+  const goalMet = monthlyVisitCount >= monthlyGoal;
+
+  select.innerHTML = stats.map((item) => `<option value="${esc(item.supervisor.name)}">${esc(item.supervisor.name)}</option>`).join('');
+  select.value = supervisor.name;
+
+  const title = document.getElementById('supervisorRecordTitle');
+  const subtitle = document.getElementById('supervisorRecordSubtitle');
+  if (title) title.textContent = supervisor.name;
+  if (subtitle) subtitle.textContent = `${selectedStat.assignedSchools.length} escola(s) | ${monthlyVisitCount}/${monthlyGoal} visita(s) no mes | ${goalMet ? 'meta cumprida' : 'meta pendente'}.`;
+
+  document.getElementById('supervisorRecordProfile').innerHTML = `
+    <div class="setechub-item">
+      <div class="setechub-head">
+        <div>
+          <strong>${esc(supervisor.name)}</strong>
+          <div class="sync-meta">${esc(supervisor.email || '')} | ${esc(supervisor.phone || '')}</div>
+          <div class="sync-meta">${esc(supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
+        </div>
+        <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('supervisorRecordGoal').innerHTML = `
+    <div class="setechub-command-score supervisor-goal-score">
+      <div>
+        <div class="sync-meta">Meta mensal</div>
+        <strong>${esc(String(monthlyVisitCount))}/${esc(String(monthlyGoal))}</strong>
+      </div>
+      <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${esc(String(goalPct))}%</span>
+    </div>
+    <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, goalPct)))}%"></span></div>
+    <div class="sync-meta">${goalMet ? 'Meta de visitas cumprida no mes atual.' : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta.`}</div>
+  `;
+
+  document.getElementById('supervisorRecordMetrics').innerHTML = [
+    { label: 'Escolas', value: String(selectedStat.assignedSchools.length), note: 'vinculadas ao supervisor' },
+    { label: 'Visitadas', value: String(visitedSchoolSet.size), note: 'com visita no mes' },
+    { label: 'Faltantes', value: String(pendingSchools.length), note: 'sem visita no mes' },
+    { label: 'Chamados', value: String(selectedStat.openCalls), note: 'ativos nas escolas vinculadas' },
+    { label: 'Alertas', value: String(selectedStat.alerts), note: 'inventario em atencao' },
+    { label: 'Historico', value: String(allVisits.length), note: 'visitas totais registradas' }
+  ].map((item) => `
+    <div class="setechub-monitor-card compact">
+      <div class="sync-meta">${esc(item.label)}</div>
+      <strong>${esc(item.value)}</strong>
+      <div class="diag-pill">${esc(item.note)}</div>
+    </div>
+  `).join('');
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const visitsByDay = monthVisits.reduce((acc, visit) => {
+    const day = new Date(`${visit.date}T00:00:00`).getDate();
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(visit);
+    return acc;
+  }, {});
+  const blanks = Array.from({ length: firstWeekday }, () => '<div class="supervisor-calendar-day empty"></div>');
+  const days = Array.from({ length: daysInMonth }, (_, index) => {
+    const day = index + 1;
+    const dayVisits = visitsByDay[day] || [];
+    return `
+      <div class="supervisor-calendar-day ${dayVisits.length ? 'has-visit' : ''}">
+        <strong>${esc(String(day))}</strong>
+        <span>${dayVisits.length ? `${esc(String(dayVisits.length))} visita(s)` : ''}</span>
+      </div>
+    `;
+  });
+  document.getElementById('supervisorRecordCalendarGrid').innerHTML = [
+    '<div class="supervisor-calendar-week">Dom</div><div class="supervisor-calendar-week">Seg</div><div class="supervisor-calendar-week">Ter</div><div class="supervisor-calendar-week">Qua</div><div class="supervisor-calendar-week">Qui</div><div class="supervisor-calendar-week">Sex</div><div class="supervisor-calendar-week">Sab</div>',
+    ...blanks,
+    ...days
+  ].join('');
+
+  const visitedSchools = selectedStat.assignedSchools.filter((school) => visitedSchoolSet.has(school));
+  document.getElementById('supervisorRecordVisitedSchools').innerHTML = visitedSchools.map((school) => {
+    const schoolVisits = monthVisits.filter((visit) => visit.school === school);
+    const lastVisit = schoolVisits.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
+    return `
+      <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school)}')">
+        <div class="setechub-head">
+          <div>
+            <strong>${esc(school)}</strong>
+            <div class="sync-meta">${esc(String(schoolVisits.length))} visita(s) | ultima em ${esc(lastVisit?.date || '--')}</div>
+          </div>
+          <span class="diag-pill pill-ok">Visitada</span>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="sync-empty">Nenhuma escola visitada no mes atual.</div>';
+
+  document.getElementById('supervisorRecordPendingSchools').innerHTML = pendingSchools.map((school) => `
+    <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school)}')">
+      <div class="setechub-head">
+        <div>
+          <strong>${esc(school)}</strong>
+          <div class="sync-meta">Ainda sem visita registrada no mes atual.</div>
+        </div>
+        <span class="diag-pill pill-warn">Pendente</span>
+      </div>
+    </div>
+  `).join('') || '<div class="sync-empty">Todas as escolas vinculadas possuem visita no mes.</div>';
+
+  document.getElementById('supervisorRecordSchoolMatrix').innerHTML = `
+    <article class="supervisor-card">
+      <div class="supervisor-school-list">
+        ${selectedStat.assignedSchools.map((schoolName) => {
+          const signal = schoolByName(schoolName) ? schoolOperationalSnapshot(schoolByName(schoolName)) : null;
+          const wasVisited = visitedSchoolSet.has(schoolName);
+          return `
+            <button class="supervisor-school-row" type="button" onclick="openSchoolRecord('${esc(schoolName)}')">
+              <span>${esc(schoolName)}</span>
+              <strong>${wasVisited ? 'visitada' : `${esc(String(signal?.alertUnits || 0))} alertas`}</strong>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </article>
+  `;
+
+  const recordSchoolSelect = document.getElementById('recordVisitSchoolSelect');
+  if (recordSchoolSelect) {
+    recordSchoolSelect.innerHTML = selectedStat.assignedSchools.map((school) => `<option value="${esc(school)}">${esc(school)}</option>`).join('');
+  }
+  const recordDate = document.getElementById('recordVisitDate');
+  if (recordDate && !recordDate.value) recordDate.value = new Date().toISOString().slice(0, 10);
+
+  document.getElementById('supervisorRecordVisitsTable').innerHTML = allVisits.length ? `
+    <table class="setechub-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Escola</th>
+          <th>Tipo</th>
+          <th>Observacao</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${allVisits.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).map((visit) => `
+          <tr>
+            <td>${esc(visit.date || '--')}</td>
+            <td><button class="link-button" type="button" onclick="openSchoolRecord('${esc(visit.school)}')">${esc(visit.school)}</button></td>
+            <td><span class="diag-pill">${esc(visit.type || 'Visita')}</span></td>
+            <td>${esc(visit.notes || '')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  ` : '<div class="sync-empty">Nenhuma visita registrada para este supervisor.</div>';
 }
 
 function renderOfficialData() {

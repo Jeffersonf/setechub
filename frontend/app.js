@@ -21,6 +21,7 @@ let currentInventoryCategory = 'todas';
 let currentInventorySearch = '';
 let currentSchoolSearch = '';
 let currentSchoolDetail = '';
+let currentSupervisorDetail = '';
 let currentSearchQuery = '';
 let serverStatus = { available: false, message: 'Servidor local nao verificado.' };
 let serverSnapshots = [];
@@ -42,6 +43,10 @@ function esc(value) {
 
 function schoolSlug(value) {
   return normalizeKey(value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function supervisorSlug(value) {
+  return schoolSlug(value);
 }
 
 function toneByPriority(priority) {
@@ -132,12 +137,14 @@ function showPage(page) {
   sessionStorage.setItem(PAGE_KEY, page);
   document.querySelectorAll('.page').forEach((node) => node.classList.toggle('active', node.id === `page-${page}`));
   document.querySelectorAll('.nav-item, .fn-item').forEach((node) => {
-    const targetPage = page === 'school-record' ? 'schools' : page;
+    const targetPage = page === 'school-record' ? 'schools' : page === 'supervisor-record' ? 'supervisors' : page;
     node.classList.toggle('active', node.dataset.page === targetPage);
   });
   const hash = page === 'school-record' && currentSchoolDetail
     ? `school/${schoolSlug(currentSchoolDetail)}`
-    : page;
+    : page === 'supervisor-record' && currentSupervisorDetail
+      ? `supervisor/${supervisorSlug(currentSupervisorDetail)}`
+      : page;
   if (window.location.hash !== `#${hash}`) {
     window.location.hash = hash;
   }
@@ -527,6 +534,7 @@ function saveUiContext() {
       inventoryCategory: currentInventoryCategory,
       inventorySearch: currentInventorySearch,
       schoolDetail: currentSchoolDetail,
+      supervisorDetail: currentSupervisorDetail,
       directoryFilter: currentDirectoryFilter,
       searchQuery: currentSearchQuery
     }));
@@ -557,6 +565,7 @@ function restoreUiContext() {
     currentInventoryCategory = context.inventoryCategory || currentInventoryCategory;
     currentInventorySearch = context.inventorySearch || '';
     currentSchoolDetail = context.schoolDetail || currentSchoolDetail;
+    currentSupervisorDetail = context.supervisorDetail || currentSupervisorDetail;
     currentDirectoryFilter = context.directoryFilter || currentDirectoryFilter;
     currentSearchQuery = context.searchQuery || '';
   } catch {
@@ -576,6 +585,16 @@ function restorePageFromHash() {
     }
     return;
   }
+  if (hash.startsWith('supervisor/')) {
+    const slug = hash.slice('supervisor/'.length);
+    const supervisor = (state.supervisors || []).find((item) => supervisorSlug(item.name) === slug);
+    if (supervisor) {
+      currentSupervisorDetail = supervisor.name;
+      currentSupervisorFilter = normalizeKey(supervisor.name);
+      currentPage = 'supervisor-record';
+    }
+    return;
+  }
   currentPage = hash;
 }
 
@@ -586,6 +605,10 @@ function currentSchoolProfile() {
 
 function schoolByName(schoolName) {
   return state.schools.find((item) => item.name === schoolName) || null;
+}
+
+function supervisorByName(supervisorName) {
+  return (state.supervisors || []).find((item) => item.name === supervisorName) || null;
 }
 
 function topOpenCalls(limit = 5) {
@@ -1000,7 +1023,7 @@ function handleSearch(query) {
 }
 
 function shiftFocusCard(direction) {
-  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'assets', 'calls', 'agenda', 'reports'];
+  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports'];
   const currentIndex = pages.indexOf(currentPage);
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + direction + pages.length) % pages.length;
   showPage(pages[nextIndex]);
@@ -1059,6 +1082,7 @@ function refreshAll() {
   renderCallHistory();
   renderSchools();
   renderSupervisors();
+  renderSupervisorRecord();
   renderSchoolDetail();
   renderAssets();
   renderReports();
