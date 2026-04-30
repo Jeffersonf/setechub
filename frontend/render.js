@@ -646,10 +646,10 @@ function renderSectors() {
 function renderDirectoryContacts() {
   const list = document.getElementById('directoryContactsList');
   if (!list) return;
-  list.innerHTML = filteredDirectoryContacts()
+  const contacts = filteredDirectoryContacts()
     .slice()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((item) => `
+    .sort((a, b) => a.name.localeCompare(b.name));
+  list.innerHTML = contacts.map((item) => `
       <div class="setechub-item">
         <div class="setechub-head">
           <div>
@@ -664,6 +664,21 @@ function renderDirectoryContacts() {
         <div class="sync-meta">${esc(item.email)}</div>
       </div>
     `).join('') || '<div class="sync-empty">Nenhum contato oficial importado.</div>';
+  const pecList = document.getElementById('pecAccountList');
+  if (pecList) {
+    pecList.innerHTML = contacts.map((item) => `
+      <div class="setechub-item">
+        <div class="setechub-head">
+          <div>
+            <strong>${esc(item.name)}</strong>
+            <div class="sync-meta">${esc(item.role)}</div>
+          </div>
+          <span class="diag-pill">${esc(item.phone)}</span>
+        </div>
+        <div class="sync-meta">${esc(item.email)}</div>
+      </div>
+    `).join('') || '<div class="sync-empty">Nenhum dado PEC liberado para este acesso.</div>';
+  }
 }
 
 function renderSchoolImports() {
@@ -1984,7 +1999,14 @@ function renderUsers() {
       .map((item) => `<option value="${esc(item.name)}">${esc(item.name)}</option>`)
       .join('');
   }
-  list.innerHTML = (state.users || []).map((user) => `
+  const users = isPecUser()
+    ? (state.users || []).filter((user) => {
+      if (user.role !== 'pec') return false;
+      if (isPecLeadUser()) return true;
+      return normalizeKey(user.id) === normalizeKey(currentUser()?.id);
+    })
+    : (state.users || []);
+  list.innerHTML = users.map((user) => `
     <div class="admin-user-row">
       <div class="admin-user-main">
         <strong>${esc(user.name)}</strong>

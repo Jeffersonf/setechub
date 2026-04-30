@@ -182,6 +182,15 @@ function isSupervisorUser() {
   return currentUserRole() === 'supervisor';
 }
 
+function isPecUser() {
+  return currentUserRole() === 'pec';
+}
+
+function isPecLeadUser() {
+  const user = currentUser();
+  return isPecUser() && normalizeKey(user?.login || user?.name) === normalizeKey('jaqueline.borelli');
+}
+
 function canEditData() {
   return ['admin', 'seintec', 'ctc'].includes(currentUserRole());
 }
@@ -225,10 +234,12 @@ function canViewSupervisor(name) {
 }
 
 function defaultPageForUser() {
+  if (isPecUser()) return 'settings';
   return isSupervisorUser() ? 'schools' : 'dashboard';
 }
 
 function canAccessPage(page) {
+  if (isPecUser()) return page === 'settings';
   if (!isSupervisorUser()) return true;
   return ['schools', 'school-record', 'supervisors', 'supervisor-record', 'settings'].includes(page);
 }
@@ -244,7 +255,7 @@ function applyAccessControl() {
   });
   document.querySelectorAll('.sidebar-icon-btn, .sidebar-mini-btn').forEach((node) => {
     const target = node.getAttribute('onclick') || '';
-    node.hidden = isSupervisorUser() && !/schools|supervisors|settings/.test(target);
+    node.hidden = (isSupervisorUser() && !/schools|supervisors|settings/.test(target)) || isPecUser();
   });
   document.querySelectorAll('[data-edit-scope]').forEach((node) => {
     node.hidden = !canEditData();
@@ -285,6 +296,12 @@ function applyAccessControl() {
     const node = document.getElementById(id);
     if (node) node.hidden = !canEditData();
   });
+  ['directoryFilterBar', 'sectorDirectoryList', 'officialLinksList'].forEach((id) => {
+    const node = document.getElementById(id);
+    if (node) node.hidden = isPecUser();
+  });
+  const pecAccountBox = document.getElementById('pecAccountBox');
+  if (pecAccountBox) pecAccountBox.hidden = !isPecUser();
 }
 
 function updateIdentity() {
@@ -338,6 +355,12 @@ function filteredSchools() {
 }
 
 function filteredDirectoryContacts() {
+  if (isPecUser()) {
+    const user = currentUser();
+    const pecContacts = state.directoryContacts.filter((item) => /pec|curriculo|currículo|especialista/i.test(`${item.role} ${item.name}`));
+    if (isPecLeadUser()) return pecContacts;
+    return pecContacts.filter((item) => normalizeKey(item.name) === normalizeKey(user?.name));
+  }
   if (currentDirectoryFilter === 'todos') return state.directoryContacts;
   if (currentDirectoryFilter === 'supervisao') {
     return state.directoryContacts.filter((item) => /supervisor/i.test(item.role));
