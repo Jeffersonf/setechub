@@ -189,30 +189,45 @@ function defaultUsers(supervisors) {
     },
     {
       id: 'user-dirigente',
-      name: 'Dirigente',
-      login: 'Dirigente',
+      name: 'Andre',
+      login: 'Andre',
       pin: '1234',
       role: 'dirigente',
       active: true
     },
     {
       id: 'user-seintec',
-      name: 'SEINTEC',
-      login: 'SEINTEC',
+      name: 'Elcio',
+      login: 'Elcio',
       pin: '1234',
       role: 'seintec',
       active: true
     },
     {
       id: 'user-ctc',
-      name: 'CTC',
-      login: 'CTC',
+      name: 'Gustavo',
+      login: 'Gustavo',
       pin: '1234',
       role: 'ctc',
       active: true
     },
     ...supervisorUsers
   ];
+}
+
+function normalizeDefaultUserNames(users) {
+  const replacements = {
+    dirigente: { name: 'Andre', login: 'Andre' },
+    seintec: { name: 'Elcio', login: 'Elcio' },
+    ctc: { name: 'Gustavo', login: 'Gustavo' }
+  };
+  return (users || []).map((user) => {
+    const replacement = replacements[user.role];
+    if (!replacement) return user;
+    const oldGeneric = ['dirigente', 'seintec', 'ctc'].includes(normalizeKey(user.name)) ||
+      ['dirigente', 'seintec', 'ctc'].includes(normalizeKey(user.login));
+    return oldGeneric ? { ...user, ...replacement } : user;
+  });
 }
 
 function loadSupabaseConfig() {
@@ -444,11 +459,11 @@ function mergeState(saved) {
     stateVersion: Math.max(STATE_VERSION, savedVersion),
     lastUpdatedAt,
     profile: { ...base.profile, ...(repaired.profile || {}) },
-    users: mergeUniqueBy(
+    users: normalizeDefaultUserNames(mergeUniqueBy(
       base.users,
       Array.isArray(repaired.users) ? repaired.users : [],
       (item) => normalizeKey(item.id || item.login || item.name)
-    ).map((item) => ({ ...item, active: item.active !== false })),
+    ).map((item) => ({ ...item, active: item.active !== false }))),
     officialContacts: { ...base.officialContacts, ...(repaired.officialContacts || {}) },
     municipalities: mergeUniqueBy(base.municipalities, savedMunicipalities, (item) => normalizeKey(item.name)),
     sectors: mergeUniqueBy(base.sectors, savedSectors, (item) => normalizeKey(item.code || item.name)),
