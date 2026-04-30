@@ -266,6 +266,22 @@ function defaultUsers(supervisors, pecs = defaultPecs()) {
       role: 'ctc',
       active: true
     },
+    {
+      id: 'user-ctc-bruno',
+      name: 'Bruno',
+      login: 'Bruno',
+      pin: '1234',
+      role: 'ctc',
+      active: true
+    },
+    {
+      id: 'user-ctc-danilo',
+      name: 'Danilo',
+      login: 'Danilo',
+      pin: '1234',
+      role: 'ctc',
+      active: true
+    },
     ...pecUsers,
     ...supervisorUsers
   ];

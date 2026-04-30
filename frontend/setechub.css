@@ -692,8 +692,16 @@
 }
 
 .dashboard-category-card strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
   font-weight: 700;
+}
+
+.category-emoji {
+  font-size: 20px;
+  line-height: 1;
 }
 
 .dashboard-category-card span {
@@ -708,6 +716,17 @@
 .dashboard-category-card.blue { border-color: rgba(120,180,255,.18); background: rgba(120,180,255,.06); }
 .dashboard-category-card.amber { border-color: rgba(245,200,90,.18); background: rgba(245,200,90,.06); }
 .dashboard-category-card.slate { border-color: rgba(180,190,220,.18); background: rgba(180,190,220,.06); }
+
+.dashboard-category-card.is-inactive {
+  opacity: .42;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+.dashboard-category-card.is-inactive:hover {
+  transform: none;
+  box-shadow: none;
+}
 
 .dashboard-quick-box .stack-list {
   gap: 8px;
@@ -1378,8 +1397,9 @@ a {
 }
 
 .nav-item .ico {
-  font-size: 14px;
-  width: 20px;
+  font-size: 22px;
+  width: 30px;
+  line-height: 1;
   text-align: center;
 }
 

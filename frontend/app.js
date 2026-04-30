@@ -250,8 +250,8 @@ function visibleNavigationPages() {
     : isSupervisorUser()
       ? new Set(['schools', 'school-record', 'supervisors', 'supervisor-record', 'info', 'settings'])
       : canEditData()
-        ? new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'agenda', 'reports', 'info', 'settings'])
-        : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'reports', 'info', 'settings']);
+      ? new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'agenda', 'reports', 'info', 'settings'])
+        : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings']);
   if (canManageUsers()) pages.add('admin');
   return pages;
 }
@@ -387,7 +387,15 @@ function filteredTasks() {
   if (currentTaskFilter === 'abertas') return state.tasks.filter((item) => !item.done);
   if (currentTaskFilter === 'alta') return state.tasks.filter((item) => item.priority === 'alta');
   if (currentTaskFilter === 'visita') return state.tasks.filter((item) => item.category.toLowerCase() === 'visita');
+  if (currentTaskFilter === 'ctc') return state.tasks.filter((item) => normalizeKey(item.category) === 'ctc');
   return state.tasks;
+}
+
+function openCtcAgenda() {
+  currentTaskFilter = 'ctc';
+  showPage('agenda');
+  syncFilterButtons('task');
+  renderTasks();
 }
 
 function filteredCalls() {
@@ -592,7 +600,7 @@ function pendingQueueItems(limit = 20) {
       items.push({ school: school.name, type: 'ficha', tone: 'pill-info', text: `Ficha incompleta: faltam ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}.` });
     }
     if (!network) {
-      items.push({ school: school.name, type: 'rede', tone: 'pill-warn', text: 'Sem importacao de rede/CFTV.' });
+      items.push({ school: school.name, type: 'rede', tone: 'pill-warn', text: 'Sem importacao de rede e cameras.' });
     } else if (networkGap > 0) {
       items.push({ school: school.name, type: 'rede', tone: 'pill-danger', text: `${networkGap} camera(s) abaixo da cobertura esperada.` });
     }

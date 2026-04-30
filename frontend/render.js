@@ -22,14 +22,14 @@ function renderDashboardHero() {
     : buildSummaryPreview();
 
   const actionItems = [
-    { label: 'Abrir chamados', action: `openCallCategory('todos')`, page: 'calls', tone: 'primary' },
-    { label: 'Ver escolas', action: `showPage('schools')`, page: 'schools', tone: '' },
-    { label: 'Inventario', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
-    { label: 'Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
+    { label: '&#127979; Ver escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
+    { label: '&#128187; Inventario', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
+    { label: '&#127760; Redes', action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: '' },
+    { label: '&#128221; Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
   ].filter((item) => canAccessPage(item.page) && (item.tone !== 'edit' || canEditData()));
 
   actions.innerHTML = actionItems.map((item) => `
-    <button class="btn ${item.tone === 'primary' ? 'btn-p' : 'btn-g'} btn-sm" type="button" onclick="${item.action}">${esc(item.label)}</button>
+    <button class="btn ${item.tone === 'primary' ? 'btn-p' : 'btn-g'} btn-sm" type="button" onclick="${item.action}">${item.label}</button>
   `).join('');
 
   scoreNode.innerHTML = `
@@ -39,12 +39,12 @@ function renderDashboardHero() {
   `;
 
   statsNode.innerHTML = [
-    { label: 'Chamados', value: String(openCalls), tone: openCalls ? 'pill-warn' : 'pill-ok' },
     { label: 'Escolas', value: String(attentionSchools), tone: attentionSchools ? 'pill-warn' : 'pill-ok' },
+    { label: 'Redes', value: String(state.schoolNetworks.length), tone: state.schoolNetworks.length ? 'pill-info' : 'pill-warn' },
+    { label: 'Cameras', value: String(state.schoolNetworks.filter((item) => Number(item.cameraInstalled || 0) > 0).length), tone: 'pill-info' },
     { label: 'Ativos', value: String(alertAssets), tone: alertAssets ? 'pill-danger' : 'pill-ok' },
     { label: 'Pendencias', value: String(pendingItems), tone: pendingItems ? 'pill-info' : 'pill-ok' },
-    { label: 'Cobertura', value: `${coverage.profileCoverage}%`, tone: coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn' },
-    { label: 'Horas', value: bankHours(), tone: '' }
+    { label: 'Cobertura', value: `${coverage.profileCoverage}%`, tone: coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn' }
   ].map((item) => `
     <div class="dashboard-hero-stat">
       <span>${esc(item.label)}</span>
@@ -119,11 +119,14 @@ function renderDashboardAccess() {
   const categoryNode = document.getElementById('dashboardCategoryGrid');
   const linksNode = document.getElementById('dashboardQuickLinks');
   const drilldownNode = document.getElementById('dashboardDrilldownGrid');
-  const callCount = state.calls.filter((item) => item.status !== 'resolvido').length;
   const schools = visibleSchools();
   const schoolAlertCount = schools.filter((item) => item.status !== 'estavel').length;
   const importCount = state.schoolImports.length;
   const inventoryAlertCount = state.schoolAssets.filter((item) => item.status !== 'ok').length;
+  const networkCount = state.schoolNetworks.length;
+  const cameraSchoolCount = state.schoolNetworks.filter((item) => Number(item.cameraInstalled || 0) > 0 || item.cameraInstalledLabel).length;
+  const ctcUsers = (state.users || []).filter((item) => item.role === 'ctc' && item.active !== false);
+  const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category) === 'ctc' && !item.done).length;
   const criticalSchools = schools.filter((item) => item.status === 'critico').length;
   const noProfileSchools = schools.filter((item) => schoolProfileCompletion(item.name) < 35).length;
   const noNetworkSchools = schools.filter((item) => !schoolNetworkRecord(item.name)).length;
@@ -132,20 +135,23 @@ function renderDashboardAccess() {
   const recentImports = recentSchoolImports(8).length;
   const pecCount = (state.users || []).filter((item) => item.role === 'pec' && item.active !== false).length;
   const categories = [
-    { title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
-    { title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
-    { title: 'Chamados', meta: `${callCount} ativos`, action: `showPage('calls')`, page: 'calls', tone: 'red', priority: 'primary' },
-    { title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `showPage('pecs')`, page: 'pecs', tone: 'blue', priority: 'secondary' },
-    { title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
-    { title: 'Rede / CFTV', meta: `${state.schoolNetworks.length} escolas com dados`, action: `showPage('schools')`, page: 'schools', tone: 'amber', priority: 'secondary' },
-    { title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, page: 'reports', tone: 'slate', priority: 'secondary' }
-  ].filter((item) => canAccessPage(item.page));
+    { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+    { icon: '&#128187;', title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
+    { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
+    { icon: '&#128247;', title: 'Cameras', meta: `${cameraSchoolCount} escolas com cameras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
+    { icon: '&#128736;', title: 'CTC', meta: `${ctcUsers.length} usuarios | ${ctcTasks} tarefa(s) abertas`, action: `openCtcAgenda()`, page: 'agenda', tone: 'teal', priority: 'secondary' },
+    { icon: '&#127891;', title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `showPage('pecs')`, page: 'pecs', tone: 'blue', priority: 'secondary' },
+    { icon: '&#128229;', title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
+    { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
+    { icon: '&#9201;', title: 'Ponto', meta: 'pausado por enquanto', page: 'agenda', tone: 'slate', priority: 'secondary', inactive: true },
+    { icon: '&#128221;', title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, page: 'reports', tone: 'slate', priority: 'secondary' }
+  ].filter((item) => item.inactive || canAccessPage(item.page));
   const categoryBox = document.getElementById('dashboardCategoryBox');
   if (categoryBox) categoryBox.hidden = !categories.length;
   if (categoryNode) {
     categoryNode.innerHTML = categories.map((item) => `
-      <button class="dashboard-category-card ${item.tone} ${item.priority}" type="button" onclick="${item.action}">
-        <strong>${esc(item.title)}</strong>
+      <button class="dashboard-category-card ${item.tone} ${item.priority} ${item.inactive ? 'is-inactive' : ''}" type="button" ${item.inactive ? 'disabled' : `onclick="${item.action}"`}>
+        <strong><span class="category-emoji">${item.icon}</span>${esc(item.title)}</strong>
         <span>${esc(item.meta)}</span>
       </button>
     `).join('') || '<div class="sync-empty">Nenhuma categoria disponivel para este perfil.</div>';
@@ -195,7 +201,7 @@ function renderDashboardAccess() {
       { title: 'Chamados abertos', meta: `${unresolvedCalls} item(ns)`, action: `openCallCategory('aberto')`, page: 'calls', tone: 'red' },
       { title: 'Chamados em rota', meta: `${routeCalls} item(ns)`, action: `openCallCategory('em_rota')`, page: 'calls', tone: 'teal' },
       { title: 'Importacoes recentes', meta: `${recentImports} item(ns)`, action: `openImportCategory('todos')`, page: 'schools', tone: 'slate' },
-      { title: 'Sem rede/CFTV', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber' }
+      { title: 'Sem rede/cameras', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber' }
     ].filter((item) => canAccessPage(item.page));
     const drilldownBox = document.getElementById('dashboardDrilldownBox');
     if (drilldownBox) drilldownBox.hidden = !cards.length;
@@ -296,7 +302,7 @@ function renderSchoolCommandCenter() {
       <div class="setechub-inline-metrics">
         <div class="mini-stat"><span class="ms-l">Inventario</span><strong class="ms-val">${esc(String(signal?.assetUnits || 0))}</strong></div>
         <div class="mini-stat"><span class="ms-l">Alertas</span><strong class="ms-val">${esc(String(signal?.alertUnits || 0))}</strong></div>
-        <div class="mini-stat"><span class="ms-l">CFTV</span><strong class="ms-val">${esc(network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--')}</strong></div>
+        <div class="mini-stat"><span class="ms-l">Cameras</span><strong class="ms-val">${esc(network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--')}</strong></div>
       </div>
       <div class="setechub-action-row left">
         <button class="btn btn-p btn-sm" onclick="openSchoolRecord('${esc(focusSchool.name)}')">Abrir ficha</button>
@@ -307,7 +313,7 @@ function renderSchoolCommandCenter() {
   if (coverageNode) {
     coverageNode.innerHTML = [
       { label: 'Com inventario', value: `${coverage.inventoryPct}%`, note: `${coverage.withInventory}/${coverage.total} escolas` },
-      { label: 'Com rede/CFTV', value: `${coverage.networkPct}%`, note: `${coverage.withNetwork}/${coverage.total} escolas` },
+      { label: 'Com rede/cameras', value: `${coverage.networkPct}%`, note: `${coverage.withNetwork}/${coverage.total} escolas` },
       { label: 'Com ficha', value: `${coverage.profilePct}%`, note: `${coverage.withProfile}/${coverage.total} escolas` },
       { label: 'Com alertas', value: String(coverage.withAlerts), note: 'escolas com itens em alerta' }
     ].map((item) => `
@@ -369,7 +375,7 @@ function renderSchoolCommandCenter() {
             <th>Alertas</th>
             <th>Chamados</th>
             <th>Importacoes</th>
-            <th>CFTV</th>
+            <th>Cameras</th>
             <th>Banda</th>
           </tr>
         </thead>
@@ -910,7 +916,7 @@ function renderSchoolDetail() {
         criticos: ${esc(String(defectUnits))}
       </div>
       <div class="sync-meta">
-        Rede/CFTV: ${network ? `${network.cameraWorking || 0}/${network.cameraInstalled || 0} cameras` : 'sem dados de rede'} |
+        Redes e cameras: ${network ? `${network.cameraWorking || 0}/${network.cameraInstalled || 0} cameras` : 'sem dados de rede'} |
         banda: ${esc(network?.bandwidth || '--')} |
         importacoes confirmadas: ${esc(String(approvedImports.length))}
       </div>
@@ -931,7 +937,7 @@ function renderSchoolDetail() {
       ? `<div class="setechub-item"><strong>Ficha incompleta</strong><div class="sync-meta">Ainda faltam: ${esc(missingFields.slice(0, 4).join(', '))}${missingFields.length > 4 ? '...' : ''}.</div></div>`
       : '',
     (!network || networkGap > 0)
-      ? `<div class="setechub-item"><strong>Rede / CFTV</strong><div class="sync-meta">${esc(!network ? 'Ainda nao ha importacao de rede para a unidade.' : `${networkGap} camera(s) fora da cobertura esperada.`)}</div></div>`
+      ? `<div class="setechub-item"><strong>Redes e cameras</strong><div class="sync-meta">${esc(!network ? 'Ainda nao ha importacao de rede para a unidade.' : `${networkGap} camera(s) fora da cobertura esperada.`)}</div></div>`
       : '',
     approvedImports.length === 0
       ? `<div class="setechub-item"><strong>Sem importacoes</strong><div class="sync-meta">A unidade ainda nao recebeu arquivo vinculado para enriquecer a base.</div></div>`
@@ -945,7 +951,7 @@ function renderSchoolDetail() {
     { label: 'Alertas', value: String(alertUnits), note: 'unidades em manutencao ou defeito' },
     { label: 'Equipamentos', value: String(totalUnits), note: `${assets.length} linhas de inventario` },
     { label: 'Ficha', value: `${completion}%`, note: missingFields.length ? `${missingFields.length} campo(s) faltando` : 'cadastro consistente' },
-    { label: 'CFTV', value: network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--', note: network ? `status ${badgeText(network.status)}` : 'sem importacao de rede' },
+    { label: 'Cameras', value: network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--', note: network ? `status ${badgeText(network.status)}` : 'sem importacao de rede' },
     { label: 'Banda', value: network?.bandwidth || '--', note: network?.wifi ? `Wi-Fi ${network.wifi}` : 'sem wifi informado' },
     { label: 'Importacoes', value: String(approvedImports.length), note: pendingImports.length ? `${pendingImports.length} pendente(s)` : 'arquivos confirmados' }
   ].map((item) => `
@@ -1053,7 +1059,7 @@ function renderSchoolDetail() {
     <div class="setechub-item school-detail-section">
       <div class="setechub-head">
         <div>
-          <strong>CFTV e espelhamento</strong>
+          <strong>Cameras e espelhamento</strong>
           <div class="sync-meta">DE ${esc(network.de || '--')} | CIE ${esc(network.cie || '--')} | espelhamento ${esc(network.mirroringDate || 'nao informado')}</div>
         </div>
         <div class="setechub-badges">
@@ -1110,7 +1116,7 @@ function renderSchoolDetail() {
       </div>
       <div class="sync-meta">${esc((network.notes || []).join(' | ') || 'Sem observacoes adicionais na importacao de rede.')}</div>
     </div>
-  ` : '<div class="sync-empty">Nenhum registro de rede/CFTV importado para esta escola ainda.</div>';
+  ` : '<div class="sync-empty">Nenhum registro de rede e cameras importado para esta escola ainda.</div>';
 
   const historyNode = document.getElementById('schoolEventHistory');
   if (historyNode) {

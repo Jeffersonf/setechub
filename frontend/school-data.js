@@ -510,7 +510,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Idalicio Mendes Lima\nCIE: 905227\nCameras instaladas: dvr16-16 cameras funcionando\nEspelhamento: 30/03/2026\nTecnicos: Jefferson\nUsuario DVR: admin1\nSenha: coi827@@\nMarca DVR: senha M\nRede ADM: 10.109.41.0\nGateway ADM: 10.109.41.1\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.2\nVIDEO-DVR2: 10.109.41.3\nVIDEO-ALARME: 10.109.41.4\nVIDEO-DVR3: 10.109.41.5\nRede PED: 10.121.7.0\nGateway PED: 10.121.7.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -520,8 +520,8 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
-      "preview": "Escola: EE Doutor Antonio Deffune\nCIE: 49323\nCameras instaladas: dvr 16 canais não deu p testar pois as maritacas romperam os cabos de video e de dados\nEspelhamento: 09/01/2026\nTecnicos: Jefferson M\nUsuario DVR: admin1\nSenha: coi124@@\nMarca DVR: intelbras\nRede ADM: 10.109.41.32\nGateway ADM: 10.109.41.33\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.34\nVIDEO-DVR2: 10.109.41.35\nVIDEO-ALARME: 10.109.41.36\nVIDEO-DVR3: 10.109.41.37\nRede PED: 10.113.9.128\nGateway PED: 10.113.9.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha no CFTV ou rede"
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "preview": "Escola: EE Doutor Antonio Deffune\nCIE: 49323\nCameras instaladas: dvr 16 canais não deu p testar pois as maritacas romperam os cabos de video e de dados\nEspelhamento: 09/01/2026\nTecnicos: Jefferson M\nUsuario DVR: admin1\nSenha: coi124@@\nMarca DVR: intelbras\nRede ADM: 10.109.41.32\nGateway ADM: 10.109.41.33\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.34\nVIDEO-DVR2: 10.109.41.35\nVIDEO-ALARME: 10.109.41.36\nVIDEO-DVR3: 10.109.41.37\nRede PED: 10.113.9.128\nGateway PED: 10.113.9.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha em cameras ou rede"
     },
     {
       "id": "seed-import-network-pei-ee-professora-celia-vasques-ferrari-duch",
@@ -530,7 +530,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professora Celia Vasques Ferrari Duch\nCIE: 39731\nCameras instaladas: dvr1 16-9 ok/dvr2** 8-4 funcionando não espelhado falta ponto de rede na sala\nEspelhamento: 16/12/2025\nTecnicos: JeffersonM\nUsuario DVR: admin1\nSenha: coi175@@\nRede ADM: 10.109.42.224\nGateway ADM: 10.109.42.225\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.226\nVIDEO-DVR2: 10.109.42.227\nVIDEO-ALARME: 10.109.42.228\nVIDEO-DVR3: 10.109.42.229\nRede PED: 10.119.127.128\nGateway PED: 10.119.127.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -540,7 +540,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professora Cinira Daniel da Silva\nCIE: 35348\nCameras instaladas: dvr1 8 cameras ok/dvr2 16 cameras 14 ok\nEspelhamento: 14/01/2026\nTecnicos: JeffersonM\nUsuario DVR: admin1\nSenha: coi450@@/M\nMarca DVR: Intelbras\nRede ADM: 10.109.41.224\nGateway ADM: 10.109.41.225\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.226\nVIDEO-DVR2: 10.109.41.227\nVIDEO-ALARME: 10.109.41.228\nVIDEO-DVR3: 10.109.41.229\nRede PED: 10.113.10.128\nGateway PED: 10.113.10.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -550,7 +550,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: DIRETORIA\nCIE: 20305\nSenha: coi198@@\nespelhamento sem data registrada"
     },
     {
@@ -560,7 +560,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: EE Bairro Ferreira dos Matos\nCIE: 915087\nCameras instaladas: 16/16\nCameras funcionando: 8 dvr1 /12 dvr 2\nEspelhamento: 12/11/2025\nTecnicos: Jefferson M\nSenha: coi131@@\nMarca DVR: admin1 senha M\nRede ADM: 10.109.42.160\nGateway ADM: 10.109.42.161\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.162\nVIDEO-DVR2: 10.109.42.163\nVIDEO-ALARME: 10.109.42.164\nVIDEO-DVR3: 10.109.42.165\nRede PED: 10.121.243.128\nGateway PED: 10.121.243.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\n23/32 camera(s) em funcionamento"
     },
     {
@@ -570,7 +570,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professora Francelina Franco\nCIE: 15568\nCameras instaladas: dvr1 16-15ok/dvr2 32 cameras 25 ok\nEspelhamento: 16/12/2025\nTecnicos: JEFFERSON M/JEFFERSON F\nSenha: coi117@@\nRede ADM: 10.109.40.96\nGateway ADM: 10.109.40.97\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.98\nVIDEO-DVR2: 10.109.40.99\nVIDEO-ALARME: 10.109.40.100\nVIDEO-DVR3: 10.109.40.101\nRede PED: 10.119.128.0\nGateway PED: 10.119.128.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -580,7 +580,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: EE Professor Gerson de Barros Margarido\nCIE: 43412\nCameras instaladas: dvr2 sem video\nCameras funcionando: 15/16\nEspelhamento: 27/02/2026\nTecnicos: JeffersonF/Elcio\nUsuario DVR: admin1\nSenha: coi123@@\nMarca DVR: senha G\nRede ADM: 10.109.41.128\nGateway ADM: 10.109.41.129\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.130\nVIDEO-DVR2: 10.109.41.131\nVIDEO-ALARME: 10.109.41.132\nVIDEO-DVR3: 10.109.41.133\nRede PED: 10.113.136.0\nGateway PED: 10.113.136.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 10 Mbps\nFirewall: FORTINET"
     },
     {
@@ -590,7 +590,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: EE Bairro Boa Vista Intervales\nCIE: 915075\nCameras instaladas: 29\nCameras funcionando: dvr 16- 13\nEspelhamento: 12/07/2022\nSenha: coi016@@\nMarca DVR: admin1\nRede ADM: 10.109.42.128\nGateway ADM: 10.109.42.129\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.130\nVIDEO-DVR2: 10.109.42.131\nVIDEO-ALARME: 10.109.42.132\nVIDEO-DVR3: 10.109.42.133\nRede PED: 10.121.243.0\nGateway PED: 10.121.243.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 2 Mbps\nFirewall: FORTINET"
     },
     {
@@ -600,7 +600,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Jeminiano David Muzel\nCIE: 15477\nCameras instaladas: dvr1 36cameras ok/dvr2 16 cameras ok\nEspelhamento: 15/01/2026\nTecnicos: JeffersonM\nUsuario DVR: admin1\nSenha: coi844@@\nRede ADM: 10.109.41.64\nGateway ADM: 10.109.41.65\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.66\nVIDEO-DVR2: 10.109.41.67\nVIDEO-ALARME: 10.109.41.68\nVIDEO-DVR3: 10.109.41.69\nRede PED: 10.113.11.0\nGateway PED: 10.113.11.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -610,7 +610,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professor Joao Baptista do Amaral Vasconcellos\nCIE: 910077\nCameras instaladas: dvr1 25-18/dvr2 25-18/dvr3 15-19\nEspelhamento: 12/01/2026\nTecnicos: Jefferson M\nSenha: coi113@@\nMarca DVR: admin1\nRede ADM: 10.109.40.224\nGateway ADM: 10.109.40.225\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.119.127.20\nVIDEO-DVR2: 10.119.127.22\nVIDEO-ALARME: 10.109.40.23\nVIDEO-DVR3: 10.109.40.229\nRede PED: 10.119.127.0\nGateway PED: 10.119.127.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 100 Mbps\nFirewall: FORTINET"
     },
     {
@@ -620,7 +620,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professor Jose Vasques Ferrari\nCIE: 15519\nCameras instaladas: dvr 16 cameras ok\nEspelhamento: 16/01/2026\nTecnicos: JeffersonM\nUsuario DVR: admin1\nSenha: coi120@\nRede ADM: 10.109.41.160\nGateway ADM: 10.109.41.161\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.162\nVIDEO-DVR2: 10.109.41.163\nVIDEO-ALARME: 10.109.41.164\nVIDEO-DVR3: 10.109.41.165\nRede PED: 10.173.48.0\nGateway PED: 10.173.48.1\nMascara PED: 255.255.254.0\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 34 Mbps\nFirewall: FORTINET"
     },
     {
@@ -630,7 +630,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professora Nicota Soares\nCIE: 15489\nCameras instaladas: dvr1 11 de 16/dvr2 13 de 16/dvr3 15 de 16 ok\nEspelhamento: 21/01/2026\nTecnicos: JeffersonF/Elcio\nUsuario DVR: admin1\nSenha: coi116@@ ou M\nRede ADM: 10.109.42.0\nGateway ADM: 10.109.42.1\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.2\nVIDEO-DVR2: 10.109.42.3\nVIDEO-ALARME: 10.109.42.4\nVIDEO-DVR3: 10.109.42.5\nRede PED: 10.173.46.0\nGateway PED: 10.173.46.1\nMascara PED: 255.255.254.0\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 34 Mbps\nFirewall: FORTINET"
     },
     {
@@ -640,7 +640,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Oscar Kurtz Camargo\nCIE: 15076\nCameras instaladas: dvr1 16-9/dvr2 16-16/dvr3 16-16\nEspelhamento: 12/12/2025\nSenha: coi597@@\nMarca DVR: dvr3  final 22 admin1 coi597@@\nRede ADM: 10.109.42.192\nGateway ADM: 10.109.42.193\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.194\nVIDEO-DVR2: 10.109.42.195\nVIDEO-ALARME: 10.109.42.196\nVIDEO-DVR3: 10.109.42.197\nRede PED: 10.119.161.0\nGateway PED: 10.119.161.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     },
     {
@@ -650,8 +650,8 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
-      "preview": "Escola: PEI EE Otavio Ferrari\nCIE: 15404\nCameras instaladas: dvr1 16/12-dvr2 16-10-dvr3 16-10/dvr4 16-13, obs dvr4 sem hd passado p o diretori Fabiano p substiruir\nEspelhamento: 22/01/2026\nTecnicos: JeffersonM\nUsuario DVR: Admin 1\nSenha: coi753@@\nMarca DVR: senha G1\nRede ADM: 10.109.41.96\nGateway ADM: 10.109.41.97\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.98\nVIDEO-DVR2: 10.109.41.99\nVIDEO-ALARME: 10.109.41.100\nVIDEO-DVR3: 10.109.41.101\nRede PED: 10.119.159.0\nGateway PED: 10.119.159.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha no CFTV ou rede"
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "preview": "Escola: PEI EE Otavio Ferrari\nCIE: 15404\nCameras instaladas: dvr1 16/12-dvr2 16-10-dvr3 16-10/dvr4 16-13, obs dvr4 sem hd passado p o diretori Fabiano p substiruir\nEspelhamento: 22/01/2026\nTecnicos: JeffersonM\nUsuario DVR: Admin 1\nSenha: coi753@@\nMarca DVR: senha G1\nRede ADM: 10.109.41.96\nGateway ADM: 10.109.41.97\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.98\nVIDEO-DVR2: 10.109.41.99\nVIDEO-ALARME: 10.109.41.100\nVIDEO-DVR3: 10.109.41.101\nRede PED: 10.119.159.0\nGateway PED: 10.119.159.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha em cameras ou rede"
     },
     {
       "id": "seed-import-network-pei-ee-padre-arlindo-vieira",
@@ -660,8 +660,8 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
-      "preview": "Escola: PEI EE Padre Arlindo Vieira\nCIE: 15118\nCameras instaladas: drv1 16-15/dvr 2 16-0/dvr3 16-0 obs:foi tirado os dvr 2 e 3 devido a escola estar destelhada\nEspelhamento: 15/12/2025\nTecnicos: Jefferson M/Jefferson F\nUsuario DVR: admin1\nSenha: coi754@\nRede ADM: 10.109.40.192\nGateway ADM: 10.109.40.193\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.194\nVIDEO-DVR2: 10.109.40.195\nVIDEO-ALARME: 10.109.40.196\nVIDEO-DVR3: 10.109.40.197\nRede PED: 10.173.40.0\nGateway PED: 10.173.40.1\nMascara PED: 255.255.254.0\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 34 Mbps\nFirewall: FORTINET\nha observacoes de falha no CFTV ou rede"
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "preview": "Escola: PEI EE Padre Arlindo Vieira\nCIE: 15118\nCameras instaladas: drv1 16-15/dvr 2 16-0/dvr3 16-0 obs:foi tirado os dvr 2 e 3 devido a escola estar destelhada\nEspelhamento: 15/12/2025\nTecnicos: Jefferson M/Jefferson F\nUsuario DVR: admin1\nSenha: coi754@\nRede ADM: 10.109.40.192\nGateway ADM: 10.109.40.193\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.194\nVIDEO-DVR2: 10.109.40.195\nVIDEO-ALARME: 10.109.40.196\nVIDEO-DVR3: 10.109.40.197\nRede PED: 10.173.40.0\nGateway PED: 10.173.40.1\nMascara PED: 255.255.254.0\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 34 Mbps\nFirewall: FORTINET\nha observacoes de falha em cameras ou rede"
     },
     {
       "id": "seed-import-network-ee-doutor-raul-venturelli",
@@ -670,8 +670,8 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
-      "preview": "Escola: EE Doutor Raul Venturelli\nCIE: 15222\nCameras instaladas: dv1 16-10/dvr 2 quadra sem internet apenas monitoramento interno/dvr3/dvr4 bloco em reforma e sem energia\nEspelhamento: 15/12/2025\nTecnicos: Jefferson M/Jefferson F\nUsuario DVR: admin\nSenha: coi592@@\nMarca DVR: Intelbras/giga ou SENHA M\nRede ADM: 10.109.40.160\nGateway ADM: 10.109.40.161\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.162\nVIDEO-DVR2: 10.109.40.188\nVIDEO-ALARME: 10.109.40.164\nVIDEO-DVR3: 10.109.40.165\nRede PED: 10.113.11.128\nGateway PED: 10.113.11.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha no CFTV ou rede"
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "preview": "Escola: EE Doutor Raul Venturelli\nCIE: 15222\nCameras instaladas: dv1 16-10/dvr 2 quadra sem internet apenas monitoramento interno/dvr3/dvr4 bloco em reforma e sem energia\nEspelhamento: 15/12/2025\nTecnicos: Jefferson M/Jefferson F\nUsuario DVR: admin\nSenha: coi592@@\nMarca DVR: Intelbras/giga ou SENHA M\nRede ADM: 10.109.40.160\nGateway ADM: 10.109.40.161\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.162\nVIDEO-DVR2: 10.109.40.188\nVIDEO-ALARME: 10.109.40.164\nVIDEO-DVR3: 10.109.40.165\nRede PED: 10.113.11.128\nGateway PED: 10.113.11.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\nha observacoes de falha em cameras ou rede"
     },
     {
       "id": "seed-import-network-pei-ee-ricardo-campolim-de-almeida-neto",
@@ -680,7 +680,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Ricardo Campolim de Almeida Neto\nCIE: 915117\nCameras instaladas: 16\nCameras funcionando: 15\nEspelhamento: 11/12/2025\nTecnicos: Jefferson M\nSenha: coi119@@\nRede ADM: 10.109.42.64\nGateway ADM: 10.109.42.65\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.66\nVIDEO-DVR2: 10.109.42.67\nVIDEO-ALARME: 10.109.42.68\nVIDEO-DVR3: 10.109.42.69\nRede PED: 10.120.162.128\nGateway PED: 10.120.162.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\n15/16 camera(s) em funcionamento"
     },
     {
@@ -690,7 +690,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: EE Professor Silverio Monteiro\nCIE: 35336\nEspelhamento: 11/04/2025\nUsuario DVR: admin1\nSenha: coi014@@\nRede ADM: 10.109.41.192\nGateway ADM: 10.109.41.193\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.41.194\nVIDEO-DVR2: 10.109.41.195\nVIDEO-ALARME: 10.109.41.196\nVIDEO-DVR3: 10.109.41.197\nRede PED: 10.121.245.0\nGateway PED: 10.121.245.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 2 Mbps\nFirewall: FORTINET"
     },
     {
@@ -700,7 +700,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Simpliciano Campolim de Almeida\nCIE: 15428\nCameras instaladas: 16/14 cameras ok\nCameras funcionando: 16\nEspelhamento: 17/12/2025\nTecnicos: JeffersonM\nUsuario DVR: admin1\nSenha: coi121\nRede ADM: 10.109.42.96\nGateway ADM: 10.109.42.97\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.98\nVIDEO-DVR2: 10.109.42.99\nVIDEO-ALARME: 10.109.42.100\nVIDEO-DVR3: 10.109.42.101\nRede PED: 10.121.242.128\nGateway PED: 10.121.242.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET\n16/30 camera(s) em funcionamento"
     },
     {
@@ -710,7 +710,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: EE Bairro Turvo dos Almeidas\nCIE: 926036\nCameras instaladas: 16\nCameras funcionando: 4\nEspelhamento: 14/08/2025\nTecnicos: ELCIO/ JEFERSON\nSenha: coi135@@\nMarca DVR: intelbras\nRede ADM: 10.109.40.128\nGateway ADM: 10.109.40.129\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.40.130\nVIDEO-DVR2: 10.109.40.131\nVIDEO-ALARME: 10.109.40.132\nVIDEO-DVR3: 10.109.40.133\nRede PED: 10.120.218.0\nGateway PED: 10.120.218.1\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 100mbps\nFirewall: FORTINET\nWi-Fi: SIM\n4/16 camera(s) em funcionamento\nwifi: SIM"
     },
     {
@@ -720,7 +720,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "label": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "filename": "IPs e Senhas 2025 (3)(Planilha1).csv",
       "importedAt": "29/04/2026 17:00",
-      "summary": "CFTV e rede importados com IPs, DVR, DNS, banda e Wi-Fi",
+      "summary": "redes e cameras importados com IPs, DVR, DNS, banda e Wi-Fi",
       "preview": "Escola: PEI EE Professora Zulmira de Oliveira\nCIE: 15544\nCameras instaladas: dvr1 9 de 18/dvr2 12 de 16\nEspelhamento: 21/01/2026\nTecnicos: JeffersonF/Elcio\nUsuario DVR: Admin1/\nSenha: coi118\nMarca DVR: dvr2 coi118@@\nRede ADM: 10.109.42.32\nGateway ADM: 10.109.42.33\nMascara ADM: 255.255.255.224\nVIDEO-DVR1: 10.109.42.51\nVIDEO-DVR2: 10.109.42.35\nVIDEO-ALARME: 10.109.42.36\nVIDEO-DVR3: 10.109.42.37\nRede PED: 10.119.160.128\nGateway PED: 10.119.160.129\nMascara PED: 255.255.255.128\nDNS 1: 10.17.16.4\nDNS 2: 10.17.16.5\nBanda: 8 Mbps\nFirewall: FORTINET"
     }
   ],
@@ -2008,7 +2008,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "firewallModel": "FORTINET",
       "wifi": "",
       "notes": [
-        "ha observacoes de falha no CFTV ou rede"
+        "ha observacoes de falha em cameras ou rede"
       ]
     },
     {
@@ -2482,7 +2482,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "firewallModel": "FORTINET",
       "wifi": "",
       "notes": [
-        "ha observacoes de falha no CFTV ou rede"
+        "ha observacoes de falha em cameras ou rede"
       ]
     },
     {
@@ -2520,7 +2520,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "firewallModel": "FORTINET",
       "wifi": "",
       "notes": [
-        "ha observacoes de falha no CFTV ou rede"
+        "ha observacoes de falha em cameras ou rede"
       ]
     },
     {
@@ -2558,7 +2558,7 @@ window.SETECHUB_SCHOOL_DATA = {
       "firewallModel": "FORTINET",
       "wifi": "",
       "notes": [
-        "ha observacoes de falha no CFTV ou rede"
+        "ha observacoes de falha em cameras ou rede"
       ]
     },
     {

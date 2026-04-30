@@ -406,7 +406,7 @@ body::before {
   transform:none;
   box-shadow:none;
 }
-.nav-item .ico { font-size: 15px; width: 20px; text-align: center; }
+.nav-item .ico { font-size: 22px; width: 30px; line-height: 1; text-align: center; }
 .sidebar-utility{
   display:flex;
   flex-direction:column;
