@@ -1,11 +1,11 @@
 {
-  "name": "SETEC Hub",
-  "short_name": "SETEC Hub",
+  "name": "PainelURE",
+  "short_name": "PainelURE",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#08111f",
   "theme_color": "#0a1526",
-  "description": "Painel de organizacao diaria para rotina SETEC na URE Itapeva",
+  "description": "Painel de organizacao diaria para rotina da URE Itapeva",
   "icons": [
     {
       "src": "./frontend/favicon.svg",

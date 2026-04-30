@@ -1,6 +1,6 @@
-# SETECHUB
+# PainelURE
 
-Base operacional inspirada no `finanza`, adaptada para concentrar rotina tecnica, agenda, chamados, escolas, ativos, relatorios e automacao de redes.
+Base operacional inspirada no `finanza`, adaptada para concentrar rotina tecnica da URE, agenda, chamados, escolas, ativos, relatorios e automacao de redes.
 
 ## Estrutura atual
 

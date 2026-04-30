@@ -2,7 +2,7 @@
   "name": "setechub",
   "version": "0.1.0",
   "private": true,
-  "description": "Base operacional do SETECHUB inspirada no Finanza",
+  "description": "Base operacional do PainelURE inspirada no Finanza",
   "scripts": {
     "start": "node server/index.js",
     "start:server": "node server/index.js",
