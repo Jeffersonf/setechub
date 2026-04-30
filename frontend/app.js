@@ -257,7 +257,7 @@ function visibleNavigationPages() {
       : isRestrictedCtcUser()
         ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'assets', 'reports', 'info', 'settings'])
       : canEditData()
-      ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'agenda', 'reports', 'info', 'settings'])
+      ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings'])
         : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings']);
   if (canManageUsers()) pages.add('admin');
   return pages;

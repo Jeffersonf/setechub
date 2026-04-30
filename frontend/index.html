@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260430-info-directory">
-<link rel="stylesheet" href="./setechub.css?v=20260430-info-directory">
+<link rel="stylesheet" href="./styles.css?v=20260430-nav-pecs">
+<link rel="stylesheet" href="./setechub.css?v=20260430-nav-pecs">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -68,7 +68,7 @@
     <div class="nav-item" data-page="supervisors"><span class="ico">&#128101;</span>Supervisores</div>
     <div class="nav-item" data-page="pecs"><span class="ico">&#127891;</span>PECs</div>
     <div class="nav-item" data-page="ctc"><span class="ico">&#128736;</span>CTC</div>
-    <div class="nav-item" data-page="assets"><span class="ico">&#128187;</span>Ativos</div>
+    <div class="nav-item" data-page="assets"><span class="ico">&#128187;</span>Inventario</div>
     <div class="nav-item an" data-page="calls"><span class="ico">&#128295;</span>Atendimentos</div>
     <div class="nav-item" data-page="agenda"><span class="ico">&#128467;</span>Agenda</div>
     <div class="nav-item fn" data-page="reports"><span class="ico">&#128204;</span>Relatorios</div>
@@ -104,7 +104,7 @@
       <div class="page-actions">
         <div class="mnav"><button onclick="shiftFocusCard(-1)">&#8249;</button><span class="mname" id="todayLabel">Hoje</span><button onclick="shiftFocusCard(1)">&#8250;</button></div>
         <button class="btn btn-g btn-sm" onclick="showPage('info')">Informacoes</button>
-        <button class="btn btn-p" data-edit-scope onclick="showPage('agenda')">+ Nova tarefa</button>
+        <button class="btn btn-g nav-disabled" type="button" disabled>Agenda pausada</button>
       </div>
     </div>
 
@@ -229,7 +229,7 @@
       <section class="box">
         <div class="bh">
           <div><div class="ct">Linha do dia</div><div class="cs">Tarefas, chamados e movimento principal em ordem de ataque.</div></div>
-          <button class="btn btn-g btn-sm" data-edit-scope onclick="showPage('agenda')">Abrir agenda</button>
+          <button class="btn btn-g btn-sm nav-disabled" type="button" disabled>Agenda pausada</button>
         </div>
         <div id="timelineList" class="stack-list"></div>
       </section>
@@ -983,12 +983,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./school-data.js?v=20260430-info-directory"></script>
-<script src="./storage.js?v=20260430-info-directory"></script>
-<script src="./app.js?v=20260430-info-directory"></script>
-<script src="./render.js?v=20260430-info-directory"></script>
-<script src="./api.js?v=20260430-info-directory"></script>
-<script src="./actions.js?v=20260430-info-directory"></script>
-<script src="./bootstrap.js?v=20260430-info-directory"></script>
+<script src="./school-data.js?v=20260430-nav-pecs"></script>
+<script src="./storage.js?v=20260430-nav-pecs"></script>
+<script src="./app.js?v=20260430-nav-pecs"></script>
+<script src="./render.js?v=20260430-nav-pecs"></script>
+<script src="./api.js?v=20260430-nav-pecs"></script>
+<script src="./actions.js?v=20260430-nav-pecs"></script>
+<script src="./bootstrap.js?v=20260430-nav-pecs"></script>
 </body>
 </html>

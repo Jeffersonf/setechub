@@ -210,7 +210,8 @@ function defaultPecs() {
     { id: 'pec-elysane-maciel', name: 'Elysane Rodrigues Cardoso Maciel', login: 'elysane.maciel', role: 'PEC - Historia', phone: '(15) 3526-6218', email: 'deitvnpe@educacao.sp.gov.br' },
     { id: 'pec-jaqueline-borelli', name: 'Jaqueline de Oliveira Cunha Borelli', login: 'jaqueline.borelli', role: 'PEC - Arte', phone: '(15) 3526-6212', email: 'deitvnpe@educacao.sp.gov.br' },
     { id: 'pec-tatiane-graciliano', name: 'Tatiane Ryden de Mello Graciliano', login: 'tatiane.graciliano', role: 'PEC - Educacao Inclusiva', phone: '(15) 3526-6218', email: 'deitvnpe@educacao.sp.gov.br' },
-    { id: 'pec-jose-netto', name: 'Jose do Amaral Netto', login: 'jose.netto', role: 'PEC - Projetos Especiais', phone: '(15) 3526-6212', email: 'deitvnpe@educacao.sp.gov.br' }
+    { id: 'pec-jose-netto', name: 'Jose do Amaral Netto', login: 'jose.netto', role: 'PEC - Projetos Especiais', phone: '(15) 3526-6218', email: 'deitvnpe@educacao.sp.gov.br' },
+    { id: 'pec-paula', name: 'Paula', login: 'paula', role: 'Especialista em Curriculo', phone: '(15) 3526-6226', email: 'deitvnpe@educacao.sp.gov.br' }
   ];
 }
 

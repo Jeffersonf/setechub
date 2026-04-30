@@ -1046,6 +1046,16 @@
   grid-template-columns: 1.5fr 120px 120px 1fr 1fr auto;
 }
 
+#ctcVisitForm {
+  grid-template-columns: minmax(150px, 220px) 150px 130px minmax(220px, .85fr) minmax(220px, .85fr) auto;
+  align-items: center;
+}
+
+#ctcVisitForm .btn {
+  min-height: 43px;
+  justify-content: center;
+}
+
 .setechub-form-school {
   grid-template-columns: 1.2fr 150px 1fr 1.3fr auto;
 }
@@ -1483,7 +1493,8 @@ a {
   .setechub-form-school,
   .setechub-form-asset,
   .setechub-form-links,
-  .setechub-form-sector {
+  .setechub-form-sector,
+  #ctcVisitForm {
     grid-template-columns: 1fr;
   }
 
