@@ -187,7 +187,7 @@
       <div class="page-actions">
         <div class="mnav"><button onclick="shiftFocusCard(-1)">‹</button><span class="mname" id="todayLabel">Hoje</span><button onclick="shiftFocusCard(1)">›</button></div>
         <button class="btn btn-g btn-sm" onclick="showPage('settings')">Conta</button>
-        <button class="btn btn-p" onclick="showPage('agenda')">+ Nova tarefa</button>
+        <button class="btn btn-p" data-edit-scope onclick="showPage('agenda')">+ Nova tarefa</button>
       </div>
     </div>
 
@@ -305,7 +305,7 @@
       <section class="box">
         <div class="bh">
           <div><div class="ct">Linha do dia</div><div class="cs">Tarefas, chamados e movimento principal em ordem de ataque.</div></div>
-          <button class="btn btn-g btn-sm" onclick="showPage('agenda')">Abrir agenda</button>
+          <button class="btn btn-g btn-sm" data-edit-scope onclick="showPage('agenda')">Abrir agenda</button>
         </div>
         <div id="timelineList" class="stack-list"></div>
       </section>

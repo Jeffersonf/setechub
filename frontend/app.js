@@ -199,6 +199,13 @@ function canManageUsers() {
   return currentUserRole() === 'admin';
 }
 
+function visibleNavigationPages() {
+  if (isPecUser()) return new Set(['settings']);
+  if (isSupervisorUser()) return new Set(['schools', 'school-record', 'supervisors', 'supervisor-record', 'settings']);
+  if (canEditData()) return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports', 'settings']);
+  return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'reports', 'settings']);
+}
+
 function assignedSchoolsForCurrentUser() {
   const user = currentUser();
   if (!user || user.role !== 'supervisor') return state.schools.map((item) => item.name);
@@ -239,9 +246,7 @@ function defaultPageForUser() {
 }
 
 function canAccessPage(page) {
-  if (isPecUser()) return page === 'settings';
-  if (!isSupervisorUser()) return true;
-  return ['schools', 'school-record', 'supervisors', 'supervisor-record', 'settings'].includes(page);
+  return visibleNavigationPages().has(page);
 }
 
 function applyAccessControl() {
@@ -254,9 +259,13 @@ function applyAccessControl() {
     }
   });
   document.querySelectorAll('.sidebar-icon-btn, .sidebar-mini-btn').forEach((node) => {
-    const target = node.getAttribute('onclick') || '';
-    node.hidden = (isSupervisorUser() && !/schools|supervisors|settings/.test(target)) || isPecUser();
+    node.hidden = !canEditData();
   });
+  document.querySelectorAll('.sidebar-utility').forEach((node) => {
+    node.hidden = !canEditData();
+  });
+  const sidebarSearch = document.querySelector('.sb-search');
+  if (sidebarSearch) sidebarSearch.hidden = isPecUser();
   document.querySelectorAll('[data-edit-scope]').forEach((node) => {
     node.hidden = !canEditData();
   });
