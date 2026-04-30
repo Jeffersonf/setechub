@@ -455,13 +455,9 @@ function openImportCategory(filter = 'todos') {
 
 function openPecDirectory() {
   currentDirectoryFilter = 'pecs';
-  showPage('settings');
+  showPage('pecs');
   syncFilterButtons('directory');
   renderDirectoryContacts();
-  setTimeout(() => {
-    const target = document.getElementById('directoryContactsList') || document.getElementById('pecAccountBox');
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 0);
 }
 
 function renameSchoolReferences(previousName, nextName) {

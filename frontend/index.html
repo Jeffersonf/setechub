@@ -112,6 +112,7 @@
   <div class="fn-item active" data-page="dashboard"><span class="fni">📊</span>Inicio</div>
   <div class="fn-item" data-page="schools"><span class="fni">🏫</span>Escolas</div>
   <div class="fn-item" data-page="supervisors"><span class="fni">👥</span>Superv.</div>
+  <div class="fn-item" data-page="pecs"><span class="fni">🎓</span>PECs</div>
   <div class="fn-item" data-page="assets"><span class="fni">💻</span>Invent.</div>
   <div class="fn-item acc-n" data-page="calls"><span class="fni">🔧</span>Cham.</div>
   <div class="fn-item sl-n" data-page="settings"><span class="fni">⚙️</span>Conta</div>
@@ -135,6 +136,7 @@
     <div class="nav-item active" data-page="dashboard"><span class="ico">📊</span>Painel</div>
     <div class="nav-item" data-page="schools"><span class="ico">🏫</span>Escolas</div>
     <div class="nav-item" data-page="supervisors"><span class="ico">👥</span>Supervisores</div>
+    <div class="nav-item" data-page="pecs"><span class="ico">🎓</span>PECs</div>
     <div class="nav-item" data-page="assets"><span class="ico">💻</span>Ativos</div>
     <div class="nav-item an" data-page="calls"><span class="ico">🔧</span>Atendimentos</div>
     <div class="nav-item" data-page="agenda"><span class="ico">🗓️</span>Agenda</div>
@@ -215,13 +217,13 @@
     </div>
 
     <div class="setechub-command-grid dashboard-access-grid">
-      <section class="box">
+      <section class="box" id="dashboardCategoryBox">
         <div class="bh">
           <div><div class="ct">Acesso por categoria</div><div class="cs">Tudo que importa no dia para cair direto na area certa.</div></div>
         </div>
         <div id="dashboardCategoryGrid" class="dashboard-category-grid"></div>
       </section>
-      <section class="box dashboard-quick-box">
+      <section class="box dashboard-quick-box" id="dashboardQuickBox">
         <div class="bh">
           <div><div class="ct">Aberturas rapidas</div><div class="cs">Itens vivos para abrir escola, inventario, chamados e importacoes sem navegar.</div></div>
         </div>
@@ -266,7 +268,7 @@
       </section>
     </div>
 
-    <div class="box">
+    <div class="box" id="dashboardDrilldownBox">
       <div class="bh">
         <div><div class="ct">Atalhos por recorte</div><div class="cs">Subcategorias clicaveis para chegar direto no filtro certo.</div></div>
       </div>
@@ -370,7 +372,7 @@
         <div class="ps">Planeje rota, visitas e tarefas criticas sem perder o contexto.</div>
       </div>
     </div>
-    <div class="box">
+    <div class="box" id="directoryContactsBox">
       <div class="bh">
         <div><div class="ct">Nova tarefa</div><div class="cs">Crie uma prioridade ligada a local, horario e categoria.</div></div>
       </div>
@@ -981,6 +983,21 @@
         <button class="btn btn-g btn-sm" data-directory-filter="gestao" type="button">Gestao</button>
       </div>
       <div id="directoryContactsList" class="stack-list"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-pecs">
+    <div class="ph">
+      <div>
+        <div class="pt">PECs</div>
+        <div class="ps">Equipe de especialistas em curriculo e dados liberados para este acesso.</div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bh">
+        <div><div class="ct">Especialistas em curriculo</div><div class="cs">A visualizacao respeita o perfil logado.</div></div>
+      </div>
+      <div id="pecsPageList" class="stack-list"></div>
     </div>
   </div>
 </main>

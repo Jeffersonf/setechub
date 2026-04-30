@@ -81,11 +81,13 @@ function renderDashboardAccess() {
     { title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
     { title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
     { title: 'Chamados', meta: `${callCount} ativos`, action: `showPage('calls')`, page: 'calls', tone: 'red', priority: 'primary' },
-    { title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `openPecDirectory()`, page: 'settings', tone: 'blue', priority: 'secondary' },
+    { title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `showPage('pecs')`, page: 'pecs', tone: 'blue', priority: 'secondary' },
     { title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
     { title: 'Rede / CFTV', meta: `${state.schoolNetworks.length} escolas com dados`, action: `showPage('schools')`, page: 'schools', tone: 'amber', priority: 'secondary' },
     { title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, page: 'reports', tone: 'slate', priority: 'secondary' }
   ].filter((item) => canAccessPage(item.page));
+  const categoryBox = document.getElementById('dashboardCategoryBox');
+  if (categoryBox) categoryBox.hidden = !categories.length;
   if (categoryNode) {
     categoryNode.innerHTML = categories.map((item) => `
       <button class="dashboard-category-card ${item.tone} ${item.priority}" type="button" onclick="${item.action}">
@@ -99,7 +101,7 @@ function renderDashboardAccess() {
     const topCalls = topOpenCalls(3);
     const topAssets = topInventoryAlerts(3);
     const topImports = recentSchoolImports(3);
-    linksNode.innerHTML = [
+    const quickItems = [
       ...(canAccessPage('schools') ? topSchools.map(({ school, signal }) => `
         <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school.name)}')">
           <strong>Escola</strong>
@@ -124,7 +126,10 @@ function renderDashboardAccess() {
           <div class="sync-meta">${esc(item.school)} | ${esc(item.label || item.filename || '')} | ${esc(item.type || '')}</div>
         </div>
       `) : [])
-    ].join('') || '<div class="sync-empty">Nenhum atalho rapido disponivel ainda.</div>';
+    ];
+    const quickBox = document.getElementById('dashboardQuickBox');
+    if (quickBox) quickBox.hidden = !quickItems.length;
+    linksNode.innerHTML = quickItems.join('') || '<div class="sync-empty">Nenhum atalho rapido disponivel ainda.</div>';
   }
   if (drilldownNode) {
     const cards = [
@@ -138,6 +143,8 @@ function renderDashboardAccess() {
       { title: 'Importacoes recentes', meta: `${recentImports} item(ns)`, action: `openImportCategory('todos')`, page: 'schools', tone: 'slate' },
       { title: 'Sem rede/CFTV', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber' }
     ].filter((item) => canAccessPage(item.page));
+    const drilldownBox = document.getElementById('dashboardDrilldownBox');
+    if (drilldownBox) drilldownBox.hidden = !cards.length;
     drilldownNode.innerHTML = cards.map((item) => `
       <button class="dashboard-drill-card ${item.tone}" type="button" onclick="${item.action}">
         <strong>${esc(item.title)}</strong>
@@ -680,6 +687,25 @@ function renderDirectoryContacts() {
         <div class="sync-meta">${esc(item.email)}</div>
       </div>
     `).join('') || '<div class="sync-empty">Nenhum dado PEC liberado para este acesso.</div>';
+  }
+  const pecsPageList = document.getElementById('pecsPageList');
+  if (pecsPageList) {
+    const pecContacts = filteredDirectoryContacts().filter((item) => /pec|curriculo|currículo|especialista/i.test(`${item.role} ${item.name}`));
+    pecsPageList.innerHTML = pecContacts
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((item) => `
+        <div class="setechub-item">
+          <div class="setechub-head">
+            <div>
+              <strong>${esc(item.name)}</strong>
+              <div class="sync-meta">${esc(item.role)}</div>
+            </div>
+            <span class="diag-pill">${esc(item.phone)}</span>
+          </div>
+          <div class="sync-meta">${esc(item.email)}</div>
+        </div>
+      `).join('') || '<div class="sync-empty">Nenhum PEC disponivel para este perfil.</div>';
   }
 }
 

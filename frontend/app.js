@@ -200,10 +200,10 @@ function canManageUsers() {
 }
 
 function visibleNavigationPages() {
-  if (isPecUser()) return new Set(['settings']);
+  if (isPecUser()) return new Set(['pecs', 'settings']);
   if (isSupervisorUser()) return new Set(['schools', 'school-record', 'supervisors', 'supervisor-record', 'settings']);
-  if (canEditData()) return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports', 'settings']);
-  return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'reports', 'settings']);
+  if (canEditData()) return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'agenda', 'reports', 'settings']);
+  return new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'reports', 'settings']);
 }
 
 function assignedSchoolsForCurrentUser() {
@@ -241,7 +241,7 @@ function canViewSupervisor(name) {
 }
 
 function defaultPageForUser() {
-  if (isPecUser()) return 'settings';
+  if (isPecUser()) return 'pecs';
   return isSupervisorUser() ? 'schools' : 'dashboard';
 }
 
@@ -311,6 +311,8 @@ function applyAccessControl() {
   });
   const pecAccountBox = document.getElementById('pecAccountBox');
   if (pecAccountBox) pecAccountBox.hidden = !isPecUser();
+  const directoryBox = document.getElementById('directoryContactsBox');
+  if (directoryBox) directoryBox.hidden = isPecUser();
 }
 
 function updateIdentity() {
@@ -1199,7 +1201,7 @@ function handleSearch(query) {
 }
 
 function shiftFocusCard(direction) {
-  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports']
+  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'agenda', 'reports']
     .filter((page) => canAccessPage(page));
   const currentIndex = pages.indexOf(currentPage);
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + direction + pages.length) % pages.length;
