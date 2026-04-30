@@ -28,6 +28,7 @@ function requireEditAccess() {
 }
 
 function exportJson() {
+  if (!canManageUsers()) return;
   downloadFile('setechub-backup.json', JSON.stringify(state, null, 2), 'application/json');
 }
 
@@ -128,6 +129,7 @@ function toggleAccountMenu() {
 }
 
 function restoreState(file) {
+  if (!canManageUsers()) return;
   const reader = new FileReader();
   reader.onload = () => {
     try {
@@ -143,6 +145,7 @@ function restoreState(file) {
 }
 
 function importLegacyState() {
+  if (!canManageUsers()) return;
   const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
   if (!raw) {
     alert('Nenhum dado do prototipo antigo foi encontrado neste navegador.');
@@ -259,11 +262,13 @@ function removeNote(id) {
 }
 
 function removeOfficialLink(id) {
+  if (!canManageUsers()) return;
   state.officialLinks = state.officialLinks.filter((item) => item.id !== id);
   refreshAll();
 }
 
 function removeSector(id) {
+  if (!canManageUsers()) return;
   state.sectors = state.sectors.filter((item) => item.id !== id);
   refreshAll();
 }
@@ -792,6 +797,7 @@ function setupEventListeners() {
 
   document.getElementById('officialForm').addEventListener('submit', (event) => {
     event.preventDefault();
+    if (!canManageUsers()) return;
     const office = document.getElementById('officeContactInput').value.trim();
     const label = document.getElementById('officialLabel').value.trim();
     const url = document.getElementById('officialUrl').value.trim();
@@ -804,6 +810,7 @@ function setupEventListeners() {
 
   document.getElementById('sectorForm').addEventListener('submit', (event) => {
     event.preventDefault();
+    if (!canManageUsers()) return;
     const code = document.getElementById('sectorCode').value.trim().toUpperCase();
     const name = document.getElementById('sectorName').value.trim();
     const lead = document.getElementById('sectorLead').value.trim();
@@ -924,9 +931,9 @@ function setupEventListeners() {
     error.classList.add('show');
   });
 
-  document.getElementById('backupBtn').addEventListener('click', exportJson);
-  document.getElementById('exportSummaryBtn').addEventListener('click', exportSummary);
-  document.getElementById('logoutBtn').addEventListener('click', () => {
+  document.getElementById('backupBtn')?.addEventListener('click', exportJson);
+  document.getElementById('exportSummaryBtn')?.addEventListener('click', exportSummary);
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
     logoutToLogin();
   });
   document.querySelectorAll('.logout-action').forEach((button) => {
@@ -940,6 +947,10 @@ function setupEventListeners() {
     closeAccountMenu();
     showPage('settings');
   });
+  document.getElementById('accountAdminBtn')?.addEventListener('click', () => {
+    closeAccountMenu();
+    showPage('admin');
+  });
   document.addEventListener('click', (event) => {
     if (!event.target.closest('.acct-area')) closeAccountMenu();
   });
@@ -947,6 +958,7 @@ function setupEventListeners() {
     if (event.key === 'Escape') closeAccountMenu();
   });
   document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!canManageUsers()) return;
     state = createDefaults();
     redePreview = [];
     refreshAll();
@@ -1025,6 +1037,7 @@ function setupEventListeners() {
   });
   document.getElementById('supabaseConfigForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (!canManageUsers()) return;
     saveSupabaseConfig({
       url: document.getElementById('supabaseUrl').value.trim(),
       anonKey: document.getElementById('supabaseAnonKey').value.trim()

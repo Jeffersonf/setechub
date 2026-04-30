@@ -309,14 +309,6 @@ body::before {
   transition: background .15s;
 }
 .theme-btn:hover { background: var(--bd); }
-#privBtn {
-  color: var(--ac2);
-}
-[data-privacy=hidden] #privBtn {
-  color: var(--warn);
-  border-color: rgba(245,200,90,.36);
-  background: rgba(245,200,90,.10);
-}
 .sb-search {
   display: flex; align-items: center; gap: 8px;
   position: relative;
@@ -2608,6 +2600,72 @@ select:focus-visible,
   outline:none;
 }
 .widget-filter:focus{border-color:rgba(200,245,90,.5);}
+.settings-simple-grid{
+  display:grid;
+  grid-template-columns:minmax(280px,520px);
+  gap:14px;
+}
+.settings-account-card .setechub-note-form{
+  display:grid;
+  grid-template-columns:1fr 160px;
+}
+.settings-actions-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  grid-column:1/-1;
+}
+.admin-page .ph{
+  margin-bottom:12px;
+}
+.admin-hero{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:14px;
+  padding:18px;
+  border:1px solid rgba(200,245,90,.18);
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(200,245,90,.12), rgba(28,157,170,.10));
+}
+.admin-hero strong{
+  display:block;
+  margin-top:4px;
+  color:var(--tx);
+  font-size:20px;
+  line-height:1.2;
+}
+.admin-hero span{
+  display:block;
+  margin-top:6px;
+  color:var(--tx2);
+  font-size:13px;
+}
+.admin-kicker{
+  color:var(--ac);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+}
+.admin-hero-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.admin-module-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);
+  gap:14px;
+  align-items:start;
+}
+.admin-module{
+  min-width:0;
+}
 .admin-user-form{
   display:grid;
   grid-template-columns:1.2fr 1fr 1fr .8fr auto;
@@ -2638,6 +2696,21 @@ select:focus-visible,
 .admin-user-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .admin-role-select{width:112px;padding:7px 9px;font-size:12px;}
 @media(max-width:700px){
+  .settings-simple-grid,
+  .admin-module-grid{
+    grid-template-columns:1fr;
+  }
+  .settings-account-card .setechub-note-form{
+    grid-template-columns:1fr;
+  }
+  .admin-hero{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .admin-hero-actions{
+    width:100%;
+    justify-content:flex-start;
+  }
   .dash-manager-head,
   .dash-manager-row{
     flex-direction:column;

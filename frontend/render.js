@@ -1,5 +1,59 @@
 'use strict';
 
+function renderDashboardHero() {
+  const title = document.getElementById('dashboardHeroTitle');
+  const text = document.getElementById('dashboardHeroText');
+  const actions = document.getElementById('dashboardHeroActions');
+  const scoreNode = document.getElementById('dashboardHeroScore');
+  const statsNode = document.getElementById('dashboardHeroStats');
+  if (!title || !text || !actions || !scoreNode || !statsNode) return;
+
+  const health = dashboardHealth();
+  const coverage = operationalCoverage();
+  const focus = nextFocusTask();
+  const openCalls = state.calls.filter((item) => item.status !== 'resolvido').length;
+  const attentionSchools = visibleSchools().filter((item) => item.status !== 'estavel').length;
+  const alertAssets = state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length;
+  const pendingItems = pendingQueueItems(99).length;
+
+  title.textContent = focus ? focus.title : 'Painel inicial pronto para abrir a rotina.';
+  text.textContent = focus
+    ? `${focus.place || 'Sem local definido'} | ${focus.category || 'Rotina'} | ${focus.time || 'sem horario definido'}`
+    : buildSummaryPreview();
+
+  const actionItems = [
+    { label: 'Abrir chamados', action: `openCallCategory('todos')`, page: 'calls', tone: 'primary' },
+    { label: 'Ver escolas', action: `showPage('schools')`, page: 'schools', tone: '' },
+    { label: 'Inventario', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
+    { label: 'Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
+  ].filter((item) => canAccessPage(item.page) && (item.tone !== 'edit' || canEditData()));
+
+  actions.innerHTML = actionItems.map((item) => `
+    <button class="btn ${item.tone === 'primary' ? 'btn-p' : 'btn-g'} btn-sm" type="button" onclick="${item.action}">${esc(item.label)}</button>
+  `).join('');
+
+  scoreNode.innerHTML = `
+    <div class="sync-meta">Saude da operacao</div>
+    <strong>${esc(String(health.score))}%</strong>
+    <span class="diag-pill ${health.tone}">${esc(health.label)}</span>
+  `;
+
+  statsNode.innerHTML = [
+    { label: 'Chamados', value: String(openCalls), tone: openCalls ? 'pill-warn' : 'pill-ok' },
+    { label: 'Escolas', value: String(attentionSchools), tone: attentionSchools ? 'pill-warn' : 'pill-ok' },
+    { label: 'Ativos', value: String(alertAssets), tone: alertAssets ? 'pill-danger' : 'pill-ok' },
+    { label: 'Pendencias', value: String(pendingItems), tone: pendingItems ? 'pill-info' : 'pill-ok' },
+    { label: 'Cobertura', value: `${coverage.profileCoverage}%`, tone: coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn' },
+    { label: 'Horas', value: bankHours(), tone: '' }
+  ].map((item) => `
+    <div class="dashboard-hero-stat">
+      <span>${esc(item.label)}</span>
+      <strong>${esc(item.value)}</strong>
+      <i class="diag-pill ${item.tone}"></i>
+    </div>
+  `).join('');
+}
+
 function renderOperationsCenter() {
   const health = dashboardHealth();
   const coverage = operationalCoverage();
@@ -625,6 +679,7 @@ function renderMunicipalities() {
 function renderSectors() {
   const preview = document.getElementById('sectorList');
   const directory = document.getElementById('sectorDirectoryList');
+  const adminActions = canManageUsers();
   const html = state.sectors.map((item) => `
     <div class="setechub-item">
       <div class="setechub-head">
@@ -634,7 +689,7 @@ function renderSectors() {
         </div>
         <div class="setechub-badges">
           <a class="btn btn-g btn-sm" href="mailto:${esc(item.email)}">Email</a>
-          <button class="btn btn-d btn-sm" onclick="removeSector(${item.id})">Remover</button>
+          ${adminActions ? `<button class="btn btn-d btn-sm" onclick="removeSector(${item.id})">Remover</button>` : ''}
         </div>
       </div>
       <div class="sync-meta">${esc(item.summary || '')}</div>
@@ -655,7 +710,7 @@ function renderSectors() {
 function renderDirectoryContacts() {
   const list = document.getElementById('directoryContactsList');
   if (!list) return;
-  const contacts = filteredDirectoryContacts()
+  const contacts = filteredDirectoryContacts(false)
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
   list.innerHTML = contacts.map((item) => `
@@ -675,7 +730,10 @@ function renderDirectoryContacts() {
     `).join('') || '<div class="sync-empty">Nenhum contato oficial importado.</div>';
   const pecList = document.getElementById('pecAccountList');
   if (pecList) {
-    pecList.innerHTML = contacts.map((item) => `
+    const pecAccountContacts = filteredDirectoryContacts(true)
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name));
+    pecList.innerHTML = pecAccountContacts.map((item) => `
       <div class="setechub-item">
         <div class="setechub-head">
           <div>
@@ -1421,6 +1479,12 @@ function renderSupervisorRecord() {
   const subtitle = document.getElementById('supervisorRecordSubtitle');
   if (title) title.textContent = supervisor.name;
   if (subtitle) subtitle.textContent = `${selectedStat.assignedSchools.length} escola(s) | ${monthlyVisitCount}/${monthlyGoal} visita(s) no mes | ${goalMet ? 'meta cumprida' : 'meta pendente'}.`;
+  const refreshButton = document.getElementById('refreshSupervisorSheetBtn');
+  if (refreshButton) {
+    refreshButton.hidden = !supervisor.visitSourceUrl;
+    refreshButton.disabled = false;
+    refreshButton.textContent = 'Atualizar planilha';
+  }
 
   profileHost.innerHTML = `
     <div class="setechub-item">
@@ -1433,7 +1497,7 @@ function renderSupervisorRecord() {
         </div>
         <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
       </div>
-      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a></div>` : ''}
+      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a><button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar planilha</button></div>` : ''}
     </div>
   `;
 
@@ -1568,6 +1632,7 @@ function renderSupervisorRecord() {
 
 function renderOfficialData() {
   const list = document.getElementById('officialList');
+  const adminActions = canManageUsers();
   list.innerHTML = state.officialLinks.slice(0, 6).map((item) => `
     <div class="setechub-item">
       <div class="setechub-head">
@@ -1583,7 +1648,7 @@ function renderOfficialData() {
           <strong>${esc(item.label)}</strong>
           <div class="sync-meta"><a href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.url)}</a></div>
         </div>
-        <button class="btn btn-d btn-sm" onclick="removeOfficialLink(${item.id})">Remover</button>
+        ${adminActions ? `<button class="btn btn-d btn-sm" onclick="removeOfficialLink(${item.id})">Remover</button>` : ''}
       </div>
     </div>
   `).join('');
