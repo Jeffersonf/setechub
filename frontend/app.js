@@ -3,7 +3,7 @@
 let state = loadState();
 let redePreview = [];
 let currentPage = 'dashboard';
-let privacyHidden = localStorage.getItem(PRIVACY_KEY) === '1';
+let privacyHidden = false;
 let currentTaskFilter = 'todas';
 let currentCallFilter = 'todos';
 let currentCallSchoolContext = '';
@@ -191,17 +191,12 @@ function isPecLeadUser() {
   return isPecUser() && normalizeKey(user?.login || user?.name) === normalizeKey('jaqueline.borelli');
 }
 
-function isOwnerAdminUser() {
-  const user = currentUser();
-  return user?.role === 'admin' && normalizeKey(user?.login || user?.name) === normalizeKey('Jefferson');
-}
-
 function canEditData() {
   return ['admin', 'seintec', 'ctc'].includes(currentUserRole());
 }
 
 function canManageUsers() {
-  return sessionStorage.getItem(SESSION_KEY) === 'ok' && isOwnerAdminUser();
+  return sessionStorage.getItem(SESSION_KEY) === 'ok' && currentUserRole() === 'admin';
 }
 
 function visibleNavigationPages() {
@@ -333,7 +328,6 @@ function updateIdentity() {
   document.getElementById('uRole').textContent = roleLabel;
   document.getElementById('uAvatar').textContent = user.name.slice(0, 2).toUpperCase();
   document.getElementById('profileName').value = user.name;
-  document.getElementById('profileUnit').value = roleLabel;
   document.getElementById('profilePin').value = user.pin || '';
   document.getElementById('todayLabel').textContent = todayLabel();
   applyAccessControl();
@@ -1234,7 +1228,11 @@ function togglePrivacy() {
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
-  document.getElementById('thmBtn').innerHTML = theme === 'dark' ? '&#9789;' : '&#9728;';
+  const themeButton = document.getElementById('thmBtn');
+  if (themeButton) {
+    themeButton.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;';
+    themeButton.title = theme === 'dark' ? 'Usar tema claro' : 'Usar tema escuro';
+  }
   document.getElementById('themeColorMeta').setAttribute('content', theme === 'dark' ? '#08090d' : '#f4f7ef');
   localStorage.setItem(THEME_KEY, theme);
 }

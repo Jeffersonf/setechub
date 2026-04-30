@@ -125,7 +125,6 @@
   <div class="logo">
     <span class="brand-word"><span style="color:var(--ac)">setec</span><span style="color:var(--tx)">hub</span></span>
     <div class="logo-actions">
-      <button class="theme-btn" id="privBtn" onclick="togglePrivacy()" title="Ocultar metricas">PV</button>
       <button class="theme-btn" id="thmBtn" onclick="toggleTheme()" title="Trocar tema">DK</button>
     </div>
   </div>
@@ -147,22 +146,6 @@
     <div class="nav-item sl-n" data-page="admin"><span class="ico">🛡️</span>Admin</div>
     <div class="nav-item sl-n" data-page="settings"><span class="ico">⚙️</span>Conta</div>
   </nav>
-  <div class="sidebar-utility">
-    <div class="sidebar-card">
-      <div class="sidebar-card-head">
-        <div class="sidebar-card-kicker">Acesso rapido</div>
-      </div>
-      <div class="sidebar-icon-shortcuts">
-        <button class="sidebar-icon-btn" onclick="showPage('agenda')" title="Nova tarefa">📝</button>
-        <button class="sidebar-icon-btn" onclick="showPage('calls')" title="Novo chamado">📞</button>
-        <button class="sidebar-icon-btn" onclick="showPage('reports')" title="Automacao">🤖</button>
-      </div>
-    </div>
-    <div class="sidebar-mini-actions">
-      <button class="sidebar-mini-btn primary" onclick="focusFirstInput('taskTitle')">+ Tarefa</button>
-      <button class="sidebar-mini-btn" onclick="focusFirstInput('callTitle')">+ Chamado</button>
-    </div>
-  </div>
   <div class="sb-bottom">
     <div class="conn-wrap"></div>
     <div class="made-by">base visual inspirada no <span>finanza</span></div>
@@ -176,6 +159,7 @@
       </button>
       <div class="acct-pop" id="accountMenu">
         <button class="pop-item" id="accountOpenBtn" type="button">Conta</button>
+        <button class="pop-item" id="accountAdminBtn" type="button" data-admin-only>Admin</button>
         <div class="pop-div"></div>
         <button class="pop-item danger logout-action" type="button">Sair da conta</button>
       </div>
@@ -857,26 +841,19 @@
         <div class="ps">Opcoes pessoais disponiveis para todos os usuarios.</div>
       </div>
     </div>
-    <div class="setechub-two-col settings-general-grid">
-      <div class="box">
+    <div class="settings-simple-grid">
+      <div class="box settings-account-card">
         <div class="bh">
-          <div><div class="ct">Conta e identidade</div><div class="cs">Ajuste nome, unidade e PIN local.</div></div>
+          <div><div class="ct">Minha conta</div><div class="cs">Atualize apenas seu nome de exibicao e PIN local.</div></div>
         </div>
         <form id="profileForm" class="setechub-form setechub-note-form">
           <input class="fi" id="profileName" placeholder="Nome">
-          <input class="fi" id="profileUnit" placeholder="Unidade">
           <input class="fi" id="profilePin" placeholder="PIN local">
-          <button class="btn btn-p" type="submit">Salvar perfil</button>
+          <div class="settings-actions-row">
+            <button class="btn btn-p" type="submit">Salvar conta</button>
+            <button class="btn btn-g" id="logoutBtn" type="button">Bloquear painel</button>
+          </div>
         </form>
-      </div>
-      <div class="box">
-        <div class="bh">
-          <div><div class="ct">Sessao e exportacao</div><div class="cs">Baixe um resumo ou bloqueie o painel neste navegador.</div></div>
-        </div>
-        <div class="setechub-action-col">
-          <button class="btn btn-g" id="exportSummaryBtn" type="button">Exportar resumo TXT</button>
-          <button class="btn btn-g" id="logoutBtn" type="button">Bloquear painel</button>
-        </div>
       </div>
     </div>
   </div>

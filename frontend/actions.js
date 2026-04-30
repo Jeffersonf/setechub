@@ -931,9 +931,9 @@ function setupEventListeners() {
     error.classList.add('show');
   });
 
-  document.getElementById('backupBtn').addEventListener('click', exportJson);
-  document.getElementById('exportSummaryBtn').addEventListener('click', exportSummary);
-  document.getElementById('logoutBtn').addEventListener('click', () => {
+  document.getElementById('backupBtn')?.addEventListener('click', exportJson);
+  document.getElementById('exportSummaryBtn')?.addEventListener('click', exportSummary);
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
     logoutToLogin();
   });
   document.querySelectorAll('.logout-action').forEach((button) => {
@@ -946,6 +946,10 @@ function setupEventListeners() {
   document.getElementById('accountOpenBtn')?.addEventListener('click', () => {
     closeAccountMenu();
     showPage('settings');
+  });
+  document.getElementById('accountAdminBtn')?.addEventListener('click', () => {
+    closeAccountMenu();
+    showPage('admin');
   });
   document.addEventListener('click', (event) => {
     if (!event.target.closest('.acct-area')) closeAccountMenu();

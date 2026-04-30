@@ -309,14 +309,6 @@ body::before {
   transition: background .15s;
 }
 .theme-btn:hover { background: var(--bd); }
-#privBtn {
-  color: var(--ac2);
-}
-[data-privacy=hidden] #privBtn {
-  color: var(--warn);
-  border-color: rgba(245,200,90,.36);
-  background: rgba(245,200,90,.10);
-}
 .sb-search {
   display: flex; align-items: center; gap: 8px;
   position: relative;
@@ -2608,8 +2600,21 @@ select:focus-visible,
   outline:none;
 }
 .widget-filter:focus{border-color:rgba(200,245,90,.5);}
-.settings-general-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr));
+.settings-simple-grid{
+  display:grid;
+  grid-template-columns:minmax(280px,520px);
+  gap:14px;
+}
+.settings-account-card .setechub-note-form{
+  display:grid;
+  grid-template-columns:1fr 160px;
+}
+.settings-actions-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  grid-column:1/-1;
 }
 .admin-page .ph{
   margin-bottom:12px;
@@ -2691,8 +2696,11 @@ select:focus-visible,
 .admin-user-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .admin-role-select{width:112px;padding:7px 9px;font-size:12px;}
 @media(max-width:700px){
-  .settings-general-grid,
+  .settings-simple-grid,
   .admin-module-grid{
+    grid-template-columns:1fr;
+  }
+  .settings-account-card .setechub-note-form{
     grid-template-columns:1fr;
   }
   .admin-hero{
