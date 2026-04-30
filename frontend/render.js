@@ -1176,6 +1176,22 @@ function renderSchoolDetail() {
   document.getElementById('schoolProfileNotes').value = profile?.notes || '';
 }
 
+function supervisorIndicatorClass(value) {
+  const key = normalizeKey(value);
+  if (key.includes('verde')) return 'pill-ok';
+  if (key.includes('amarelo')) return 'pill-warn';
+  if (key.includes('vermelho')) return 'pill-danger';
+  return 'pill-info';
+}
+
+function supervisorOfficialMonthlyVisits(supervisor, fallback) {
+  return Number.isFinite(Number(supervisor.monthlyVisits)) ? Number(supervisor.monthlyVisits) : fallback;
+}
+
+function supervisorOfficialWeeklyVisits(supervisor) {
+  return Number.isFinite(Number(supervisor.weeklyVisits)) ? Number(supervisor.weeklyVisits) : 0;
+}
+
 function renderSupervisors() {
   const metricCount = document.getElementById('supervisorMetricCount');
   const stats = supervisorStats();
@@ -1224,12 +1240,17 @@ function renderSupervisors() {
     const syncedCount = stats.filter((item) => item.supervisor.sourceSyncedAt).length;
     const pendingGoals = stats.filter((item) => {
       const goal = Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1);
-      const count = monthVisits.filter((visit) => visit.supervisor === item.supervisor.name).length;
+      const localCount = monthVisits.filter((visit) => visit.supervisor === item.supervisor.name).length;
+      const count = supervisorOfficialMonthlyVisits(item.supervisor, localCount);
       return count < goal;
     }).length;
+    const officialMonthlyVisits = stats.reduce((sum, item) => {
+      const localCount = monthVisits.filter((visit) => visit.supervisor === item.supervisor.name).length;
+      return sum + supervisorOfficialMonthlyVisits(item.supervisor, localCount);
+    }, 0);
     panelGrid.innerHTML = [
       { label: 'Supervisores', value: String(stats.length), note: `${syncedCount} sincronizado(s)`, tone: 'pill-info' },
-      { label: 'Visitas no mes', value: String(monthVisits.length), note: 'registros no mes atual', tone: 'pill-ok' },
+      { label: 'Visitas no mes', value: String(officialMonthlyVisits), note: 'painel oficial da planilha', tone: 'pill-ok' },
       { label: 'Metas pendentes', value: String(pendingGoals), note: pendingGoals ? 'precisam de acompanhamento' : 'metas em dia', tone: pendingGoals ? 'pill-warn' : 'pill-ok' },
       { label: 'Escolas vinculadas', value: String(assignedSchoolCount), note: `${averageCoverage}% de cobertura`, tone: averageCoverage >= 70 ? 'pill-ok' : 'pill-warn' }
     ].map((item) => `
@@ -1250,26 +1271,30 @@ function renderSupervisors() {
       <div class="setechub-item setechub-clickable supervisor-list-card ${normalizeKey(item.supervisor.name) === currentSupervisorFilter ? 'active' : ''}" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
         ${(() => {
           const monthlyGoal = Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1);
+          const weeklyGoal = Number(item.supervisor.weeklyGoal || 0);
           const monthVisits = visits.filter((visit) => {
             if (visit.supervisor !== item.supervisor.name) return false;
             const date = new Date(`${visit.date}T00:00:00`);
             return date.getFullYear() === year && date.getMonth() === month;
           });
+          const officialMonthVisits = supervisorOfficialMonthlyVisits(item.supervisor, monthVisits.length);
+          const officialWeekVisits = supervisorOfficialWeeklyVisits(item.supervisor);
           const visitedSchools = new Set(monthVisits.map((visit) => visit.school)).size;
           const pending = Math.max(0, item.assignedSchools.length - visitedSchools);
-          const goalMet = monthVisits.length >= monthlyGoal;
+          const goalMet = officialMonthVisits >= monthlyGoal;
+          const monthlyIndicator = item.supervisor.monthlyIndicator || (goalMet ? 'verde' : 'amarelo');
           return `
             <div class="setechub-head">
               <div>
                 <strong>${esc(item.supervisor.name)}</strong>
                 <div class="sync-meta">${esc(item.supervisor.email || '')} | ${esc(item.supervisor.phone || '')}</div>
               </div>
-              <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
+              <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(badgeText(monthlyIndicator))}</span>
             </div>
             <div class="school-overview-kpis supervisor-list-kpis">
-              <div><span>Visitas</span><strong>${esc(String(monthVisits.length))}/${esc(String(monthlyGoal))}</strong></div>
+              <div><span>Mes</span><strong>${esc(String(officialMonthVisits))}/${esc(String(monthlyGoal))}</strong></div>
+              <div><span>Semana</span><strong>${esc(String(officialWeekVisits))}${weeklyGoal ? `/${esc(String(weeklyGoal))}` : ''}</strong></div>
               <div><span>Escolas</span><strong>${esc(String(item.assignedSchools.length))}</strong></div>
-              <div><span>Visitadas</span><strong>${esc(String(visitedSchools))}</strong></div>
               <div><span>Faltam</span><strong>${esc(String(pending))}</strong></div>
             </div>
           `;
@@ -1547,9 +1572,13 @@ function renderSupervisorRecord() {
   const visitedSchoolSet = new Set(monthVisits.map((visit) => visit.school));
   const pendingSchools = selectedStat.assignedSchools.filter((school) => !visitedSchoolSet.has(school));
   const monthlyGoal = Number(supervisor.monthlyGoal || selectedStat.assignedSchools.length || 1);
-  const monthlyVisitCount = monthVisits.length;
+  const weeklyGoal = Number(supervisor.weeklyGoal || 0);
+  const monthlyVisitCount = supervisorOfficialMonthlyVisits(supervisor, monthVisits.length);
+  const weeklyVisitCount = supervisorOfficialWeeklyVisits(supervisor);
   const goalPct = Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100));
   const goalMet = monthlyVisitCount >= monthlyGoal;
+  const monthlyIndicator = supervisor.monthlyIndicator || (goalMet ? 'verde' : 'amarelo');
+  const weeklyIndicator = supervisor.weeklyIndicator || '';
 
   if (select) {
     select.innerHTML = stats.map((item) => `<option value="${esc(item.supervisor.name)}">${esc(item.supervisor.name)}</option>`).join('');
@@ -1576,7 +1605,7 @@ function renderSupervisorRecord() {
           <div class="sync-meta">${esc(supervisor.visitSourceUrl ? `${supervisor.visitSourceLabel || 'Planilha Google'} como fonte principal.` : supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
           ${supervisor.sourceSyncedAt ? `<div class="sync-meta">Ultima leitura online: ${esc(timestampLabel(new Date(supervisor.sourceSyncedAt)))}</div>` : ''}
         </div>
-        <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
+        <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(badgeText(monthlyIndicator))}</span>
       </div>
       ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a><button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar planilha</button></div>` : ''}
     </div>
@@ -1596,11 +1625,12 @@ function renderSupervisorRecord() {
 
   document.getElementById('supervisorRecordMetrics').innerHTML = [
     { label: 'Escolas', value: String(selectedStat.assignedSchools.length), note: 'vinculadas ao supervisor' },
-    { label: 'Visitadas', value: String(visitedSchoolSet.size), note: 'com visita no mes' },
+    { label: 'Semana', value: weeklyGoal ? `${weeklyVisitCount}/${weeklyGoal}` : String(weeklyVisitCount), note: weeklyIndicator ? `indicador ${badgeText(weeklyIndicator)}` : 'visitas da semana' },
+    { label: 'Visitadas', value: String(visitedSchoolSet.size), note: 'escolas distintas no mes' },
     { label: 'Faltantes', value: String(pendingSchools.length), note: 'sem visita no mes' },
     { label: 'Chamados', value: String(selectedStat.openCalls), note: 'ativos nas escolas vinculadas' },
-    { label: 'Alertas', value: String(selectedStat.alerts), note: 'inventario em atencao' },
-    { label: 'Historico', value: String(allVisits.length), note: 'visitas totais registradas' }
+    { label: 'Indicador mes', value: badgeText(monthlyIndicator || 'sem dado'), note: `${monthlyVisitCount}/${monthlyGoal} visita(s)` },
+    { label: 'Historico', value: String(allVisits.length), note: 'registros importados' }
   ].map((item) => `
     <div class="setechub-monitor-card compact">
       <div class="sync-meta">${esc(item.label)}</div>

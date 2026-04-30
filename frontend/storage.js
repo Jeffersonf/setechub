@@ -93,6 +93,7 @@ const SUPERVISOR_VISIT_SOURCES = [
     primary: true,
     aggregate: true,
     requireSupervisorColumn: true,
+    panelGid: '1507846737',
     tabPrefix: 'DADOS_'
   }
 ];

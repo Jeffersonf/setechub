@@ -310,6 +310,20 @@ function googleSheetCsvUrl(url) {
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
+function googleSheetGidCsvUrl(url, gid) {
+  const text = String(url || '').trim();
+  if (!gid) return googleSheetCsvUrl(text);
+  if (/docs\.google\.com\/spreadsheets\/d\/e\//i.test(text)) {
+    const base = text.split('?')[0];
+    return `${base}?output=csv&gid=${encodeURIComponent(gid)}`;
+  }
+  const regularMatch = text.match(/docs\.google\.com\/spreadsheets\/d\/([^/]+)/i);
+  if (regularMatch) {
+    return `https://docs.google.com/spreadsheets/d/${regularMatch[1]}/export?format=csv&gid=${encodeURIComponent(gid)}`;
+  }
+  return googleSheetCsvUrl(text);
+}
+
 function supervisorSheetTabName(supervisorName, source = {}) {
   const prefix = source.tabPrefix || 'DADOS_';
   const firstName = String(supervisorName || '').trim().split(/\s+/)[0] || '';
@@ -333,6 +347,66 @@ function rowSupervisorName(row) {
     'dados_primeiro nome do supervisor',
     'Supervisor'
   ]);
+}
+
+function parseVisitCount(value) {
+  const match = String(value || '').match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function indicatorTone(value) {
+  const key = normalizeKey(value);
+  if (key.includes('verde')) return 'verde';
+  if (key.includes('amarelo')) return 'amarelo';
+  if (key.includes('vermelho')) return 'vermelho';
+  return String(value || '').trim();
+}
+
+function mergeSupervisorPanelRows(source, rows) {
+  const importedAt = new Date().toISOString();
+  let updatedCount = 0;
+  state.supervisors = (state.supervisors || []).map((supervisor) => {
+    const row = rows.find((item) => supervisorForSourceRow(csvValue(item, ['Supervisor']), source)?.name === supervisor.name);
+    if (!row) return supervisor;
+    updatedCount += 1;
+    const assignedSchoolCount = parseVisitCount(csvValue(row, ['Escolas Atribuidas', 'Escolas Atribuídas']));
+    const weeklyGoal = parseVisitCount(csvValue(row, ['Meta Semanal']));
+    const monthlyGoal = parseVisitCount(csvValue(row, ['Meta Mensal']));
+    const currentWeek = parseVisitCount(csvValue(row, ['Semana do Mes', 'Semana do Mês']));
+    const weeklyVisits = parseVisitCount(csvValue(row, ['Visitas na Semana']));
+    const monthlyVisits = parseVisitCount(csvValue(row, ['Visitas no Mes', 'Visitas no Mês']));
+    const weeklyIndicator = indicatorTone(csvValue(row, ['Indicador Semana']));
+    const monthlyIndicator = indicatorTone(csvValue(row, ['Indicador Mensal']));
+    return {
+      ...supervisor,
+      assignedSchoolCount: assignedSchoolCount || supervisor.assignedSchoolCount,
+      weeklyGoal: weeklyGoal || supervisor.weeklyGoal,
+      monthlyGoal: monthlyGoal || supervisor.monthlyGoal,
+      currentWeek: currentWeek || supervisor.currentWeek,
+      weeklyVisits: Number.isFinite(weeklyVisits) ? weeklyVisits : supervisor.weeklyVisits,
+      monthlyVisits: Number.isFinite(monthlyVisits) ? monthlyVisits : supervisor.monthlyVisits,
+      weeklyIndicator: weeklyIndicator || supervisor.weeklyIndicator,
+      monthlyIndicator: monthlyIndicator || supervisor.monthlyIndicator,
+      visitSourceId: source.id,
+      visitSourceUrl: source.url,
+      visitSourceLabel: source.label,
+      visitSourcePrimary: source.primary,
+      source: 'google-sheet',
+      sourceSyncedAt: importedAt
+    };
+  });
+  return updatedCount;
+}
+
+async function syncSupervisorPanelSource(source) {
+  if (!source.panelGid) return 0;
+  const response = await fetch(googleSheetGidCsvUrl(source.url, source.panelGid), { cache: 'no-store' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const rows = parseCsvRows(await response.text());
+  const [headers, ...dataRows] = rows;
+  if (!headers?.length) return 0;
+  const records = dataRows.map((row) => Object.fromEntries(headers.map((header, index) => [normalizeCsvHeader(header), row[index] || ''])));
+  return mergeSupervisorPanelRows(source, records);
 }
 
 function googleSheetTabCsvUrl(url, tabName) {
@@ -457,6 +531,7 @@ async function syncSupervisorVisitSources(options = {}) {
   for (const source of SUPERVISOR_VISIT_SOURCES) {
     if (source.aggregate) {
       try {
+        importedCount += await syncSupervisorPanelSource(source);
         importedCount += await syncSupervisorVisitSource(source);
       } catch (error) {
         errorCount += 1;
@@ -513,9 +588,11 @@ async function syncCurrentSupervisorVisitSource() {
       url: supervisor.visitSourceUrl,
       label: supervisor.visitSourceLabel || 'Planilha Google',
       primary: supervisor.visitSourcePrimary ?? true,
+      panelGid: SUPERVISOR_VISIT_SOURCES[0]?.panelGid,
       tabNames: supervisorSheetTabNames(supervisor.name),
       requireSupervisorColumn: true
     };
+    await syncSupervisorPanelSource(source);
     await syncSupervisorVisitSource(source);
     refreshAll();
     showPage('supervisor-record');
