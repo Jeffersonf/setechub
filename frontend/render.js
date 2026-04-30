@@ -76,21 +76,23 @@ function renderDashboardAccess() {
   const unresolvedCalls = state.calls.filter((item) => item.status === 'aberto').length;
   const routeCalls = state.calls.filter((item) => item.status === 'em_rota').length;
   const recentImports = recentSchoolImports(8).length;
+  const pecCount = (state.users || []).filter((item) => item.role === 'pec' && item.active !== false).length;
   const categories = [
-    { title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, tone: 'lime', priority: 'primary' },
-    { title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, tone: 'teal', priority: 'primary' },
-    { title: 'Chamados', meta: `${callCount} ativos`, action: `showPage('calls')`, tone: 'red', priority: 'primary' },
-    { title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, tone: 'blue', priority: 'secondary' },
-    { title: 'Rede / CFTV', meta: `${state.schoolNetworks.length} escolas com dados`, action: `showPage('schools')`, tone: 'amber', priority: 'secondary' },
-    { title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, tone: 'slate', priority: 'secondary' }
-  ];
+    { title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+    { title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
+    { title: 'Chamados', meta: `${callCount} ativos`, action: `showPage('calls')`, page: 'calls', tone: 'red', priority: 'primary' },
+    { title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `openPecDirectory()`, page: 'settings', tone: 'blue', priority: 'secondary' },
+    { title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
+    { title: 'Rede / CFTV', meta: `${state.schoolNetworks.length} escolas com dados`, action: `showPage('schools')`, page: 'schools', tone: 'amber', priority: 'secondary' },
+    { title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, page: 'reports', tone: 'slate', priority: 'secondary' }
+  ].filter((item) => canAccessPage(item.page));
   if (categoryNode) {
     categoryNode.innerHTML = categories.map((item) => `
       <button class="dashboard-category-card ${item.tone} ${item.priority}" type="button" onclick="${item.action}">
         <strong>${esc(item.title)}</strong>
         <span>${esc(item.meta)}</span>
       </button>
-    `).join('');
+    `).join('') || '<div class="sync-empty">Nenhuma categoria disponivel para este perfil.</div>';
   }
   if (linksNode) {
     const topSchools = topSchoolSignals(3);
@@ -98,50 +100,50 @@ function renderDashboardAccess() {
     const topAssets = topInventoryAlerts(3);
     const topImports = recentSchoolImports(3);
     linksNode.innerHTML = [
-      ...topSchools.map(({ school, signal }) => `
+      ...(canAccessPage('schools') ? topSchools.map(({ school, signal }) => `
         <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school.name)}')">
           <strong>Escola</strong>
           <div class="sync-meta">${esc(school.name)} | CIE ${esc(school.cie || '--')} | ${esc(String(signal.alertUnits))} alertas | ${esc(String(signal.assetUnits))} unid.</div>
         </div>
-      `),
-      ...topAssets.map((item) => `
+      `) : []),
+      ...(canAccessPage('assets') ? topAssets.map((item) => `
         <div class="setechub-item setechub-clickable" onclick="setInventorySchool('${esc(item.school)}')">
           <strong>Inventario</strong>
           <div class="sync-meta">${esc(item.school)} | ${esc(item.name)} | ${esc(String(item.alertUnits))} alertas</div>
         </div>
-      `),
-      ...topCalls.map((item) => `
+      `) : []),
+      ...(canAccessPage('calls') ? topCalls.map((item) => `
         <div class="setechub-item setechub-clickable" onclick="openSchoolCalls('${esc(item.school)}')">
           <strong>Chamado</strong>
           <div class="sync-meta">${esc(item.school)} | ${esc(item.title)} | ${esc(badgeText(item.status))}</div>
         </div>
-      `),
-      ...topImports.map((item) => `
+      `) : []),
+      ...(canAccessPage('schools') ? topImports.map((item) => `
         <div class="setechub-item setechub-clickable" onclick="openSchoolImports('${esc(item.school)}')">
           <strong>Importacao</strong>
           <div class="sync-meta">${esc(item.school)} | ${esc(item.label || item.filename || '')} | ${esc(item.type || '')}</div>
         </div>
-      `)
+      `) : [])
     ].join('') || '<div class="sync-empty">Nenhum atalho rapido disponivel ainda.</div>';
   }
   if (drilldownNode) {
     const cards = [
-      { title: 'Escolas criticas', meta: `${criticalSchools} escola(s)`, action: `openSchoolCategory('critico')`, tone: 'red' },
-      { title: 'Escolas sem ficha', meta: `${noProfileSchools} escola(s)`, action: `openSchoolCategory('sem_ficha')`, tone: 'amber' },
-      { title: 'Escolas com alerta', meta: `${schoolAlertCount} escola(s)`, action: `openSchoolCategory('com_alerta')`, tone: 'lime' },
-      { title: 'Inventario critico', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.defectUnits > 0).length} familia(s)`, action: `openInventoryCategory('criticos')`, tone: 'red' },
-      { title: 'Infra de rede', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.category === 'infra').length} familia(s)`, action: `openInventoryCategory('todos', 'infra')`, tone: 'blue' },
-      { title: 'Chamados abertos', meta: `${unresolvedCalls} item(ns)`, action: `openCallCategory('aberto')`, tone: 'red' },
-      { title: 'Chamados em rota', meta: `${routeCalls} item(ns)`, action: `openCallCategory('em_rota')`, tone: 'teal' },
-      { title: 'Importacoes recentes', meta: `${recentImports} item(ns)`, action: `openImportCategory('todos')`, tone: 'slate' },
-      { title: 'Sem rede/CFTV', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, tone: 'amber' }
-    ];
+      { title: 'Escolas criticas', meta: `${criticalSchools} escola(s)`, action: `openSchoolCategory('critico')`, page: 'schools', tone: 'red' },
+      { title: 'Escolas sem ficha', meta: `${noProfileSchools} escola(s)`, action: `openSchoolCategory('sem_ficha')`, page: 'schools', tone: 'amber' },
+      { title: 'Escolas com alerta', meta: `${schoolAlertCount} escola(s)`, action: `openSchoolCategory('com_alerta')`, page: 'schools', tone: 'lime' },
+      { title: 'Inventario critico', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.defectUnits > 0).length} familia(s)`, action: `openInventoryCategory('criticos')`, page: 'assets', tone: 'red' },
+      { title: 'Infra de rede', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.category === 'infra').length} familia(s)`, action: `openInventoryCategory('todos', 'infra')`, page: 'assets', tone: 'blue' },
+      { title: 'Chamados abertos', meta: `${unresolvedCalls} item(ns)`, action: `openCallCategory('aberto')`, page: 'calls', tone: 'red' },
+      { title: 'Chamados em rota', meta: `${routeCalls} item(ns)`, action: `openCallCategory('em_rota')`, page: 'calls', tone: 'teal' },
+      { title: 'Importacoes recentes', meta: `${recentImports} item(ns)`, action: `openImportCategory('todos')`, page: 'schools', tone: 'slate' },
+      { title: 'Sem rede/CFTV', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber' }
+    ].filter((item) => canAccessPage(item.page));
     drilldownNode.innerHTML = cards.map((item) => `
       <button class="dashboard-drill-card ${item.tone}" type="button" onclick="${item.action}">
         <strong>${esc(item.title)}</strong>
         <span>${esc(item.meta)}</span>
       </button>
-    `).join('');
+    `).join('') || '<div class="sync-empty">Nenhum recorte disponivel para este perfil.</div>';
   }
 }
 

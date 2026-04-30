@@ -453,6 +453,17 @@ function openImportCategory(filter = 'todos') {
   renderSchoolImports();
 }
 
+function openPecDirectory() {
+  currentDirectoryFilter = 'pecs';
+  showPage('settings');
+  syncFilterButtons('directory');
+  renderDirectoryContacts();
+  setTimeout(() => {
+    const target = document.getElementById('directoryContactsList') || document.getElementById('pecAccountBox');
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 0);
+}
+
 function renameSchoolReferences(previousName, nextName) {
   if (!previousName || !nextName || previousName === nextName) return;
   state.tasks = state.tasks.map((item) => item.place === previousName ? { ...item, place: nextName } : item);

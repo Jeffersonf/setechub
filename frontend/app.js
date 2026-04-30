@@ -1199,10 +1199,11 @@ function handleSearch(query) {
 }
 
 function shiftFocusCard(direction) {
-  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports'];
+  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports']
+    .filter((page) => canAccessPage(page));
   const currentIndex = pages.indexOf(currentPage);
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + direction + pages.length) % pages.length;
-  showPage(pages[nextIndex]);
+  showPage(pages[nextIndex] || defaultPageForUser());
 }
 
 function applyPrivacy() {
