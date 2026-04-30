@@ -48,7 +48,7 @@
 <body>
 <main>
   <h1>SETECHUB</h1>
-  <p id="message">Abrindo o modo local pelo servidor correto...</p>
+  <p id="message">Abrindo o SETECHUB...</p>
   <p>
     <a id="localLink" href="http://localhost:4173">Abrir modo local</a>
   </p>
@@ -69,7 +69,9 @@
     link.href = fallbackUrl;
     setTimeout(() => location.replace(fallbackUrl), 300);
   } else {
-    location.replace('/frontend/index.html');
+    message.textContent = 'Redirecionando para a aplicacao...';
+    link.href = fallbackUrl;
+    setTimeout(() => location.replace(fallbackUrl), 300);
   }
 </script>
 </body>
