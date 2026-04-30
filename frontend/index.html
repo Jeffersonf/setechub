@@ -442,72 +442,14 @@
     <div class="ph">
       <div>
         <div class="pt">Base de Escolas</div>
-        <div class="ps">Base principal por escola, com CIE, inventario, alertas e atalhos diretos para a ficha.</div>
+        <div class="ps">Cards de resumo por escola. Clique em uma unidade para abrir a ficha completa.</div>
       </div>
-    </div>
-    <div class="setechub-command-grid school-command-grid">
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Escola em foco</div><div class="cs">Resumo mestre com CIE, parque, fila e rede.</div></div>
-        </div>
-        <div id="schoolFocusPanel" class="stack-list"></div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Filtros da base</div><div class="cs">Navegue pela escola e chegue na ficha mais rapido.</div></div>
-        </div>
-        <div class="setechub-action-col">
-          <input class="fi" id="schoolMasterSearch" placeholder="Buscar escola, CIE, municipio ou observacao...">
-          <select class="fi" id="schoolSortSelect">
-            <option value="prioridade">Ordenar por importancia</option>
-            <option value="alertas">Mais alertas primeiro</option>
-            <option value="inventario">Maior inventario primeiro</option>
-            <option value="dados">Base mais completa primeiro</option>
-            <option value="municipio">Municipio e escola</option>
-            <option value="nome">Nome da escola</option>
-          </select>
-          <div class="setechub-toolbar" id="schoolFilterBar">
-            <button class="btn btn-g btn-sm active-filter" data-school-filter="todas" type="button">Todas</button>
-            <button class="btn btn-g btn-sm" data-school-filter="critico" type="button">Criticas</button>
-            <button class="btn btn-g btn-sm" data-school-filter="atencao" type="button">Atencao</button>
-            <button class="btn btn-g btn-sm" data-school-filter="oficiais" type="button">Oficiais</button>
-            <button class="btn btn-g btn-sm" data-school-filter="com_dados" type="button">Com dados</button>
-            <button class="btn btn-g btn-sm" data-school-filter="com_importacao" type="button">Com importacao</button>
-            <button class="btn btn-g btn-sm" data-school-filter="com_chamado" type="button">Com chamado</button>
-            <button class="btn btn-g btn-sm" data-school-filter="com_alerta" type="button">Com alerta</button>
-            <button class="btn btn-g btn-sm" data-school-filter="sem_inventario" type="button">Sem inventario</button>
-            <button class="btn btn-g btn-sm" data-school-filter="sem_rede" type="button">Sem rede</button>
-            <button class="btn btn-g btn-sm" data-school-filter="sem_ficha" type="button">Sem ficha</button>
-            <select class="fi fi-inline" id="schoolZoneFilterSelect">
-              <option value="todas">Todos os municipios</option>
-            </select>
-          </div>
-        </div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Qualidade da base</div><div class="cs">Mostra o quanto a escola ja esta rica em dados operacionais.</div></div>
-        </div>
-        <div id="schoolCoverageGrid" class="setechub-monitor-grid compact-grid"></div>
-      </section>
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Visao geral por escola</div><div class="cs">Cartoes por unidade com importancia, cobertura de dados e atalhos para abrir a informacao certa.</div></div>
+        <div><div class="ct">Escolas</div><div class="cs">Cada card mostra o essencial; os dados completos ficam na pagina da escola.</div></div>
       </div>
       <div id="schoolOverviewMatrix" class="school-overview-matrix"></div>
-    </div>
-    <div class="box">
-      <div class="bh">
-        <div><div class="ct">Nova escola</div><div class="cs">Registre uma escola para acompanhar sua operacao.</div></div>
-      </div>
-      <form id="schoolForm" class="setechub-form setechub-form-school">
-        <input class="fi" id="schoolName" list="officialSchoolOptions" placeholder="Nome da escola">
-        <input class="fi" id="schoolCie" placeholder="Codigo CIE">
-        <input class="fi" id="schoolZone" placeholder="Zona ou municipio">
-        <input class="fi" id="schoolNotes" placeholder="Observacao inicial">
-        <button class="btn btn-p" type="submit">Adicionar escola</button>
-      </form>
     </div>
   </div>
 
@@ -619,81 +561,15 @@
   <div class="page" id="page-supervisors">
     <div class="ph">
       <div>
-        <div class="pt">Supervisores e Visitas</div>
-        <div class="ps">Categoria dedicada para acompanhar supervisor, escolas vinculadas e quantitativo de visitas por unidade.</div>
+        <div class="pt">Supervisores</div>
+        <div class="ps">Cards de resumo por supervisor. Clique em um supervisor para abrir os dados completos.</div>
       </div>
-      <div class="page-actions">
-        <button class="btn btn-g btn-sm" id="seedSupervisorVisitsBtn" type="button">Gerar visitas teste</button>
-      </div>
-    </div>
-    <div class="insight-grid">
-      <div class="insight-card">
-        <div class="insight-l">Supervisores</div>
-        <div class="insight-v private" id="supervisorMetricCount">0</div>
-        <div class="sync-meta">nomes na base de supervisao</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Escolas vinculadas</div>
-        <div class="insight-v private" id="supervisorMetricSchools">0</div>
-        <div class="sync-meta">relacao teste ate chegar o CSV</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Visitas</div>
-        <div class="insight-v private" id="supervisorMetricVisits">0</div>
-        <div class="sync-meta">registros quantitativos</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Cobertura media</div>
-        <div class="insight-v private" id="supervisorMetricCoverage">0%</div>
-        <div class="sync-meta">escolas com ao menos uma visita</div>
-      </div>
-    </div>
-    <div class="setechub-command-grid supervisor-command-grid">
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Selecionar supervisor</div><div class="cs">Clique em um nome para abrir o painel individual.</div></div>
-        </div>
-        <div class="setechub-action-col">
-          <div id="supervisorSelectorList" class="supervisor-selector-list"></div>
-        </div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Resumo geral</div><div class="cs">Leitura consolidada da supervisao sem entrar em detalhes repetidos.</div></div>
-        </div>
-        <div id="supervisorOverviewPanel" class="stack-list"></div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Atencao</div><div class="cs">Supervisores que ainda precisam de visita no mes.</div></div>
-        </div>
-        <div id="supervisorAttentionList" class="stack-list"></div>
-      </section>
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Registrar visita teste</div><div class="cs">Use para validar o BI ate o modelo CSV oficial chegar.</div></div>
+        <div><div class="ct">Supervisores</div><div class="cs">Resumo, meta e sinal de pendencia sem repetir os dados completos.</div></div>
       </div>
-      <form id="supervisorVisitForm" class="setechub-form setechub-form-wide">
-        <select class="fi" id="visitSupervisorSelect"></select>
-        <select class="fi" id="visitSchoolSelect"></select>
-        <input class="fi" id="visitDate" type="date">
-        <select class="fi" id="visitType">
-          <option value="Rotina">Rotina</option>
-          <option value="Acompanhamento">Acompanhamento</option>
-          <option value="Busca ativa">Busca ativa</option>
-          <option value="Formacao">Formacao</option>
-          <option value="Emergencial">Emergencial</option>
-        </select>
-        <input class="fi" id="visitNotes" placeholder="Observacao da visita">
-        <button class="btn btn-p" type="submit">Salvar visita</button>
-      </form>
-    </div>
-    <div class="box">
-      <div class="bh">
-        <div><div class="ct">Ultimas visitas</div><div class="cs">Amostra geral. O historico completo fica na pagina de cada supervisor.</div></div>
-      </div>
-      <div id="supervisorVisitTable" class="setechub-table-wrap"></div>
+      <div id="supervisorSelectorList" class="supervisor-selector-list"></div>
     </div>
   </div>
 

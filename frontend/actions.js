@@ -506,7 +506,7 @@ function setupEventListeners() {
     refreshAll();
   });
 
-  document.getElementById('schoolForm').addEventListener('submit', (event) => {
+  document.getElementById('schoolForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
     const name = document.getElementById('schoolName').value.trim();
     const cie = document.getElementById('schoolCie').value.trim();

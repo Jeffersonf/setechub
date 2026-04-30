@@ -210,7 +210,7 @@ function renderPendingQueue() {
 }
 
 function renderSchoolCommandCenter() {
-  const filtered = sortSchoolsByCurrentView(filteredSchools());
+  const filtered = sortSchoolsByCurrentView(state.schools.slice());
   const focusSchool = schoolByName(currentSchoolDetail) || filtered[0] || null;
   const coverage = schoolCoverageSummary();
   const focusNode = document.getElementById('schoolFocusPanel');
@@ -1027,7 +1027,6 @@ function renderSchoolDetail() {
 
 function renderSupervisors() {
   const metricCount = document.getElementById('supervisorMetricCount');
-  if (!metricCount) return;
   const stats = supervisorStats();
   const visits = state.supervisorVisits || [];
   const assignedSchoolCount = new Set(stats.flatMap((item) => item.assignedSchools)).size;
@@ -1035,10 +1034,13 @@ function renderSupervisors() {
     ? Math.round(stats.reduce((sum, item) => sum + item.coverage, 0) / stats.length)
     : 0;
 
-  metricCount.textContent = String(stats.length);
-  document.getElementById('supervisorMetricSchools').textContent = String(assignedSchoolCount);
-  document.getElementById('supervisorMetricVisits').textContent = String(visits.length);
-  document.getElementById('supervisorMetricCoverage').textContent = `${averageCoverage}%`;
+  if (metricCount) metricCount.textContent = String(stats.length);
+  const metricSchools = document.getElementById('supervisorMetricSchools');
+  const metricVisits = document.getElementById('supervisorMetricVisits');
+  const metricCoverage = document.getElementById('supervisorMetricCoverage');
+  if (metricSchools) metricSchools.textContent = String(assignedSchoolCount);
+  if (metricVisits) metricVisits.textContent = String(visits.length);
+  if (metricCoverage) metricCoverage.textContent = `${averageCoverage}%`;
 
   const filterSelect = document.getElementById('supervisorFilterSelect');
   const visitSupervisorSelect = document.getElementById('visitSupervisorSelect');
@@ -1050,7 +1052,6 @@ function renderSupervisors() {
   }
   if (visitSupervisorSelect) {
     visitSupervisorSelect.innerHTML = stats.map(({ supervisor }) => `<option value="${esc(supervisor.name)}">${esc(supervisor.name)}</option>`).join('');
-    if (selectedStat) visitSupervisorSelect.value = selectedStat.supervisor.name;
   }
   if (visitSchoolSelect) {
     const selectedSupervisor = visitSupervisorSelect?.value || stats[0]?.supervisor.name || '';
@@ -1064,10 +1065,28 @@ function renderSupervisors() {
 
   const selectorList = document.getElementById('supervisorSelectorList');
   if (selectorList) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
     selectorList.innerHTML = stats.map((item) => `
       <button class="supervisor-selector-btn" type="button" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
-        <span>${esc(item.supervisor.name)}</span>
-        <strong>${esc(String(item.visits))} visita(s)</strong>
+        ${(() => {
+          const monthlyGoal = Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1);
+          const monthVisits = visits.filter((visit) => {
+            if (visit.supervisor !== item.supervisor.name) return false;
+            const date = new Date(`${visit.date}T00:00:00`);
+            return date.getFullYear() === year && date.getMonth() === month;
+          });
+          const visitedSchools = new Set(monthVisits.map((visit) => visit.school)).size;
+          const pending = Math.max(0, item.assignedSchools.length - visitedSchools);
+          const goalMet = monthVisits.length >= monthlyGoal;
+          return `
+            <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
+            <span>${esc(item.supervisor.name)}</span>
+            <strong>${esc(String(monthVisits.length))}/${esc(String(monthlyGoal))} visita(s)</strong>
+            <small>${esc(String(item.assignedSchools.length))} escola(s) | ${esc(String(visitedSchools))} visitada(s) | ${esc(String(pending))} pendente(s)</small>
+          `;
+        })()}
       </button>
     `).join('') || '<div class="sync-empty">Nenhum supervisor cadastrado.</div>';
   }
