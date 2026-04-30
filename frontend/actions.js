@@ -627,6 +627,30 @@ function setupEventListeners() {
     refreshAll();
   });
 
+  document.getElementById('ctcVisitForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const owner = document.getElementById('ctcVisitOwner').value;
+    const date = document.getElementById('ctcVisitDate').value;
+    const time = document.getElementById('ctcVisitTime').value;
+    const place = document.getElementById('ctcVisitPlace').value.trim();
+    const notes = document.getElementById('ctcVisitNotes').value.trim();
+    if (!owner || !place) return;
+    state.tasks.unshift({
+      id: uid(),
+      title: notes || `Visita programada - ${owner}`,
+      time,
+      date,
+      priority: 'media',
+      place,
+      category: 'CTC',
+      ctcOwner: owner,
+      done: false
+    });
+    event.target.reset();
+    refreshAll();
+    showPage('ctc');
+  });
+
   document.getElementById('callForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const title = document.getElementById('callTitle').value.trim();

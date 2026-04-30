@@ -139,7 +139,7 @@ function renderDashboardAccess() {
     { icon: '&#128187;', title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
     { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
     { icon: '&#128247;', title: 'Cameras', meta: `${cameraSchoolCount} escolas com cameras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
-    { icon: '&#128736;', title: 'CTC', meta: `${ctcUsers.length} usuarios | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'agenda', tone: 'teal', priority: 'secondary', alwaysVisible: true },
+    { icon: '&#128736;', title: 'CTC', meta: `${ctcUsers.length} usuarios | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
     { icon: '&#127891;', title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `showPage('pecs')`, page: 'pecs', tone: 'blue', priority: 'secondary' },
     { icon: '&#128229;', title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
     { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
@@ -1740,6 +1740,34 @@ function renderTasks(filtered) {
       </div>
     </div>
   `).join('') || '<div class="sync-empty">Nenhuma tarefa encontrada. Use a agenda para transformar escolas e chamados em acoes reais.</div>';
+}
+
+function renderCtcAgenda() {
+  const renderOwner = (owner) => {
+    const items = (state.tasks || [])
+      .filter((task) => normalizeKey(task.category) === 'ctc' && normalizeKey(task.ctcOwner) === normalizeKey(owner))
+      .sort((a, b) => `${a.date || '9999-99-99'} ${a.time || '99:99'}`.localeCompare(`${b.date || '9999-99-99'} ${b.time || '99:99'}`));
+    return items.map((task) => `
+      <div class="setechub-item">
+        <div class="setechub-head">
+          <div>
+            <strong class="${task.done ? 'is-done' : ''}">${esc(task.title)}</strong>
+            <div class="sync-meta">${esc(task.date || 'Sem data')} | ${esc(task.time || 'Sem horario')} | ${esc(task.place || 'Sem local')}</div>
+          </div>
+          <div class="setechub-badges">
+            <span class="diag-pill ${task.done ? 'pill-ok' : 'pill-info'}">${task.done ? 'Concluida' : 'Programada'}</span>
+            <button class="btn btn-g btn-sm" onclick="toggleTask(${task.id})">${task.done ? 'Reabrir' : 'Concluir'}</button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<div class="sync-empty">Nenhuma visita programada.</div>';
+  };
+  const bruno = document.getElementById('ctcAgendaBruno');
+  const danilo = document.getElementById('ctcAgendaDanilo');
+  if (bruno) bruno.innerHTML = renderOwner('Bruno');
+  if (danilo) danilo.innerHTML = renderOwner('Danilo');
+  const date = document.getElementById('ctcVisitDate');
+  if (date && !date.value) date.value = new Date().toISOString().slice(0, 10);
 }
 
 function renderCalls() {

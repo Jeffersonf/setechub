@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260430-ctc-sidebar">
-<link rel="stylesheet" href="./setechub.css?v=20260430-ctc-sidebar">
+<link rel="stylesheet" href="./styles.css?v=20260430-ctc-page">
+<link rel="stylesheet" href="./setechub.css?v=20260430-ctc-page">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -67,7 +67,7 @@
     <div class="nav-item" data-page="schools"><span class="ico">&#127979;</span>Escolas</div>
     <div class="nav-item" data-page="supervisors"><span class="ico">&#128101;</span>Supervisores</div>
     <div class="nav-item" data-page="pecs"><span class="ico">&#127891;</span>PECs</div>
-    <div class="nav-item" onclick="openCtcAgenda()"><span class="ico">&#128736;</span>CTC</div>
+    <div class="nav-item" data-page="ctc"><span class="ico">&#128736;</span>CTC</div>
     <div class="nav-item" data-page="assets"><span class="ico">&#128187;</span>Ativos</div>
     <div class="nav-item an" data-page="calls"><span class="ico">&#128295;</span>Atendimentos</div>
     <div class="nav-item" data-page="agenda"><span class="ico">&#128467;</span>Agenda</div>
@@ -284,6 +284,45 @@
         </div>
         <div id="weekBadges" class="setechub-chip-row"></div>
       </section>
+    </div>
+  </div>
+
+  <div class="page" id="page-ctc">
+    <div class="ph">
+      <div>
+        <div class="pt">CTC</div>
+        <div class="ps">Agenda de visitas programadas da equipe CTC.</div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bh">
+        <div><div class="ct">Nova visita CTC</div><div class="cs">Agende uma visita para Bruno ou Danilo.</div></div>
+      </div>
+      <form id="ctcVisitForm" class="setechub-form setechub-form-wide">
+        <select class="fi" id="ctcVisitOwner">
+          <option value="Bruno">Bruno</option>
+          <option value="Danilo">Danilo</option>
+        </select>
+        <input class="fi" id="ctcVisitDate" type="date">
+        <input class="fi" id="ctcVisitTime" type="time">
+        <input class="fi" id="ctcVisitPlace" list="officialSchoolOptions" placeholder="Escola ou local">
+        <input class="fi" id="ctcVisitNotes" placeholder="Objetivo da visita">
+        <button class="btn btn-p" type="submit">Agendar</button>
+      </form>
+    </div>
+    <div class="setechub-two-col">
+      <div class="box">
+        <div class="bh">
+          <div><div class="ct">Agenda Bruno</div><div class="cs">Visitas CTC programadas.</div></div>
+        </div>
+        <div id="ctcAgendaBruno" class="stack-list"></div>
+      </div>
+      <div class="box">
+        <div class="bh">
+          <div><div class="ct">Agenda Danilo</div><div class="cs">Visitas CTC programadas.</div></div>
+        </div>
+        <div id="ctcAgendaDanilo" class="stack-list"></div>
+      </div>
     </div>
   </div>
 
@@ -944,12 +983,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./school-data.js?v=20260430-ctc-sidebar"></script>
-<script src="./storage.js?v=20260430-ctc-sidebar"></script>
-<script src="./app.js?v=20260430-ctc-sidebar"></script>
-<script src="./render.js?v=20260430-ctc-sidebar"></script>
-<script src="./api.js?v=20260430-ctc-sidebar"></script>
-<script src="./actions.js?v=20260430-ctc-sidebar"></script>
-<script src="./bootstrap.js?v=20260430-ctc-sidebar"></script>
+<script src="./school-data.js?v=20260430-ctc-page"></script>
+<script src="./storage.js?v=20260430-ctc-page"></script>
+<script src="./app.js?v=20260430-ctc-page"></script>
+<script src="./render.js?v=20260430-ctc-page"></script>
+<script src="./api.js?v=20260430-ctc-page"></script>
+<script src="./actions.js?v=20260430-ctc-page"></script>
+<script src="./bootstrap.js?v=20260430-ctc-page"></script>
 </body>
 </html>

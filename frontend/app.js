@@ -236,6 +236,11 @@ function isPecLeadUser() {
   return isPecUser() && normalizeKey(user?.login || user?.name) === normalizeKey('jaqueline.borelli');
 }
 
+function isRestrictedCtcUser() {
+  const user = currentUser();
+  return user?.role === 'ctc' && ['bruno', 'danilo'].includes(normalizeKey(user.login || user.name));
+}
+
 function canEditData() {
   return ['admin', 'seintec', 'ctc'].includes(currentUserRole());
 }
@@ -249,8 +254,10 @@ function visibleNavigationPages() {
     ? new Set(['pecs', 'info', 'settings'])
     : isSupervisorUser()
       ? new Set(['schools', 'school-record', 'supervisors', 'supervisor-record', 'info', 'settings'])
+      : isRestrictedCtcUser()
+        ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'assets', 'reports', 'info', 'settings'])
       : canEditData()
-      ? new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'agenda', 'reports', 'info', 'settings'])
+      ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'agenda', 'reports', 'info', 'settings'])
         : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings']);
   if (canManageUsers()) pages.add('admin');
   return pages;
@@ -292,6 +299,7 @@ function canViewSupervisor(name) {
 
 function defaultPageForUser() {
   if (isPecUser()) return 'pecs';
+  if (currentUserRole() === 'ctc') return 'ctc';
   return isSupervisorUser() ? 'schools' : 'dashboard';
 }
 
@@ -306,7 +314,7 @@ function applyAccessControl() {
   document.querySelectorAll('.nav-item, .fn-item').forEach((node) => {
     if (node.dataset.page) {
       const allowed = canAccessPage(node.dataset.page);
-      node.hidden = false;
+      node.hidden = isRestrictedCtcUser() && !allowed;
       node.classList.toggle('nav-disabled', !allowed);
       node.setAttribute('aria-disabled', allowed ? 'false' : 'true');
       node.tabIndex = allowed ? 0 : -1;
@@ -392,10 +400,8 @@ function filteredTasks() {
 }
 
 function openCtcAgenda() {
-  currentTaskFilter = 'ctc';
-  showPage('agenda');
-  syncFilterButtons('task');
-  renderTasks();
+  showPage('ctc');
+  renderCtcAgenda();
 }
 
 function filteredCalls() {
@@ -1323,6 +1329,7 @@ function refreshAll() {
   renderOfficialData();
   renderSectors();
   renderDirectoryContacts();
+  renderCtcAgenda();
   renderTasks();
   renderCalls();
   renderCallHistory();
