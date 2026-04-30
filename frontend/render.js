@@ -1189,10 +1189,10 @@ function renderSupervisors() {
       return count < goal;
     }).length;
     panelGrid.innerHTML = [
-      { label: 'Supervisores', value: String(stats.length), note: `${syncedCount} com leitura online`, tone: 'pill-info' },
-      { label: 'Visitas no mes', value: String(monthVisits.length), note: 'lidas das abas DADOS_', tone: 'pill-ok' },
-      { label: 'Metas pendentes', value: String(pendingGoals), note: 'supervisores abaixo da meta', tone: pendingGoals ? 'pill-warn' : 'pill-ok' },
-      { label: 'Escolas vinculadas', value: String(assignedSchoolCount), note: `${averageCoverage}% de cobertura media`, tone: averageCoverage >= 70 ? 'pill-ok' : 'pill-warn' }
+      { label: 'Supervisores', value: String(stats.length), note: `${syncedCount} sincronizado(s)`, tone: 'pill-info' },
+      { label: 'Visitas no mes', value: String(monthVisits.length), note: 'registros no mes atual', tone: 'pill-ok' },
+      { label: 'Metas pendentes', value: String(pendingGoals), note: pendingGoals ? 'precisam de acompanhamento' : 'metas em dia', tone: pendingGoals ? 'pill-warn' : 'pill-ok' },
+      { label: 'Escolas vinculadas', value: String(assignedSchoolCount), note: `${averageCoverage}% de cobertura`, tone: averageCoverage >= 70 ? 'pill-ok' : 'pill-warn' }
     ].map((item) => `
       <div class="setechub-monitor-card">
         <div class="sync-meta">${esc(item.label)}</div>

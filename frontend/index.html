@@ -40,14 +40,14 @@
 </div>
 
 <nav class="fnav" id="fnav">
-  <div class="fn-item active" data-page="dashboard"><span class="fni">📊</span>Inicio</div>
-  <div class="fn-item" data-page="schools"><span class="fni">🏫</span>Escolas</div>
-  <div class="fn-item" data-page="supervisors"><span class="fni">👥</span>Superv.</div>
-  <div class="fn-item" data-page="pecs"><span class="fni">🎓</span>PECs</div>
-  <div class="fn-item" data-page="assets"><span class="fni">💻</span>Invent.</div>
-  <div class="fn-item acc-n" data-page="calls"><span class="fni">🔧</span>Cham.</div>
-  <div class="fn-item sl-n" data-page="info"><span class="fni">ℹ️</span>Info</div>
-  <button class="fn-item fn-logout logout-action" type="button"><span class="fni">↩</span>Sair</button>
+  <div class="fn-item active" data-page="dashboard"><span class="fni">&#128202;</span>Inicio</div>
+  <div class="fn-item" data-page="schools"><span class="fni">&#127979;</span>Escolas</div>
+  <div class="fn-item" data-page="supervisors"><span class="fni">&#128101;</span>Superv.</div>
+  <div class="fn-item" data-page="pecs"><span class="fni">&#127891;</span>PECs</div>
+  <div class="fn-item" data-page="assets"><span class="fni">&#128187;</span>Invent.</div>
+  <div class="fn-item acc-n" data-page="calls"><span class="fni">&#128295;</span>Cham.</div>
+  <div class="fn-item sl-n" data-page="info"><span class="fni">&#8505;</span>Info</div>
+  <button class="fn-item fn-logout logout-action" type="button"><span class="fni">&#8617;</span>Sair</button>
 </nav>
 
 <aside class="sidebar">
@@ -58,20 +58,20 @@
     </div>
   </div>
   <div class="sb-search">
-    <span>🔍</span>
+    <span>&#128269;</span>
     <input id="sidebarSearch" placeholder="Buscar tarefas, escolas, ativos..." oninput="handleSearch(this.value)">
   </div>
   <div class="nav-lbl">Menu</div>
   <nav>
-    <div class="nav-item active" data-page="dashboard"><span class="ico">📊</span>Painel</div>
-    <div class="nav-item" data-page="schools"><span class="ico">🏫</span>Escolas</div>
-    <div class="nav-item" data-page="supervisors"><span class="ico">👥</span>Supervisores</div>
-    <div class="nav-item" data-page="pecs"><span class="ico">🎓</span>PECs</div>
-    <div class="nav-item" data-page="assets"><span class="ico">💻</span>Ativos</div>
-    <div class="nav-item an" data-page="calls"><span class="ico">🔧</span>Atendimentos</div>
-    <div class="nav-item" data-page="agenda"><span class="ico">🗓️</span>Agenda</div>
-    <div class="nav-item fn" data-page="reports"><span class="ico">📌</span>Relatorios</div>
-    <div class="nav-item sl-n" data-page="info"><span class="ico">ℹ️</span>Informacoes</div>
+    <div class="nav-item active" data-page="dashboard"><span class="ico">&#128202;</span>Painel</div>
+    <div class="nav-item" data-page="schools"><span class="ico">&#127979;</span>Escolas</div>
+    <div class="nav-item" data-page="supervisors"><span class="ico">&#128101;</span>Supervisores</div>
+    <div class="nav-item" data-page="pecs"><span class="ico">&#127891;</span>PECs</div>
+    <div class="nav-item" data-page="assets"><span class="ico">&#128187;</span>Ativos</div>
+    <div class="nav-item an" data-page="calls"><span class="ico">&#128295;</span>Atendimentos</div>
+    <div class="nav-item" data-page="agenda"><span class="ico">&#128467;</span>Agenda</div>
+    <div class="nav-item fn" data-page="reports"><span class="ico">&#128204;</span>Relatorios</div>
+    <div class="nav-item sl-n" data-page="info"><span class="ico">&#8505;</span>Informacoes</div>
   </nav>
   <div class="sb-bottom">
     <div class="conn-wrap"></div>
@@ -101,7 +101,7 @@
         <div class="ps">Centro do dia para organizar rota, chamados, escolas e fechamento.</div>
       </div>
       <div class="page-actions">
-        <div class="mnav"><button onclick="shiftFocusCard(-1)">‹</button><span class="mname" id="todayLabel">Hoje</span><button onclick="shiftFocusCard(1)">›</button></div>
+        <div class="mnav"><button onclick="shiftFocusCard(-1)">&#8249;</button><span class="mname" id="todayLabel">Hoje</span><button onclick="shiftFocusCard(1)">&#8250;</button></div>
         <button class="btn btn-g btn-sm" onclick="showPage('info')">Informacoes</button>
         <button class="btn btn-p" data-edit-scope onclick="showPage('agenda')">+ Nova tarefa</button>
       </div>
@@ -502,12 +502,12 @@
       </div>
     </div>
     <div class="school-record-nav supervisor-tabs">
-      <button class="btn btn-p btn-sm" type="button" onclick="document.getElementById('painelSupervisor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">painelSupervisor</button>
+      <button class="btn btn-p btn-sm" type="button" onclick="document.getElementById('painelSupervisor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Painel</button>
       <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorSelectorList')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Lista</button>
     </div>
     <div class="box" id="painelSupervisor">
       <div class="bh">
-        <div><div class="ct">painelSupervisor</div><div class="cs">Visao consolidada das abas da planilha Google por supervisor.</div></div>
+        <div><div class="ct">Painel de supervisores</div><div class="cs">Resumo mensal das visitas, metas e escolas vinculadas.</div></div>
         <button class="btn btn-g btn-sm" type="button" onclick="syncSupervisorVisitSources()">Atualizar planilha</button>
       </div>
       <div id="supervisorPanelGrid" class="setechub-monitor-grid"></div>
