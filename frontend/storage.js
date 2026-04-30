@@ -7,6 +7,10 @@ const THEME_KEY = 'setechub_theme';
 const PRIVACY_KEY = 'setechub_privacy';
 const SESSION_KEY = 'setechub_session';
 const SUPABASE_CONFIG_KEY = 'setechub_supabase_config';
+const SUPABASE_DEFAULT_CONFIG = {
+  url: 'https://pzbmnwnkmuvqgqetlpti.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6Ym1ud25rbXV2cWdxZXRscHRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTAyMzQsImV4cCI6MjA5MzEyNjIzNH0.5ajNZvl3rNZ06HwOY6FhnLoKJDzPC6wwZmhaKjsSuaE'
+};
 const GENERATED_SCHOOL_DATA = typeof window !== 'undefined' && window.SETECHUB_SCHOOL_DATA
   ? window.SETECHUB_SCHOOL_DATA
   : { generalAssets: [], schoolImports: [], schoolAssets: [], schoolNetworks: [] };
@@ -303,9 +307,12 @@ function enrichSupervisorSources(supervisors) {
 
 function loadSupabaseConfig() {
   try {
-    return JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY) || '{}');
+    return {
+      ...SUPABASE_DEFAULT_CONFIG,
+      ...JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY) || '{}')
+    };
   } catch {
-    return {};
+    return { ...SUPABASE_DEFAULT_CONFIG };
   }
 }
 

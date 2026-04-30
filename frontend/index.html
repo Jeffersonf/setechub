@@ -909,26 +909,6 @@
       </div>
       <div id="snapshotList" class="stack-list"></div>
     </div>
-    <div class="box admin-module">
-      <div class="bh">
-        <div><div class="ct">Supabase online</div><div class="cs">Base PostgreSQL para sincronizar o estado do GitHub Pages sem expor chave secreta.</div></div>
-      </div>
-      <form id="supabaseConfigForm" class="setechub-form setechub-note-form">
-        <input class="fi" id="supabaseUrl" placeholder="https://seu-projeto.supabase.co">
-        <input class="fi" id="supabaseAnonKey" placeholder="Anon public key">
-        <button class="btn btn-p" type="submit">Salvar configuracao Supabase</button>
-      </form>
-      <div class="setechub-action-col">
-        <button class="btn btn-p" id="saveSupabaseBtn" type="button">Salvar estado no Supabase</button>
-        <button class="btn btn-g" id="loadSupabaseBtn" type="button">Carregar estado do Supabase</button>
-        <button class="btn btn-g" id="checkSupabaseBtn" type="button">Testar conexao</button>
-        <div class="sync-meta" id="supabaseStatusMeta">Supabase nao configurado.</div>
-      </div>
-      <div class="setechub-summary-card">
-        <div class="ct">Tabela esperada</div>
-        <div class="sync-meta">Crie uma tabela chamada <strong>app_state</strong> com colunas: <strong>id text primary key</strong>, <strong>state jsonb not null</strong>, <strong>updated_at timestamptz default now()</strong>.</div>
-      </div>
-    </div>
       <div class="box admin-module">
         <div class="bh">
           <div><div class="ct">Migracao do prototipo</div><div class="cs">Puxe os dados do setec_daily_app para a base nova em um clique.</div></div>

@@ -272,6 +272,8 @@ function supervisorVisitSourceFor(source) {
 
 function sourceRowBelongsToSupervisor(rowSupervisor, source, supervisor) {
   const names = [source.supervisor, supervisor?.name, ...(source.aliases || []), ...(supervisor?.sourceAliases || [])];
+  const firstNames = names.map((name) => String(name || '').trim().split(/\s+/)[0]);
+  names.push(...firstNames);
   return names.filter(Boolean).some((name) => normalizeKey(name) === normalizeKey(rowSupervisor));
 }
 
@@ -288,7 +290,17 @@ function googleSheetCsvUrl(url) {
 
 function supervisorSheetTabName(supervisorName, source = {}) {
   const prefix = source.tabPrefix || 'DADOS_';
-  return `${prefix}${String(supervisorName || '').trim()}`;
+  const firstName = String(supervisorName || '').trim().split(/\s+/)[0] || '';
+  return `${prefix}${firstName}`;
+}
+
+function supervisorSheetTabNames(supervisorName, source = {}) {
+  const prefix = source.tabPrefix || 'DADOS_';
+  const fullName = String(supervisorName || '').trim();
+  return [...new Set([
+    supervisorSheetTabName(supervisorName, source),
+    fullName ? `${prefix}${fullName}` : ''
+  ].filter(Boolean))];
 }
 
 function googleSheetTabCsvUrl(url, tabName) {
@@ -311,7 +323,13 @@ function mergeSupervisorVisitSourceRows(source, rows) {
   const importedAt = new Date().toISOString();
   const incoming = rows
     .map((row) => {
-      const rowSupervisor = csvValue(row, ['Nome do Supervisor', 'Supervisor']) || source.supervisor;
+      const rowSupervisor = csvValue(row, [
+        'Nome do Supervisor',
+        'Primeiro nome do Supervisor',
+        'Dados primeiro nome do Supervisor',
+        'dados_primeiro nome do supervisor',
+        'Supervisor'
+      ]) || source.supervisor;
       const school = canonicalSchoolName(csvValue(row, ['Escola Visitada', 'Escola']));
       const date = parseBrazilianDate(csvValue(row, ['Data Da Visita', 'Data da Visita', 'Data']));
       if (!rowSupervisor || !school || !date || !sourceRowBelongsToSupervisor(rowSupervisor, source, supervisor)) return null;
@@ -365,11 +383,25 @@ function mergeSupervisorVisitSourceRows(source, rows) {
 }
 
 async function syncSupervisorVisitSource(source) {
-  const url = source.tabName
-    ? googleSheetTabCsvUrl(source.url, source.tabName)
-    : googleSheetCsvUrl(source.url);
-  const response = await fetch(url, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const tabNames = Array.isArray(source.tabNames)
+    ? source.tabNames
+    : source.tabName ? [source.tabName] : [];
+  let response = null;
+  let lastError = null;
+  const urls = tabNames.length
+    ? tabNames.map((tabName) => googleSheetTabCsvUrl(source.url, tabName))
+    : [googleSheetCsvUrl(source.url)];
+
+  for (const url of urls) {
+    try {
+      response = await fetch(url, { cache: 'no-store' });
+      if (response.ok) break;
+      lastError = new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (!response?.ok) throw lastError || new Error('Falha ao ler planilha Google');
   const rows = parseCsvRows(await response.text());
   const [headers, ...dataRows] = rows;
   if (!headers?.length) return 0;
@@ -390,7 +422,7 @@ async function syncSupervisorVisitSources() {
           ...source,
           supervisor: supervisor.name,
           aliases: supervisor.sourceAliases || source.aliases || [],
-          tabName: source.workbookTabs ? supervisorSheetTabName(supervisor.name, source) : source.tabName
+          tabNames: source.workbookTabs ? supervisorSheetTabNames(supervisor.name, source) : source.tabName ? [source.tabName] : []
         });
       } catch (error) {
         console.warn(`Nao foi possivel sincronizar ${source.label} / ${supervisor.name}:`, error);
@@ -419,7 +451,7 @@ async function syncCurrentSupervisorVisitSource() {
       url: supervisor.visitSourceUrl,
       label: supervisor.visitSourceLabel || 'Planilha Google',
       primary: supervisor.visitSourcePrimary ?? true,
-      tabName: supervisorSheetTabName(supervisor.name)
+      tabNames: supervisorSheetTabNames(supervisor.name)
     };
     const importedCount = await syncSupervisorVisitSource(source);
     refreshAll();
