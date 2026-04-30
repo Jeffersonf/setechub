@@ -445,10 +445,10 @@ function filteredDirectoryContacts(scopeToCurrentPec = true) {
     return state.directoryContacts.filter((item) => /supervisor/i.test(item.role));
   }
   if (currentDirectoryFilter === 'tecnologia') {
-    return state.directoryContacts.filter((item) => /prodesp|seintec|tecnologia/i.test(item.role));
+    return state.directoryContacts.filter((item) => /prodesp|seintec|setec|tecnologia|ctc/i.test(`${item.role} ${item.sector}`));
   }
   if (currentDirectoryFilter === 'gestao') {
-    return state.directoryContacts.filter((item) => /chefe|diretor|executiva|assistente/i.test(item.role));
+    return state.directoryContacts.filter((item) => /chefe|diretor|dirigente|executiva|assistente|gab|asure|seafin|sepes|segre/i.test(`${item.role} ${item.sector}`));
   }
   if (currentDirectoryFilter === 'pecs') {
     return state.directoryContacts.filter((item) => /pec|curriculo|currículo|especialista/i.test(`${item.role} ${item.name}`));

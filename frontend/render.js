@@ -688,23 +688,42 @@ function renderMunicipalities() {
   `).join('');
 }
 
+function contactInitials(name) {
+  return String(name || '?')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || '?';
+}
+
+function renderContactPhoto(item) {
+  if (item.photo) {
+    return `<img class="directory-photo" src="${esc(item.photo)}" alt="${esc(item.name)}" loading="lazy">`;
+  }
+  return `<div class="directory-photo directory-photo-placeholder">${esc(contactInitials(item.name))}</div>`;
+}
+
 function renderSectors() {
   const preview = document.getElementById('sectorList');
   const directory = document.getElementById('sectorDirectoryList');
   const adminActions = canManageUsers();
   const html = state.sectors.map((item) => `
-    <div class="setechub-item">
+    <div class="setechub-item directory-sector-card">
       <div class="setechub-head">
         <div>
           <strong>${esc(item.code)} | ${esc(item.name)}</strong>
-          <div class="sync-meta">${esc(item.lead)} | ${esc(item.phone)} | ${esc(item.email)}</div>
+          <div class="sync-meta">${esc(item.lead)}</div>
         </div>
         <div class="setechub-badges">
+          <span class="diag-pill">${esc(item.phone)}</span>
           <a class="btn btn-g btn-sm" href="mailto:${esc(item.email)}">Email</a>
           ${adminActions ? `<button class="btn btn-d btn-sm" onclick="removeSector(${item.id})">Remover</button>` : ''}
         </div>
       </div>
-      <div class="sync-meta">${esc(item.summary || '')}</div>
+      <div class="sync-meta">${esc(item.email)}${item.summary ? ` | ${esc(item.summary)}` : ''}</div>
     </div>
   `).join('');
   if (preview) preview.innerHTML = state.sectors.slice(0, 5).map((item) => `
@@ -726,18 +745,29 @@ function renderDirectoryContacts() {
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name));
   list.innerHTML = contacts.map((item) => `
-      <div class="setechub-item">
-        <div class="setechub-head">
-          <div>
-            <strong>${esc(item.name)}</strong>
-            <div class="sync-meta">${esc(item.role)}</div>
+      <div class="setechub-item directory-card">
+        ${renderContactPhoto(item)}
+        <div class="directory-main">
+          <div class="setechub-head">
+            <div>
+              <strong>${esc(item.name)}</strong>
+              <div class="sync-meta">${esc(item.role || 'Contato institucional')}</div>
+            </div>
+            <div class="setechub-badges">
+              ${item.sector ? `<span class="diag-pill pill-info">${esc(item.sector)}</span>` : ''}
+              ${item.ramal ? `<span class="diag-pill">Ramal ${esc(item.ramal)}</span>` : ''}
+            </div>
           </div>
-          <div class="setechub-badges">
-            <span class="diag-pill">${esc(item.phone)}</span>
-            <a class="btn btn-g btn-sm" href="mailto:${esc(item.email)}">Email</a>
+          <div class="directory-lines">
+            <span>${esc(item.email || 'Sem email cadastrado')}</span>
+            <span>${esc(item.phone || '(15) 3526-6200')}</span>
+            ${item.sectorEmail && item.sectorEmail !== item.email ? `<span>Setor: ${esc(item.sectorEmail)}</span>` : ''}
+          </div>
+          <div class="setechub-action-row left">
+            ${item.email ? `<a class="btn btn-g btn-sm" href="mailto:${esc(item.email)}">Email</a>` : ''}
+            ${item.sourceUrl ? `<a class="btn btn-g btn-sm" href="${esc(item.sourceUrl)}" target="_blank" rel="noopener">Pagina oficial</a>` : ''}
           </div>
         </div>
-        <div class="sync-meta">${esc(item.email)}</div>
       </div>
     `).join('') || '<div class="sync-empty">Nenhum contato oficial importado.</div>';
   const pecList = document.getElementById('pecAccountList');
@@ -746,15 +776,18 @@ function renderDirectoryContacts() {
       .slice()
       .sort((a, b) => a.name.localeCompare(b.name));
     pecList.innerHTML = pecAccountContacts.map((item) => `
-      <div class="setechub-item">
+      <div class="setechub-item directory-card">
+        ${renderContactPhoto(item)}
+        <div class="directory-main">
         <div class="setechub-head">
           <div>
             <strong>${esc(item.name)}</strong>
             <div class="sync-meta">${esc(item.role)}</div>
           </div>
-          <span class="diag-pill">${esc(item.phone)}</span>
+          <span class="diag-pill">Ramal ${esc(item.ramal || item.phone)}</span>
         </div>
         <div class="sync-meta">${esc(item.email)}</div>
+        </div>
       </div>
     `).join('') || '<div class="sync-empty">Nenhum dado PEC liberado para este acesso.</div>';
   }

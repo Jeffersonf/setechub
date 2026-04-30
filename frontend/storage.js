@@ -214,6 +214,122 @@ function defaultPecs() {
   ];
 }
 
+const DIRECTORY_PHOTOS = {
+  dirigente: 'https://midiasstoragesec.blob.core.windows.net/001/2025/09/dsc02935-5.jpg',
+  asure: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-04.jpeg',
+  ese1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-04-1.jpeg',
+  ese2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-15-41-59.jpeg',
+  ese3: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-03.jpeg',
+  ese4: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-28-at-13-43-36.jpeg',
+  ese5: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-29.jpeg',
+  ese6: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-56.jpeg',
+  eec: 'https://midiasstoragesec.blob.core.windows.net/001/2026/02/whatsapp-image-2026-02-24-at-11-55-32.jpeg',
+  seafin: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-16-05-17.jpeg',
+  secomse1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-30.jpeg',
+  secomse2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-30-1.jpeg',
+  sefin1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-29-1.jpeg',
+  sefin2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-59-1.jpeg',
+  seom: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-57.jpeg',
+  sefisc: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-59.jpeg',
+  segre: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-29-2.jpeg',
+  semat: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-02.jpeg',
+  sevesc: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-02-1.jpeg',
+  seintec: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-58.jpeg',
+  setec: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-15-54-28.jpeg',
+  sepes1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-16-08-34.jpeg',
+  sepes2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-16-05-18.jpeg',
+  sefrep1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-58-3.jpeg',
+  sefrep2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/09/whatsapp-image-2025-06-18-at-08-31-25.jpeg',
+  seape1: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-58-1.jpeg',
+  seape2: 'https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-58-2.jpeg',
+  seape3: 'https://midiasstoragesec.blob.core.windows.net/001/2025/09/whatsapp-image-2025-09-10-at-09-38-34.jpeg',
+  seape4: 'https://midiasstoragesec.blob.core.windows.net/001/2025/09/whatsapp-image-2025-06-18-at-09-23-36.jpeg',
+  seape5: 'https://midiasstoragesec.blob.core.windows.net/001/2025/09/whatsapp-image-2025-06-30-at-09-20-27.jpeg'
+};
+
+function directoryContact(data) {
+  return {
+    id: `contact-${normalizeKey(data.name).replace(/\s+/g, '-')}`,
+    phone: data.phone || '(15) 3526-6200',
+    email: data.email || data.sectorEmail || 'deitv@educacao.sp.gov.br',
+    ...data
+  };
+}
+
+function ureDirectoryContacts(pecs = []) {
+  const contacts = [
+    directoryContact({ name: 'Andre Dias de Oliveira', role: 'Dirigente Regional de Ensino', sector: 'GAB', ramal: '6202', email: 'deitv@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.dirigente, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/dirigente/' }),
+    directoryContact({ name: 'Vanessa', role: 'Gabinete', sector: 'GAB', ramal: '6201', email: 'deitv@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.dirigente, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/dirigente/' }),
+    directoryContact({ name: 'Juliano Lobo Ribeiro', role: 'Assistente II', sector: 'GAB', ramal: '6225', email: 'juliano.ribeiro@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.dirigente, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/dirigente/' }),
+    directoryContact({ name: 'Juli Francis Oliveira Roza', role: 'Executiva Publica', sector: 'ASURE', ramal: '6219', email: 'juli.oliveira@educacao.sp.gov.br', sectorEmail: 'itv.asure@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.asure, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/assessoria-tecnica-asure/' }),
+    directoryContact({ name: 'Nelio Celso Fernandes Junior', role: 'Chefe de Servico', sector: 'SEOM', ramal: '6236', email: 'nelio.junior@educacao.sp.gov.br', sectorEmail: 'itv.seom@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seom, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-obras-e-manut-escolar/' }),
+    directoryContact({ name: 'Priscila Aparecida Conceicao Souza', role: 'Chefe de Servico', sector: 'SEGRE', ramal: '6230', email: 'priscila.souza01@educacao.sp.gov.br', sectorEmail: 'itv.segre@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.segre, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/centro-de-informacoes-educacionais-e-gestao-da-rede-escolar/' }),
+    directoryContact({ name: 'Rosinei Dell Anhol', role: 'Chefe de Secao', sector: 'SEMAT', ramal: '6228', email: 'rosinei.anhol@educacao.sp.gov.br', sectorEmail: 'itv.semat@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.semat, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-matricula-semat/' }),
+    directoryContact({ name: 'Joao', role: 'Vida Escolar', sector: 'SEVESC', ramal: '6207 / 6239', email: 'itv.sevesc@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sevesc, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-vida-escolar-sevesc/' }),
+    directoryContact({ name: 'Richard', role: 'Protocolo', sector: 'SEAFIN', ramal: '6200', email: 'itv.seafin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seafin, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/servico-de-administracao-e-financas-seafin/' }),
+    directoryContact({ name: 'Adriana', role: 'Protocolo', sector: 'SEAFIN', ramal: '6209', email: 'itv.seafin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seafin, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/servico-de-administracao-e-financas-seafin/' }),
+    directoryContact({ name: 'Juliana', role: 'Protocolo', sector: 'SEAFIN', ramal: '6233', email: 'itv.seafin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seafin, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/servico-de-administracao-e-financas-seafin/' }),
+    directoryContact({ name: 'Daniel Duchen Hiromitus', role: 'Chefe de Secao', sector: 'SEFISC', ramal: '6206', email: 'daniel.hiromitus@educacao.sp.gov.br', sectorEmail: 'itv.sefisc@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sefisc, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/setor-de-fiscalizacao-sefisc/' }),
+    directoryContact({ name: 'Silvio', role: 'Financas', sector: 'SEFIN', ramal: '6223', email: 'itv.sefin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sefin1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-financas/' }),
+    directoryContact({ name: 'Nelson da Conceicao Junior', role: 'Chefe de Secao', sector: 'SEFIN', ramal: '6237', email: 'nelson.junior@educacao.sp.gov.br', sectorEmail: 'itv.sefin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sefin2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-financas/' }),
+    directoryContact({ name: 'Hector Antunes de Carvalho', role: 'Diretor II', sector: 'SEPES', ramal: '6221', email: 'hector.carvalho@educacao.sp.gov.br', sectorEmail: 'itv.sepes@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sepes1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/serrvico-de-pessoas-sepes/' }),
+    directoryContact({ name: 'Elenira Trindade Diniz', role: 'Pessoas', sector: 'SEPES', ramal: '6231', email: 'elenira.diniz1@educacao.sp.gov.br', sectorEmail: 'itv.sepes@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sepes2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/serrvico-de-pessoas-sepes/' }),
+    directoryContact({ name: 'Paulo Sergio de Oliveira', role: 'Administracao de Pessoal', sector: 'SEAPE', ramal: '6222', email: 'paulo.oliveira@educacao.sp.gov.br', sectorEmail: 'itv.seape@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seape1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-administracao-de-pessoal-seape/' }),
+    directoryContact({ name: 'Ana Paula', role: 'Administracao de Pessoal', sector: 'SEAPE', ramal: '6203', email: 'itv.seape@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seape2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-administracao-de-pessoal-seape/' }),
+    directoryContact({ name: 'Wania Chrischner Nunes Figueiredo', role: 'Administracao de Pessoal', sector: 'SEAPE', ramal: '6204', email: 'wania.figueiredo@educacao.sp.gov.br', sectorEmail: 'itv.seape@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seape3, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-administracao-de-pessoal-seape/' }),
+    directoryContact({ name: 'Camila', role: 'Administracao de Pessoal', sector: 'SEAPE', ramal: '6234', email: 'itv.seape@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seape4, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-administracao-de-pessoal-seape/' }),
+    directoryContact({ name: 'Leticia Aparecida Alves dos Santos', role: 'Frequencia e Pagamento', sector: 'SEFREP', ramal: '6205', email: 'leticia.santos01@educacao.sp.gov.br', sectorEmail: 'itv.sefrep@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sefrep1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-frequencia-e-pagamento-sefrep/' }),
+    directoryContact({ name: 'Valeria', role: 'Frequencia e Pagamento', sector: 'SEFREP', ramal: '6215', email: 'itv.sefrep@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.sefrep2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-frequencia-e-pagamento-sefrep/' }),
+    directoryContact({ name: 'Rafael Alves Machado', role: 'Administracao e Financas', sector: 'SEAFIN / SECOMSE', ramal: '6220', email: 'rafael.machado@educacao.sp.gov.br', sectorEmail: 'itv.secomse@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.secomse1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-compras-e-servicos/' }),
+    directoryContact({ name: 'Roque', role: 'Administracao e Financas', sector: 'SEAFIN / SECOMSE', ramal: '6229', email: 'itv.secomse@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.secomse2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-compras-e-servicos/' }),
+    directoryContact({ name: 'Fabricio Santos', role: 'Chefe de Secao', sector: 'SECOMSE', ramal: '6238', email: 'fabricio.santos05@educacao.sp.gov.br', sectorEmail: 'itv.secomse@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.secomse2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-compras-e-servicos/' }),
+    directoryContact({ name: 'Rodolfo Rodrigues Pereira', role: 'Chefe de Servico', sector: 'SEAFIN', ramal: '6240', email: 'rodolfo.pereira@educacao.sp.gov.br', sectorEmail: 'itv.seafin@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seafin, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/servico-de-administracao-e-financas-seafin/' }),
+    directoryContact({ name: 'WHATS', role: 'WhatsApp institucional', sector: 'SEINTEC / SETEC', ramal: '6210', email: 'itv.setec@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.setec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-tecnologia-setec/' }),
+    directoryContact({ name: 'Elcio Renato Bonifacio de Azevedo', role: 'Chefe de Servico', sector: 'SEINTEC', ramal: '6211', email: 'elcio.azevedo@educacao.sp.gov.br', sectorEmail: 'itv.seintec@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.seintec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-informacoes-educacionais-e-tecnologia/' }),
+    directoryContact({ name: 'Jefferson do Espirito Santo Moreira', role: 'Analista Prodesp', sector: 'SETEC', ramal: '6213', email: 'jefferson.paula@educacao.sp.gov.br', sectorEmail: 'itv.setec@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.setec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-tecnologia-setec/' }),
+    directoryContact({ name: 'Gustavo', role: 'CTC', sector: 'SETEC', ramal: '6235', email: 'itv.setec@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.setec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/secao-de-tecnologia-setec/' }),
+    directoryContact({ name: 'Jaqueline de Oliveira Cunha Borelli', role: 'PEC - Arte', sector: 'EEC', ramal: '6212', email: 'deitvnpe@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.eec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-especialistas-em-curriculo-eec/' }),
+    directoryContact({ name: 'Jose do Amaral Netto', role: 'PEC - Projetos Especiais', sector: 'EEC', ramal: '6218', email: 'deitvnpe@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.eec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-especialistas-em-curriculo-eec/' }),
+    directoryContact({ name: 'Paula', role: 'Especialista em Curriculo', sector: 'EEC', ramal: '6226', email: 'deitvnpe@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.eec, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-especialistas-em-curriculo-eec/' }),
+    directoryContact({ name: 'Marcio Nunes da Cruz', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6208', email: 'marcio.cruz@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese1, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' }),
+    directoryContact({ name: 'Maria Luiza Brizolla de Queiroz', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6216', email: 'maria.queiroz14@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese2, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' }),
+    directoryContact({ name: 'Edilene da Silva Almeida Oliveira', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6217', email: 'edilene.oliveira@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese3, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' }),
+    directoryContact({ name: 'Adilson Fogaca', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6224', email: 'adilson.fogaca@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese4, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' }),
+    directoryContact({ name: 'Daiane Aparecida de Oliveira Ribeiro', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6227', email: 'daiane.ribeiro@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese5, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' }),
+    directoryContact({ name: 'Magda Gisele Silva de Oliveira', role: 'Supervisor Educacional', sector: 'ESE', ramal: '6232', email: 'magda.oliveira@educacao.sp.gov.br', photo: DIRECTORY_PHOTOS.ese6, sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' })
+  ];
+  const existing = new Set(contacts.map((item) => normalizeKey(item.name)));
+  pecs.forEach((pec) => {
+    if (existing.has(normalizeKey(pec.name))) return;
+    contacts.push(directoryContact({
+      name: pec.name,
+      role: pec.role,
+      sector: 'EEC',
+      ramal: String(pec.phone || '').replace(/\D/g, '').slice(-4),
+      phone: pec.phone,
+      email: pec.email,
+      photo: DIRECTORY_PHOTOS.eec,
+      sourceUrl: 'https://deitapeva.educacao.sp.gov.br/equipe-de-especialistas-em-curriculo-eec/'
+    }));
+  });
+  return contacts;
+}
+
+function mergeDirectoryContacts(baseItems, savedItems) {
+  const map = new Map();
+  const keyOf = (item) => normalizeKey(item.name || item.email || item.id);
+  baseItems.forEach((item) => map.set(keyOf(item), item));
+  savedItems.forEach((item) => {
+    const key = keyOf(item);
+    const base = map.get(key) || {};
+    map.set(key, {
+      ...item,
+      ...base
+    });
+  });
+  return Array.from(map.values());
+}
+
 function defaultUsers(supervisors, pecs = defaultPecs()) {
   const supervisorUsers = supervisors.map((supervisor, index) => ({
     id: `user-supervisor-${index + 1}`,
@@ -449,47 +565,30 @@ function createDefaults() {
         summary: 'Supervisao, acompanhamento pedagogico, programas e orientacao das unidades.'
       }
     ],
-    directoryContacts: [
-      { id: uid(), name: 'Vanessa Juliane Antunes Polidoro Rodrigues', role: 'Chefe de Secao - SEVESC', phone: '(15) 3526-6201', email: 'deitvnve@educacao.sp.gov.br' },
-      { id: uid(), name: 'Juli Francis Oliveira Roza', role: 'Executiva Publica - ASURE', phone: '(15) 3526-6219', email: 'deitvat@educacao.sp.gov.br' },
-      { id: uid(), name: 'Elenira Trindade Diniz', role: 'Executivo Publico', phone: '(15) 3526-6231', email: 'deitvnfp@educacao.sp.gov.br' },
-      { id: uid(), name: 'Jefferson do Espirito Santo Moreira', role: 'Analista Prodesp', phone: '(15) 3526-6235', email: 'deitvnit@educacao.sp.gov.br' },
-      { id: uid(), name: 'Rodolfo Rodrigues Pereira', role: 'Chefe de Servico - SEAFIN', phone: '(15) 3526-6240', email: 'deitvcaf@educacao.sp.gov.br' },
-      { id: uid(), name: 'Daniel Duchen Hiromitus', role: 'Chefe de Secao - SEFISC', phone: '(15) 3526-6206', email: 'deitvnfi@educacao.sp.gov.br' },
-      { id: uid(), name: 'Nelson da Conceicao Junior', role: 'Chefe de Secao - SEFIN', phone: '(15) 3526-6237', email: 'deitvnfi@educacao.sp.gov.br' },
-      { id: uid(), name: 'Elcio Renato Bonifacio de Azevedo', role: 'Chefe de Servico - SEINTEC', phone: '(15) 3526-6211', email: 'deitvnit@educacao.sp.gov.br' },
-      { id: uid(), name: 'Nelio Celso Fernandes Junior', role: 'Chefe de Servico - SEOM', phone: '(15) 3526-6236', email: 'deitvnom@educacao.sp.gov.br' },
-      { id: uid(), name: 'Rafael Alves Machado', role: 'Oficial Administrativo', phone: '(15) 3526-6209', email: 'deitvnad@educacao.sp.gov.br' },
-      { id: uid(), name: 'Juliana de Fatima Rodrigues Lopes de Jesus', role: 'Analista Sociocultural', phone: '(15) 3526-6200', email: 'deitvnad@educacao.sp.gov.br' },
-      { id: uid(), name: 'Leticia Aparecida Alves dos Santos', role: 'Diretor I - Nucleo de Frequencia e Pagamento', phone: '(15) 3526-6205', email: 'deitvnfp@educacao.sp.gov.br' },
-      { id: uid(), name: 'Paulo Sergio de Oliveira', role: 'Oficial Administrativo', phone: '(15) 3526-6222', email: 'deitvnfp@educacao.sp.gov.br' },
-      { id: uid(), name: 'Fabricio Santos', role: 'Chefe de Secao - SECOMSE', phone: '(15) 3526-6238', email: 'deitvncs@educacao.sp.gov.br' },
-      { id: uid(), name: 'Hector Antunes de Carvalho', role: 'Diretor II - Centro de Recursos Humanos', phone: '(15) 3526-6204', email: 'deitvcrh@educacao.sp.gov.br' },
-      { id: uid(), name: 'Wania Chrischner Nunes Figueiredo', role: 'Professor Readaptado', phone: '(15) 3526-6203', email: 'deitvnap@educacao.sp.gov.br' },
-      { id: uid(), name: 'Priscila Aparecida Conceicao Souza', role: 'Chefe de Servico - SEGRE', phone: '(15) 3526-6230', email: 'deitvcie@educacao.sp.gov.br' },
-      { id: uid(), name: 'Rosinei Dell Anhol', role: 'Chefe de Secao - Matricula', phone: '(15) 3526-6228', email: 'deitvnve@educacao.sp.gov.br' },
-      { id: uid(), name: 'Juliano Lobo Ribeiro', role: 'Assistente II', phone: '(15) 3526-6225', email: 'juliano.ribeiro@educacao.sp.gov.br' },
-      { id: uid(), name: 'Daiane Aparecida de Oliveira Ribeiro', role: 'Supervisor Educacional', phone: '(15) 3526-6227', email: 'daiane.ribeiro@educacao.sp.gov.br' },
-      { id: uid(), name: 'Edilene da Silva Almeida Oliveira', role: 'Supervisor Educacional', phone: '(15) 3526-6217', email: 'edilene.oliveira@educacao.sp.gov.br' },
-      { id: uid(), name: 'Magda Gisele Silva de Oliveira', role: 'Supervisor Educacional', phone: '(15) 3526-6232', email: 'magda.oliveira@educacao.sp.gov.br' },
-      { id: uid(), name: 'Marcio Nunes da Cruz', role: 'Supervisor Educacional', phone: '(15) 3526-6208', email: 'marcio.cruz@educacao.sp.gov.br' },
-      { id: uid(), name: 'Maria Luiza Brizolla de Queiroz', role: 'Supervisor Educacional', phone: '(15) 3526-6216', email: 'maria.queiroz14@educacao.sp.gov.br' },
-      { id: uid(), name: 'Adilson Fogaca', role: 'Supervisor Educacional', phone: '(15) 3526-6224', email: 'adilson.fogaca@educacao.sp.gov.br' },
-      ...pecs.map((pec) => ({
-        id: uid(),
-        name: pec.name,
-        role: pec.role,
-        phone: pec.phone,
-        email: pec.email
-      }))
-    ],
+    directoryContacts: ureDirectoryContacts(pecs),
     officialLinks: [
       { id: uid(), label: 'Portal da Diretoria de Ensino de Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/' },
       { id: uid(), label: 'Escolas da URE Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/escolas/' },
       { id: uid(), label: 'Lista de ramais da URE Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/lista-de-ramais/' },
       { id: uid(), label: 'Fale Conosco da URE Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/central-de-atendimento/' },
       { id: uid(), label: 'SIC.SP - Informacoes ao Cidadao', url: 'https://deitapeva.educacao.sp.gov.br/sic-sp-informacoes-ao-cidadao/' },
+      { id: uid(), label: 'Assessoria Tecnica - ASURE', url: 'https://deitapeva.educacao.sp.gov.br/assessoria-tecnica-asure/' },
+      { id: uid(), label: 'Dirigente Regional', url: 'https://deitapeva.educacao.sp.gov.br/dirigente/' },
+      { id: uid(), label: 'Equipe de Supervisao Escolar', url: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' },
+      { id: uid(), label: 'Equipe de Especialistas em Curriculo', url: 'https://deitapeva.educacao.sp.gov.br/equipe-de-especialistas-em-curriculo-eec/' },
+      { id: uid(), label: 'Servico de Administracao e Financas - SEAFIN', url: 'https://deitapeva.educacao.sp.gov.br/servico-de-administracao-e-financas-seafin/' },
+      { id: uid(), label: 'Secao de Compras e Servicos', url: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-compras-e-servicos/' },
+      { id: uid(), label: 'Secao de Financas', url: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-financas/' },
+      { id: uid(), label: 'Servico de Obras e Manutencao Escolar', url: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-obras-e-manut-escolar/' },
+      { id: uid(), label: 'Setor de Fiscalizacao', url: 'https://deitapeva.educacao.sp.gov.br/setor-de-fiscalizacao-sefisc/' },
+      { id: uid(), label: 'Centro de Informacoes Educacionais', url: 'https://deitapeva.educacao.sp.gov.br/centro-de-informacoes-educacionais-e-gestao-da-rede-escolar/' },
+      { id: uid(), label: 'Secao de Matricula', url: 'https://deitapeva.educacao.sp.gov.br/secao-de-matricula-semat/' },
+      { id: uid(), label: 'Secao de Vida Escolar', url: 'https://deitapeva.educacao.sp.gov.br/secao-de-vida-escolar-sevesc/' },
       { id: uid(), label: 'Pagina do SEINTEC', url: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-informacoes-educacionais-e-tecnologia/' },
+      { id: uid(), label: 'Secao de Tecnologia - SETEC', url: 'https://deitapeva.educacao.sp.gov.br/secao-de-tecnologia-setec/' },
+      { id: uid(), label: 'Servico de Pessoas - SEPES', url: 'https://deitapeva.educacao.sp.gov.br/serrvico-de-pessoas-sepes/' },
+      { id: uid(), label: 'Secao de Frequencia e Pagamento', url: 'https://deitapeva.educacao.sp.gov.br/secao-de-frequencia-e-pagamento-sefrep/' },
+      { id: uid(), label: 'Secao de Administracao de Pessoal', url: 'https://deitapeva.educacao.sp.gov.br/secao-de-administracao-de-pessoal-seape/' },
       { id: uid(), label: 'Pagina do SEOM', url: 'https://deitapeva.educacao.sp.gov.br/nucleo-de-obras-e-manut-escolar/' },
       { id: uid(), label: 'Equipe de Supervisao de Ensino', url: 'https://deitapeva.educacao.sp.gov.br/equipe-de-supervisao-escolar/' },
       { id: uid(), label: 'Secretaria Escolar Digital', url: 'https://sed.educacao.sp.gov.br/' },
@@ -578,7 +677,7 @@ function mergeState(saved) {
     officialContacts: { ...base.officialContacts, ...(repaired.officialContacts || {}) },
     municipalities: mergeUniqueBy(base.municipalities, savedMunicipalities, (item) => normalizeKey(item.name)),
     sectors: mergeUniqueBy(base.sectors, savedSectors, (item) => normalizeKey(item.code || item.name)),
-    directoryContacts: mergeUniqueBy(base.directoryContacts, savedDirectoryContacts, (item) => normalizeKey(item.email || item.name)),
+    directoryContacts: mergeDirectoryContacts(base.directoryContacts, savedDirectoryContacts),
     officialLinks: mergeUniqueBy(base.officialLinks, savedOfficialLinks, (item) => normalizeKey(item.url || item.label)),
     checklist: Array.isArray(repaired.checklist) ? repaired.checklist : base.checklist,
     tasks: savedTasks,
