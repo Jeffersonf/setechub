@@ -113,7 +113,7 @@ function supervisorSourceAliases(name) {
 }
 
 function canonicalSchoolName(value) {
-  const text = String(value || '').trim();
+  const text = String(value || '').trim().replace(/\s+/g, ' ');
   if (!text) return '';
   const direct = SCHOOL_ALIASES[text.toUpperCase()];
   if (direct) return direct;

@@ -1192,6 +1192,12 @@ function supervisorOfficialWeeklyVisits(supervisor) {
   return Number.isFinite(Number(supervisor.weeklyVisits)) ? Number(supervisor.weeklyVisits) : 0;
 }
 
+function supervisorGoalPct(visits, goal) {
+  const total = Number(goal || 0);
+  if (!total) return 0;
+  return Math.min(100, Math.round((Number(visits || 0) / total) * 100));
+}
+
 function renderSupervisors() {
   const metricCount = document.getElementById('supervisorMetricCount');
   const stats = supervisorStats();
@@ -1237,29 +1243,95 @@ function renderSupervisors() {
       const date = new Date(`${visit.date}T00:00:00`);
       return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
     });
-    const syncedCount = stats.filter((item) => item.supervisor.sourceSyncedAt).length;
-    const pendingGoals = stats.filter((item) => {
-      const goal = Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1);
-      const localCount = monthVisits.filter((visit) => visit.supervisor === item.supervisor.name).length;
-      const count = supervisorOfficialMonthlyVisits(item.supervisor, localCount);
-      return count < goal;
-    }).length;
-    const officialMonthlyVisits = stats.reduce((sum, item) => {
-      const localCount = monthVisits.filter((visit) => visit.supervisor === item.supervisor.name).length;
-      return sum + supervisorOfficialMonthlyVisits(item.supervisor, localCount);
-    }, 0);
-    panelGrid.innerHTML = [
-      { label: 'Supervisores', value: String(stats.length), note: `${syncedCount} sincronizado(s)`, tone: 'pill-info' },
-      { label: 'Visitas no mes', value: String(officialMonthlyVisits), note: 'painel oficial da planilha', tone: 'pill-ok' },
-      { label: 'Metas pendentes', value: String(pendingGoals), note: pendingGoals ? 'precisam de acompanhamento' : 'metas em dia', tone: pendingGoals ? 'pill-warn' : 'pill-ok' },
-      { label: 'Escolas vinculadas', value: String(assignedSchoolCount), note: `${averageCoverage}% de cobertura`, tone: averageCoverage >= 70 ? 'pill-ok' : 'pill-warn' }
-    ].map((item) => `
-      <div class="setechub-monitor-card">
-        <div class="sync-meta">${esc(item.label)}</div>
-        <strong>${esc(item.value)}</strong>
-        <div class="diag-pill ${item.tone}">${esc(item.note)}</div>
+    const sheetRows = stats.map((item) => {
+      const supervisor = item.supervisor;
+      const localCount = monthVisits.filter((visit) => visit.supervisor === supervisor.name).length;
+      const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools.length || 0);
+      const weeklyGoal = Number(supervisor.weeklyGoal || 0);
+      const monthlyGoal = Number(supervisor.monthlyGoal || item.assignedSchools.length || 1);
+      const weeklyVisits = supervisorOfficialWeeklyVisits(supervisor);
+      const monthlyVisits = supervisorOfficialMonthlyVisits(supervisor, localCount);
+      const weeklyIndicator = supervisor.weeklyIndicator || (weeklyVisits >= weeklyGoal ? 'verde' : 'amarelo');
+      const monthlyIndicator = supervisor.monthlyIndicator || (monthlyVisits >= monthlyGoal ? 'verde' : 'amarelo');
+      return {
+        item,
+        supervisor,
+        assigned,
+        weeklyGoal,
+        monthlyGoal,
+        currentWeek: Number(supervisor.currentWeek || 0),
+        weeklyVisits,
+        monthlyVisits,
+        weeklyIndicator,
+        monthlyIndicator
+      };
+    });
+    const syncedCount = sheetRows.filter((row) => row.supervisor.sourceSyncedAt).length;
+    const pendingGoals = sheetRows.filter((row) => row.monthlyVisits < row.monthlyGoal).length;
+    const weeklyGoalTotal = sheetRows.reduce((sum, row) => sum + row.weeklyGoal, 0);
+    const weeklyVisitTotal = sheetRows.reduce((sum, row) => sum + row.weeklyVisits, 0);
+    const monthlyGoalTotal = sheetRows.reduce((sum, row) => sum + row.monthlyGoal, 0);
+    const monthlyVisitTotal = sheetRows.reduce((sum, row) => sum + row.monthlyVisits, 0);
+    const currentWeek = sheetRows.find((row) => row.currentWeek)?.currentWeek || 0;
+    panelGrid.innerHTML = `
+      <div class="supervisor-sheet-summary">
+        ${[
+          { label: 'Semana do mes', value: currentWeek ? String(currentWeek) : '--', note: 'aba PainelSupervisor', tone: 'pill-info' },
+          { label: 'Meta semanal', value: `${weeklyVisitTotal}/${weeklyGoalTotal || 0}`, note: `${supervisorGoalPct(weeklyVisitTotal, weeklyGoalTotal)}% realizado`, tone: weeklyVisitTotal >= weeklyGoalTotal ? 'pill-ok' : 'pill-warn' },
+          { label: 'Meta mensal', value: `${monthlyVisitTotal}/${monthlyGoalTotal || 0}`, note: `${supervisorGoalPct(monthlyVisitTotal, monthlyGoalTotal)}% realizado`, tone: pendingGoals ? 'pill-warn' : 'pill-ok' },
+          { label: 'Sincronizacao', value: String(syncedCount), note: 'supervisores com dados online', tone: syncedCount === stats.length ? 'pill-ok' : 'pill-warn' }
+        ].map((card) => `
+          <div class="supervisor-sheet-card">
+            <div class="sync-meta">${esc(card.label)}</div>
+            <strong>${esc(card.value)}</strong>
+            <span class="diag-pill ${card.tone}">${esc(card.note)}</span>
+          </div>
+        `).join('')}
       </div>
-    `).join('');
+      <div class="supervisor-sheet-table-wrap">
+        <table class="supervisor-sheet-table">
+          <thead>
+            <tr>
+              <th>Supervisor</th>
+              <th>Escolas</th>
+              <th>Meta semanal</th>
+              <th>Meta mensal</th>
+              <th>Semana</th>
+              <th>Indicador semana</th>
+              <th>Indicador mes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sheetRows.map((row) => `
+              <tr class="supervisor-sheet-row" onclick="openSupervisorRecord('${esc(row.supervisor.name)}')">
+                <td>
+                  <strong>${esc(row.supervisor.name)}</strong>
+                  <span>${esc(row.supervisor.email || row.supervisor.phone || 'Supervisor educacional')}</span>
+                </td>
+                <td>${esc(String(row.assigned || row.item.assignedSchools.length))}</td>
+                <td>
+                  <strong>${esc(String(row.weeklyVisits))}/${esc(String(row.weeklyGoal || '--'))}</strong>
+                  <div class="supervisor-sheet-bar"><span style="width:${esc(String(Math.max(4, supervisorGoalPct(row.weeklyVisits, row.weeklyGoal))))}%"></span></div>
+                </td>
+                <td>
+                  <strong>${esc(String(row.monthlyVisits))}/${esc(String(row.monthlyGoal || '--'))}</strong>
+                  <div class="supervisor-sheet-bar"><span style="width:${esc(String(Math.max(4, supervisorGoalPct(row.monthlyVisits, row.monthlyGoal))))}%"></span></div>
+                </td>
+                <td>${esc(String(row.currentWeek || '--'))}</td>
+                <td><span class="diag-pill ${supervisorIndicatorClass(row.weeklyIndicator)}">${esc(badgeText(row.weeklyIndicator))}</span></td>
+                <td><span class="diag-pill ${supervisorIndicatorClass(row.monthlyIndicator)}">${esc(badgeText(row.monthlyIndicator))}</span></td>
+                <td><button class="btn btn-g btn-sm" type="button" onclick="event.stopPropagation(); openSupervisorRecord('${esc(row.supervisor.name)}')">Abrir</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="supervisor-sheet-foot">
+        <span>Fonte: planilha oficial de supervisao</span>
+        <span>${esc(syncedCount ? `Atualizada em ${timestampLabel(new Date(sheetRows.find((row) => row.supervisor.sourceSyncedAt)?.supervisor.sourceSyncedAt || Date.now()))}` : 'Aguardando sincronizacao')}</span>
+      </div>
+    `;
   }
 
   const selectorList = document.getElementById('supervisorSelectorList');
