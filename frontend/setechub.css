@@ -395,6 +395,26 @@
   gap: 10px;
 }
 
+.inventory-board {
+  display: grid;
+  grid-template-columns: minmax(280px, .38fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.inventory-school-panel {
+  position: sticky;
+  top: 78px;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+}
+
+.inventory-detail-stack {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
 .inventory-workspace-grid {
   display: grid;
   grid-template-columns: minmax(300px, .85fr) minmax(0, 1.15fr);
@@ -452,10 +472,17 @@
 
 .inventory-school-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
   padding: 12px;
+}
+
+.inventory-school-row.active {
+  border-color: rgba(200,245,90,.38);
+  background:
+    linear-gradient(135deg, rgba(200,245,90,.10), rgba(90,245,200,.045)),
+    var(--sf2);
 }
 
 .inventory-rank {
@@ -540,6 +567,53 @@
 .inventory-detail-card .setechub-table,
 .inventory-category-card .setechub-table {
   min-width: 680px;
+}
+
+.inventory-category-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.inventory-category-chip {
+  min-height: 88px;
+  padding: 13px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: rgba(255,255,255,.032);
+  color: var(--tx);
+  text-align: left;
+  cursor: pointer;
+}
+
+.inventory-category-chip:hover {
+  border-color: color-mix(in srgb, var(--ac) 30%, var(--bd));
+  background: rgba(200,245,90,.08);
+}
+
+.inventory-category-chip span,
+.inventory-category-chip small {
+  display: block;
+  color: var(--mt);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.inventory-category-chip strong {
+  display: block;
+  margin: 6px 0 5px;
+  color: var(--tx);
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.inventory-category-chip small {
+  color: var(--tx2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: none;
 }
 
 .dashboard-access-grid {
@@ -1420,12 +1494,22 @@
 .supervisor-sheet-table td:nth-child(6),
 .supervisor-sheet-table td:nth-child(7) {
   padding-inline: 18px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .supervisor-sheet-table .diag-pill {
+  width: 190px;
   min-width: 190px;
-  min-height: 28px;
-  padding: 0 18px;
+  height: 30px;
+  min-height: 30px;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   font-size: 12px;
   letter-spacing: .055em;
   box-shadow: 0 10px 22px rgba(0,0,0,.24);
@@ -1444,9 +1528,11 @@
 
 #painelSupervisor:fullscreen .supervisor-sheet-table .diag-pill,
 #painelSupervisor.supervisor-panel-fullscreen .supervisor-sheet-table .diag-pill {
+  width: 230px;
   min-width: 230px;
+  height: 42px;
   min-height: 42px;
-  padding: 0 24px;
+  padding: 0;
   font-size: 15px;
   letter-spacing: .065em;
   box-shadow: 0 14px 30px rgba(0,0,0,.32);
@@ -1582,13 +1668,21 @@
   background: rgba(255,255,255,.03);
 }
 
-.supervisor-list-card.active {
-  border-color: rgba(200,245,90,.36);
-  background: rgba(200,245,90,.08);
-}
-
 .supervisor-list-kpis {
   margin-top: 10px;
+}
+
+.supervisor-list-card > .setechub-head {
+  align-items: center;
+}
+
+.supervisor-list-card .setechub-head > .diag-pill {
+  width: 118px;
+  min-width: 118px;
+  min-height: 30px;
+  padding: 0 14px;
+  align-self: center;
+  flex: 0 0 118px;
 }
 
 .supervisor-card {
@@ -2694,6 +2788,7 @@ a {
 @media (max-width: 1100px) {
   .setechub-command-grid,
   .inventory-hero,
+  .inventory-board,
   .inventory-workspace-grid,
   .dashboard-control-grid,
   .dashboard-triage-grid,
@@ -2725,6 +2820,11 @@ a {
 
   .inventory-filter-grid {
     grid-template-columns: 1fr;
+  }
+
+  .inventory-school-panel {
+    position: static;
+    max-height: none;
   }
 
   .school-directory-filters {

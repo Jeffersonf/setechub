@@ -389,6 +389,50 @@ function selectSupervisor(name) {
   saveUiContext();
 }
 
+function readSupervisorAdminNumber(id) {
+  const value = Number(document.getElementById(id)?.value || 0);
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
+function selectSupervisorAdmin(name) {
+  currentSupervisorAdmin = name || '';
+  const schoolsNode = document.getElementById('supervisorAdminSchools');
+  if (schoolsNode) schoolsNode.value = '';
+  renderSupervisors();
+}
+
+function saveSupervisorAdmin(event) {
+  event.preventDefault();
+  if (!canManageUsers()) return;
+  const name = document.getElementById('supervisorAdminSelect')?.value || currentSupervisorAdmin;
+  if (!name) return;
+  const schoolsText = document.getElementById('supervisorAdminSchools')?.value || '';
+  const schools = schoolsText
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  state.supervisors = (state.supervisors || []).map((supervisor) => {
+    if (supervisor.name !== name) return supervisor;
+    return {
+      ...supervisor,
+      schools,
+      assignedSchoolCount: readSupervisorAdminNumber('supervisorAdminAssigned') || schools.length,
+      weeklyGoal: readSupervisorAdminNumber('supervisorAdminWeeklyGoal'),
+      weeklyVisits: readSupervisorAdminNumber('supervisorAdminWeeklyVisits'),
+      monthlyGoal: readSupervisorAdminNumber('supervisorAdminMonthlyGoal') || schools.length || 1,
+      monthlyVisits: readSupervisorAdminNumber('supervisorAdminMonthlyVisits'),
+      currentWeek: readSupervisorAdminNumber('supervisorAdminCurrentWeek'),
+      weeklyIndicator: document.getElementById('supervisorAdminWeeklyIndicator')?.value || 'aviso',
+      monthlyIndicator: document.getElementById('supervisorAdminMonthlyIndicator')?.value || 'aviso',
+      visitSourceUrl: document.getElementById('supervisorAdminSourceUrl')?.value.trim() || supervisor.visitSourceUrl || '',
+      source: 'admin',
+      sourceSyncedAt: new Date().toISOString()
+    };
+  });
+  currentSupervisorAdmin = name;
+  refreshAll();
+}
+
 function openSupervisorRecord(name) {
   if (!canViewSupervisor(name)) {
     showPage('supervisors');
@@ -473,7 +517,7 @@ function showSchoolDetail(name) {
 }
 
 function setInventorySchool(name) {
-  if (!canViewSchool(name)) {
+  if (name !== 'todas' && !canViewSchool(name)) {
     showPage('schools');
     return;
   }
@@ -1383,6 +1427,8 @@ function setupEventListeners() {
   });
 
   document.getElementById('visitSupervisorSelect')?.addEventListener('change', renderSupervisors);
+  document.getElementById('supervisorAdminSelect')?.addEventListener('change', (event) => selectSupervisorAdmin(event.target.value));
+  document.getElementById('supervisorAdminForm')?.addEventListener('submit', saveSupervisorAdmin);
   document.getElementById('openSupervisorSelectedBtn')?.addEventListener('click', () => {
     const name = document.getElementById('supervisorRecordSelect')?.value;
     if (name) openSupervisorRecord(name);

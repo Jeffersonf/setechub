@@ -569,12 +569,10 @@ function renderSchoolCommandCenter() {
 
 function renderInventoryWorkspace() {
   const filteredAssets = filteredSchoolAssets();
-  const schoolRows = inventorySchoolRows();
   const focusSchool = inventoryFocusSchool();
-  const focusRows = focusSchool
-    ? aggregateInventoryItems(filteredAssets.filter((item) => item.school === focusSchool))
-      .sort((a, b) => b.alertUnits - a.alertUnits || b.units - a.units || a.name.localeCompare(b.name))
-    : [];
+  const regionalView = currentInventorySchool === 'todas';
+  const focusRows = aggregateInventoryItems(filteredAssets)
+    .sort((a, b) => b.alertUnits - a.alertUnits || b.defectUnits - a.defectUnits || b.units - a.units || a.school.localeCompare(b.school) || a.name.localeCompare(b.name));
   const categorySummary = focusRows.reduce((acc, item) => {
     if (!acc[item.category]) {
       acc[item.category] = { category: item.category, units: 0, alertUnits: 0, items: 0 };
@@ -585,9 +583,9 @@ function renderInventoryWorkspace() {
     return acc;
   }, {});
   const categorySummaryRows = Object.values(categorySummary);
-  const issueRows = focusSchool ? inventoryIssuesForSchool(focusSchool) : [];
-  const quality = inventoryQualitySummary();
-  const aggregateRows = aggregateInventoryItems(filteredAssets);
+  const issueRows = focusRows
+    .filter((item) => item.alertUnits > 0 || item.defectUnits > 0 || item.quality !== 'bom' || item.rawNameCount > 1 || item.originalStatusCount > 1)
+    .slice(0, 12);
   const totalUnits = filteredAssets.reduce((sum, item) => sum + schoolAssetUnits(item), 0);
   const alertUnits = filteredAssets.filter((item) => item.status !== 'ok').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
   const defectUnits = filteredAssets.filter((item) => item.status === 'defeito').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
@@ -595,6 +593,49 @@ function renderInventoryWorkspace() {
   const totalSchools = visibleSchools().length || 1;
   const coveragePct = Math.round((coveredSchools / totalSchools) * 100);
   const riskPct = totalUnits ? Math.round((alertUnits / totalUnits) * 100) : 0;
+  const schoolListAssets = state.schoolAssets.filter((item) => {
+    if (!canViewSchool(item.school)) return false;
+    if (currentInventoryStatus === 'alerta' && item.status === 'ok') return false;
+    if (currentInventoryStatus === 'criticos' && item.status !== 'defeito') return false;
+    if (currentInventoryStatus === 'ok' && item.status !== 'ok') return false;
+    if (currentInventoryCategory !== 'todas' && inventoryCategory(item.name) !== currentInventoryCategory) return false;
+    if (currentInventorySearch) {
+      const haystack = normalizeKey(`${item.school} ${item.name} ${item.notes || ''}`);
+      if (!haystack.includes(normalizeKey(currentInventorySearch))) return false;
+    }
+    return true;
+  });
+  const assetsBySchool = schoolListAssets.reduce((acc, item) => {
+    if (!acc[item.school]) acc[item.school] = [];
+    acc[item.school].push(item);
+    return acc;
+  }, {});
+  const schoolRows = visibleSchools()
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((school) => {
+      const rows = assetsBySchool[school.name] || [];
+      const total = rows.reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+      const alerts = rows.filter((item) => item.status !== 'ok').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+      const defects = rows.filter((item) => item.status === 'defeito').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+      return {
+        school: school.name,
+        cie: school.cie || '',
+        zone: school.zone || '',
+        totalLines: rows.length,
+        totalUnits: total,
+        alertUnits: alerts,
+        defectUnits: defects,
+        categories: new Set(rows.map((item) => inventoryCategory(item.name))).size,
+        visible: !currentInventorySearch || rows.length || normalizeKey(school.name).includes(normalizeKey(currentInventorySearch))
+      };
+    })
+    .filter((item) => item.visible)
+    .sort((a, b) => {
+      if (a.school === currentInventorySchool) return -1;
+      if (b.school === currentInventorySchool) return 1;
+      return b.alertUnits - a.alertUnits || b.defectUnits - a.defectUnits || b.totalUnits - a.totalUnits || a.school.localeCompare(b.school);
+    });
   const heroTitle = document.getElementById('inventoryHeroTitle');
   const heroText = document.getElementById('inventoryHeroText');
   const heroStats = document.getElementById('inventoryHeroStats');
@@ -607,7 +648,6 @@ function renderInventoryWorkspace() {
   const schoolSelect = document.getElementById('inventorySchoolSelect');
   const categorySelect = document.getElementById('inventoryCategorySelect');
   const searchInput = document.getElementById('inventorySearchInput');
-  const qualityNode = document.getElementById('inventoryQualityGrid');
   const issueNode = document.getElementById('inventoryIssuesList');
   if (schoolSelect) {
     schoolSelect.innerHTML = [`<option value="todas">Todas as escolas</option>`]
@@ -633,20 +673,22 @@ function renderInventoryWorkspace() {
     searchInput.value = currentInventorySearch;
   }
   if (heroTitle) {
-    heroTitle.textContent = focusSchool && currentInventorySchool !== 'todas'
-      ? `Inventario de ${focusSchool}`
-      : 'Inventario regional consolidado';
+    heroTitle.textContent = regionalView
+      ? 'Inventario regional'
+      : focusSchool;
   }
   if (heroText) {
     const statusLabel = currentInventoryStatus === 'todos' ? 'todos os status' : badgeText(currentInventoryStatus);
     const categoryLabel = currentInventoryCategory === 'todas' ? 'todas as categorias' : badgeText(currentInventoryCategory);
-    heroText.textContent = `${coveredSchools} escola(s), ${aggregateRows.length} familia(s) e ${totalUnits} unidade(s) em ${statusLabel.toLowerCase()} / ${categoryLabel.toLowerCase()}.`;
+    heroText.textContent = regionalView
+      ? `${coveredSchools} escola(s) com inventario no recorte, ${focusRows.length} familia(s) e ${totalUnits} unidade(s) em ${statusLabel.toLowerCase()} / ${categoryLabel.toLowerCase()}.`
+      : `Inventario especifico da unidade: ${totalUnits} unidade(s), ${alertUnits} alerta(s) e ${defectUnits} defeito(s).`;
   }
   if (heroStats) {
     heroStats.innerHTML = [
-      { label: 'Unidades', value: String(totalUnits), note: `${aggregateRows.length} familias` },
-      { label: 'Alertas', value: String(alertUnits), note: `${defectUnits} criticas` },
-      { label: 'Escolas', value: String(coveredSchools), note: `${coveragePct}% com inventario no recorte` }
+      { label: 'Unidades', value: String(totalUnits), note: `${focusRows.length} familias` },
+      { label: 'Alertas', value: String(alertUnits), note: `${defectUnits} com defeito` },
+      { label: regionalView ? 'Escolas' : 'Linhas', value: regionalView ? String(coveredSchools) : String(filteredAssets.length), note: regionalView ? `${coveragePct}% com inventario` : 'registros do recorte' }
     ].map((item) => `
       <div class="inventory-hero-stat">
         <span>${esc(item.label)}</span>
@@ -659,7 +701,7 @@ function renderInventoryWorkspace() {
     const scoreTone = riskPct >= 30 ? 'pill-danger' : riskPct >= 12 ? 'pill-warn' : 'pill-ok';
     heroScore.innerHTML = `
       <div class="inventory-risk-top">
-        <span>Risco do recorte</span>
+        <span>${regionalView ? 'Risco regional' : 'Risco da escola'}</span>
         <strong>${esc(String(riskPct))}%</strong>
       </div>
       <div class="inventory-risk-bar"><span style="width:${esc(String(Math.min(100, riskPct)))}%"></span></div>
@@ -670,7 +712,7 @@ function renderInventoryWorkspace() {
     `;
   }
   if (familyStrip) {
-    const families = Object.values(aggregateRows.reduce((acc, item) => {
+    const families = Object.values(focusRows.reduce((acc, item) => {
       if (!acc[item.category]) acc[item.category] = { category: item.category, units: 0, alertUnits: 0 };
       acc[item.category].units += item.units;
       acc[item.category].alertUnits += item.alertUnits;
@@ -687,43 +729,25 @@ function renderInventoryWorkspace() {
   if (focusPanel) {
     const focusMeta = schoolByName(focusSchool);
     const okUnits = focusRows.reduce((sum, item) => sum + item.okUnits, 0);
-    const focusUnits = focusRows.reduce((sum, item) => sum + item.units, 0);
-    const focusAlerts = focusRows.reduce((sum, item) => sum + item.alertUnits, 0);
-    const focusDefects = focusRows.reduce((sum, item) => sum + item.defectUnits, 0);
-    focusPanel.innerHTML = focusSchool ? `
+    focusPanel.innerHTML = `
       <div class="inventory-school-header">
         <div>
-          <div class="sync-meta">CIE ${esc(focusMeta?.cie || '--')} | ${esc(focusMeta?.zone || 'Municipio nao definido')}</div>
-          <strong>${esc(focusSchool)}</strong>
+          <div class="sync-meta">${regionalView ? 'Visao geral da URE' : `CIE ${esc(focusMeta?.cie || '--')} | ${esc(focusMeta?.zone || 'Municipio nao definido')}`}</div>
+          <strong>${esc(regionalView ? 'Todas as escolas' : focusSchool)}</strong>
         </div>
-        <span class="diag-pill ${focusDefects ? 'pill-danger' : focusAlerts ? 'pill-warn' : 'pill-ok'}">${esc(String(focusAlerts))} alertas</span>
+        <span class="diag-pill ${defectUnits ? 'pill-danger' : alertUnits ? 'pill-warn' : 'pill-ok'}">${esc(String(alertUnits))} alertas</span>
       </div>
       <div class="inventory-focus-metrics">
         <div><span>Familias</span><strong>${esc(String(focusRows.length))}</strong></div>
-        <div><span>Unidades</span><strong>${esc(String(focusUnits))}</strong></div>
+        <div><span>Unidades</span><strong>${esc(String(totalUnits))}</strong></div>
         <div><span>Ok</span><strong>${esc(String(okUnits))}</strong></div>
-        <div><span>Defeito</span><strong>${esc(String(focusDefects))}</strong></div>
+        <div><span>Defeito</span><strong>${esc(String(defectUnits))}</strong></div>
       </div>
       <div class="inventory-focus-actions">
-        <button class="btn btn-p btn-sm" onclick="setInventorySchool('${esc(focusSchool)}')">Ver inventario</button>
-        <button class="btn btn-g btn-sm" onclick="showSchoolDetail('${esc(focusSchool)}')">Dados da escola</button>
+        ${regionalView ? '' : '<button class="btn btn-g btn-sm" onclick="setInventorySchool(\'todas\')">Ver regional</button>'}
+        <button class="btn btn-p btn-sm" onclick="document.getElementById('inventoryDetailTable')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Ver equipamentos</button>
       </div>
-    ` : '<div class="sync-empty">Nenhuma escola com inventario no filtro atual.</div>';
-  }
-  if (qualityNode) {
-    qualityNode.innerHTML = [
-      { label: 'Familias consolidadas', value: String(quality.families), note: 'tipos normalizados no inventario' },
-      { label: 'Dados fracos', value: String(quality.lowQuality), note: 'nomes vagos ou pouco confiaveis' },
-      { label: 'Familias fundidas', value: String(quality.mergedFamilies), note: 'agrupam variacoes do mesmo item' },
-      { label: 'Familias criticas', value: String(quality.criticalFamilies), note: 'com defeito real registrado' },
-      { label: 'Status mistos', value: String(quality.mixedStatuses), note: 'mais de um status original dentro da mesma familia' }
-    ].map((item) => `
-      <div class="setechub-monitor-card compact">
-        <div class="sync-meta">${esc(item.label)}</div>
-        <strong>${esc(item.value)}</strong>
-        <div class="diag-pill">${esc(item.note)}</div>
-      </div>
-    `).join('');
+    `;
   }
   if (issueNode) {
     issueNode.innerHTML = issueRows.map((item) => `
@@ -731,7 +755,7 @@ function renderInventoryWorkspace() {
         <div class="inventory-issue-main">
           <div>
             <strong>${esc(item.name)}</strong>
-            <div class="sync-meta">${esc(item.brand)}${item.model ? ` | modelo ${esc(item.model)}` : ''} | ${esc(badgeText(item.category))}</div>
+            <div class="sync-meta">${regionalView ? `${esc(item.school)} | ` : ''}${esc(item.brand)}${item.model ? ` | modelo ${esc(item.model)}` : ''} | ${esc(badgeText(item.category))}</div>
           </div>
         </div>
         <div class="inventory-issue-badges">
@@ -748,24 +772,22 @@ function renderInventoryWorkspace() {
     `).join('') || '<div class="sync-empty">Nenhuma inconsistencia importante na escola em foco.</div>';
   }
   if (ranking) {
-    ranking.innerHTML = schoolRows.slice(0, 8).map((item, index) => {
+    ranking.innerHTML = schoolRows.map((item) => {
       const risk = item.totalUnits ? Math.round((item.alertUnits / item.totalUnits) * 100) : 0;
+      const active = item.school === currentInventorySchool;
       return `
-      <div class="inventory-school-row setechub-clickable" onclick="setInventorySchool('${esc(item.school)}')">
-        <div class="inventory-rank">${esc(String(index + 1).padStart(2, '0'))}</div>
+      <div class="inventory-school-row setechub-clickable ${active ? 'active' : ''}" onclick="setInventorySchool('${esc(item.school)}')">
+        <div class="inventory-rank">${esc(item.school.replace(/^E\.?E\.?\s+/i, '').slice(0, 2).toUpperCase())}</div>
         <div class="inventory-school-row-main">
           <div>
             <strong>${esc(item.school)}</strong>
-            <div class="sync-meta">CIE ${esc(schoolByName(item.school)?.cie || '--')} | ${esc(String(item.totalLines))} linhas | ${esc(String(item.categories))} categorias</div>
+            <div class="sync-meta">CIE ${esc(item.cie || '--')} | ${esc(item.zone || '--')} | ${esc(String(item.categories))} categoria(s)</div>
           </div>
           <div class="inventory-school-row-metrics">
             <span><strong>${esc(String(item.totalUnits))}</strong> unid.</span>
             <span class="${item.alertUnits ? 'danger' : ''}"><strong>${esc(String(item.alertUnits))}</strong> alertas</span>
             <span><strong>${esc(String(risk))}%</strong> risco</span>
           </div>
-        </div>
-        <div class="inventory-row-actions">
-          <button class="btn btn-g btn-sm" onclick="event.stopPropagation(); setInventorySchool('${esc(item.school)}')">Focar inventario</button>
         </div>
       </div>
     `;
@@ -776,8 +798,9 @@ function renderInventoryWorkspace() {
       <table class="setechub-table">
         <thead>
           <tr>
+            ${regionalView ? '<th>Escola</th>' : ''}
             <th>Equipamento</th>
-            <th>Leitura</th>
+            <th>Categoria</th>
             <th>Total</th>
             <th>Ok</th>
             <th>Alertas</th>
@@ -788,8 +811,9 @@ function renderInventoryWorkspace() {
         <tbody>
           ${focusRows.map((item) => `
             <tr>
-              <td><strong>${esc(item.name)}</strong><div class="sync-meta">${esc(item.brand)}${item.model ? ` | ${esc(item.model)}` : ''} | ${esc(badgeText(item.category))}</div></td>
-              <td><span class="diag-pill ${item.quality === 'fraco' ? 'pill-danger' : item.quality === 'medio' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(item.quality))}</span><div class="sync-meta">${esc(String(item.rawNameCount))} nome(s) | ${esc(String(item.originalStatusCount))} status</div></td>
+              ${regionalView ? `<td><button class="link-button" type="button" onclick="setInventorySchool('${esc(item.school)}')">${esc(item.school)}</button></td>` : ''}
+              <td><strong>${esc(item.name)}</strong><div class="sync-meta">${esc(item.brand)}${item.model ? ` | ${esc(item.model)}` : ''}</div></td>
+              <td><span class="diag-pill ${item.quality === 'fraco' ? 'pill-danger' : item.quality === 'medio' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(item.category))}</span><div class="sync-meta">${esc(String(item.rawNameCount))} nome(s)</div></td>
               <td>${esc(String(item.units))}</td>
               <td>${esc(String(item.okUnits))}</td>
               <td>${esc(String(item.alertUnits))}</td>
@@ -802,28 +826,15 @@ function renderInventoryWorkspace() {
     ` : '<div class="sync-empty">Nenhuma linha detalhada para a escola filtrada.</div>';
   }
   if (categoryTable) {
-    categoryTable.innerHTML = categorySummaryRows.length ? `
-      <table class="setechub-table">
-        <thead>
-          <tr>
-            <th>Categoria</th>
-            <th>Tipos</th>
-            <th>Unidades</th>
-            <th>Alertas</th>
-          </tr>
-        </thead>
-        <tbody>
-            ${categorySummaryRows.sort((a, b) => b.units - a.units || a.category.localeCompare(b.category)).map((item) => `
-              <tr>
-                <td><strong>${esc(badgeText(item.category))}</strong></td>
-                <td>${esc(String(item.items))}</td>
-                <td>${esc(String(item.units))}</td>
-                <td>${esc(String(item.alertUnits))}</td>
-              </tr>
-            `).join('')}
-        </tbody>
-      </table>
-    ` : '<div class="sync-empty">Sem categorias para resumir nesta escola.</div>';
+    categoryTable.innerHTML = categorySummaryRows.length ? categorySummaryRows
+      .sort((a, b) => b.units - a.units || a.category.localeCompare(b.category))
+      .map((item) => `
+        <button class="inventory-category-chip" type="button" onclick="openInventoryCategory('${esc(currentInventoryStatus)}', '${esc(item.category)}', '${esc(currentInventorySchool)}')">
+          <span>${esc(badgeText(item.category))}</span>
+          <strong>${esc(String(item.units))}</strong>
+          <small>${esc(String(item.items))} tipo(s) | ${esc(String(item.alertUnits))} alerta(s)</small>
+        </button>
+      `).join('') : '<div class="sync-empty">Sem categorias para resumir neste recorte.</div>';
   }
 }
 
@@ -1369,6 +1380,25 @@ function supervisorGoalPct(visits, goal) {
   return Math.min(100, Math.round((Number(visits || 0) / total) * 100));
 }
 
+function supervisorSheetMetrics(item) {
+  const supervisor = item.supervisor || item;
+  const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools?.length || supervisor.schools?.length || 0);
+  const weeklyGoal = Number(supervisor.weeklyGoal || 0);
+  const monthlyGoal = Number(supervisor.monthlyGoal || assigned || 1);
+  const weeklyVisits = supervisorOfficialWeeklyVisits(supervisor);
+  const monthlyVisits = supervisorOfficialMonthlyVisits(supervisor, item.visits || 0);
+  return {
+    assigned,
+    weeklyGoal,
+    monthlyGoal,
+    weeklyVisits,
+    monthlyVisits,
+    pendingMonth: Math.max(0, monthlyGoal - monthlyVisits),
+    weeklyIndicator: supervisor.weeklyIndicator || 'aviso',
+    monthlyIndicator: supervisor.monthlyIndicator || 'aviso'
+  };
+}
+
 function renderSupervisors() {
   const metricCount = document.getElementById('supervisorMetricCount');
   const stats = supervisorStats();
@@ -1487,25 +1517,11 @@ function renderSupervisors() {
 
   const selectorList = document.getElementById('supervisorSelectorList');
   if (selectorList) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
     selectorList.innerHTML = stats.map((item) => `
-      <div class="setechub-item setechub-clickable supervisor-list-card ${normalizeKey(item.supervisor.name) === currentSupervisorFilter ? 'active' : ''}" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
+      <div class="setechub-item setechub-clickable supervisor-list-card" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
         ${(() => {
-          const monthlyGoal = Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1);
-          const weeklyGoal = Number(item.supervisor.weeklyGoal || 0);
-          const monthVisits = visits.filter((visit) => {
-            if (visit.supervisor !== item.supervisor.name) return false;
-            const date = new Date(`${visit.date}T00:00:00`);
-            return date.getFullYear() === year && date.getMonth() === month;
-          });
-          const officialMonthVisits = supervisorOfficialMonthlyVisits(item.supervisor, monthVisits.length);
-          const officialWeekVisits = supervisorOfficialWeeklyVisits(item.supervisor);
-          const visitedSchools = new Set(monthVisits.map((visit) => visit.school)).size;
-          const pending = Math.max(0, item.assignedSchools.length - visitedSchools);
-          const goalMet = officialMonthVisits >= monthlyGoal;
-          const monthlyIndicator = item.supervisor.monthlyIndicator || 'aviso';
+          const metrics = supervisorSheetMetrics(item);
+          const monthlyIndicator = metrics.monthlyIndicator;
           return `
             <div class="setechub-head">
               <div>
@@ -1515,16 +1531,17 @@ function renderSupervisors() {
               <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
             </div>
             <div class="school-overview-kpis supervisor-list-kpis">
-              <div><span>Mes</span><strong>${esc(String(officialMonthVisits))}/${esc(String(monthlyGoal))}</strong></div>
-              <div><span>Semana</span><strong>${esc(String(officialWeekVisits))}${weeklyGoal ? `/${esc(String(weeklyGoal))}` : ''}</strong></div>
-              <div><span>Escolas</span><strong>${esc(String(item.assignedSchools.length))}</strong></div>
-              <div><span>Faltam</span><strong>${esc(String(pending))}</strong></div>
+              <div><span>Mes</span><strong>${esc(String(metrics.monthlyVisits))}/${esc(String(metrics.monthlyGoal))}</strong></div>
+              <div><span>Semana</span><strong>${esc(String(metrics.weeklyVisits))}${metrics.weeklyGoal ? `/${esc(String(metrics.weeklyGoal))}` : ''}</strong></div>
+              <div><span>Escolas</span><strong>${esc(String(metrics.assigned))}</strong></div>
+              <div><span>Faltam</span><strong>${esc(String(metrics.pendingMonth))}</strong></div>
             </div>
           `;
         })()}
       </div>
     `).join('') || '<div class="sync-empty">Nenhum supervisor cadastrado.</div>';
   }
+  renderSupervisorAdminEditor(stats);
 
   const overviewPanel = document.getElementById('supervisorOverviewPanel');
   if (overviewPanel) {
@@ -1769,6 +1786,37 @@ function renderSupervisors() {
   }
 }
 
+function renderSupervisorAdminEditor(stats = supervisorStats()) {
+  const select = document.getElementById('supervisorAdminSelect');
+  if (!select) return;
+  if (!canManageUsers()) return;
+  const supervisors = stats.map((item) => item.supervisor);
+  if (!currentSupervisorAdmin) currentSupervisorAdmin = supervisors[0]?.name || '';
+  select.innerHTML = supervisors.map((supervisor) => `<option value="${esc(supervisor.name)}">${esc(supervisor.name)}</option>`).join('');
+  select.value = currentSupervisorAdmin;
+  const stat = stats.find((item) => item.supervisor.name === currentSupervisorAdmin) || stats[0];
+  const supervisor = stat?.supervisor;
+  if (!supervisor) return;
+  const metrics = supervisorSheetMetrics(stat);
+  const setValue = (id, value) => {
+    const node = document.getElementById(id);
+    if (node && node.value !== String(value ?? '')) node.value = value ?? '';
+  };
+  setValue('supervisorAdminAssigned', metrics.assigned);
+  setValue('supervisorAdminWeeklyGoal', metrics.weeklyGoal);
+  setValue('supervisorAdminWeeklyVisits', metrics.weeklyVisits);
+  setValue('supervisorAdminMonthlyGoal', metrics.monthlyGoal);
+  setValue('supervisorAdminMonthlyVisits', metrics.monthlyVisits);
+  setValue('supervisorAdminCurrentWeek', supervisor.currentWeek || '');
+  setValue('supervisorAdminWeeklyIndicator', metrics.weeklyIndicator);
+  setValue('supervisorAdminMonthlyIndicator', metrics.monthlyIndicator);
+  setValue('supervisorAdminSourceUrl', supervisor.visitSourceUrl || '');
+  const schoolsNode = document.getElementById('supervisorAdminSchools');
+  if (schoolsNode && schoolsNode.value === '') {
+    schoolsNode.value = (supervisor.schools || []).join('\n');
+  }
+}
+
 function renderSupervisorRecord() {
   const profileHost = document.getElementById('supervisorRecordProfile');
   if (!profileHost) return;
@@ -1794,14 +1842,15 @@ function renderSupervisorRecord() {
   });
   const visitedSchoolSet = new Set(monthVisits.map((visit) => visit.school));
   const pendingSchools = selectedStat.assignedSchools.filter((school) => !visitedSchoolSet.has(school));
-  const monthlyGoal = Number(supervisor.monthlyGoal || selectedStat.assignedSchools.length || 1);
-  const weeklyGoal = Number(supervisor.weeklyGoal || 0);
-  const monthlyVisitCount = supervisorOfficialMonthlyVisits(supervisor, monthVisits.length);
-  const weeklyVisitCount = supervisorOfficialWeeklyVisits(supervisor);
+  const sheetMetrics = supervisorSheetMetrics(selectedStat);
+  const monthlyGoal = sheetMetrics.monthlyGoal;
+  const weeklyGoal = sheetMetrics.weeklyGoal;
+  const monthlyVisitCount = sheetMetrics.monthlyVisits;
+  const weeklyVisitCount = sheetMetrics.weeklyVisits;
   const goalPct = Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100));
   const goalMet = monthlyVisitCount >= monthlyGoal;
-  const monthlyIndicator = supervisor.monthlyIndicator || 'aviso';
-  const weeklyIndicator = supervisor.weeklyIndicator || 'aviso';
+  const monthlyIndicator = sheetMetrics.monthlyIndicator;
+  const weeklyIndicator = sheetMetrics.weeklyIndicator;
 
   if (select) {
     select.innerHTML = stats.map((item) => `<option value="${esc(item.supervisor.name)}">${esc(item.supervisor.name)}</option>`).join('');
@@ -1811,7 +1860,7 @@ function renderSupervisorRecord() {
   const title = document.getElementById('supervisorRecordTitle');
   const subtitle = document.getElementById('supervisorRecordSubtitle');
   if (title) title.textContent = supervisor.name;
-  if (subtitle) subtitle.textContent = `${selectedStat.assignedSchools.length} escola(s) | ${monthlyVisitCount}/${monthlyGoal} visita(s) no mes | ${goalMet ? 'meta cumprida' : 'meta pendente'}.`;
+  if (subtitle) subtitle.textContent = `${sheetMetrics.assigned} escola(s) | ${monthlyVisitCount}/${monthlyGoal} visita(s) no mes | ${goalMet ? 'meta cumprida' : 'meta pendente'}.`;
   const refreshButton = document.getElementById('refreshSupervisorSheetBtn');
   if (refreshButton) {
     refreshButton.hidden = !supervisor.visitSourceUrl;
@@ -1847,10 +1896,10 @@ function renderSupervisorRecord() {
   `;
 
   document.getElementById('supervisorRecordMetrics').innerHTML = [
-    { label: 'Escolas', value: String(selectedStat.assignedSchools.length), note: 'vinculadas ao supervisor' },
+    { label: 'Escolas', value: String(sheetMetrics.assigned), note: 'numero vindo da planilha' },
     { label: 'Semana', value: weeklyGoal ? `${weeklyVisitCount}/${weeklyGoal}` : String(weeklyVisitCount), note: `indicador ${supervisorIndicatorText(weeklyIndicator)}` },
     { label: 'Visitadas', value: String(visitedSchoolSet.size), note: 'escolas distintas no mes' },
-    { label: 'Faltantes', value: String(pendingSchools.length), note: 'sem visita no mes' },
+    { label: 'Faltantes', value: String(sheetMetrics.pendingMonth), note: 'meta mensal menos visitas' },
     { label: 'Chamados', value: String(selectedStat.openCalls), note: 'ativos nas escolas vinculadas' },
     { label: 'Indicador mes', value: supervisorIndicatorText(monthlyIndicator), note: `${monthlyVisitCount}/${monthlyGoal} visita(s)` },
     { label: 'Historico', value: String(allVisits.length), note: 'registros importados' }

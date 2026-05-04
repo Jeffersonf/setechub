@@ -2745,6 +2745,26 @@ select:focus-visible,
   padding:12px 16px;
   border-top:1px solid var(--bd);
 }
+.supervisor-admin-form{
+  display:grid;
+  grid-template-columns:1.2fr repeat(6, minmax(78px, .42fr)) minmax(130px,.55fr) minmax(130px,.55fr);
+  gap:8px;
+  padding:12px 16px;
+  border-top:1px solid var(--bd);
+}
+.supervisor-admin-form .fi{
+  min-width:0;
+  padding:8px 10px;
+  font-size:12px;
+}
+.supervisor-admin-form textarea{
+  grid-column:1 / -2;
+  min-height:92px;
+  resize:vertical;
+}
+.supervisor-admin-form button{
+  align-self:stretch;
+}
 .admin-school-form{
   display:grid;
   grid-template-columns:1.25fr 1.25fr .72fr .92fr .78fr 1fr auto auto;
@@ -2828,11 +2848,14 @@ select:focus-visible,
     max-height:none;
   }
   .admin-user-form,
+  .supervisor-admin-form,
   .admin-school-form,
   .admin-merge-row{grid-template-columns:1fr;}
   .admin-user-form button,
+  .supervisor-admin-form button,
   .admin-school-form button,
   .admin-merge-row button{width:100%;}
+  .supervisor-admin-form textarea{grid-column:auto;}
   .admin-user-row{align-items:flex-start;flex-direction:column;}
   .admin-user-actions{width:100%;justify-content:space-between;}
   .admin-role-select{flex:1;width:auto;}

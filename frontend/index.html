@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260504-admin-tools">
-<link rel="stylesheet" href="./setechub.css?v=20260504-admin-tools">
+<link rel="stylesheet" href="./styles.css?v=20260504-supervisor-admin">
+<link rel="stylesheet" href="./setechub.css?v=20260504-supervisor-admin">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -380,10 +380,6 @@
         <div class="ps">Cards de resumo por supervisor. Clique em um supervisor para abrir os dados completos.</div>
       </div>
     </div>
-    <div class="school-record-nav supervisor-tabs">
-      <button class="btn btn-g btn-sm active-filter" type="button" onclick="document.getElementById('painelSupervisor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Painel</button>
-      <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorSelectorList')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Lista</button>
-    </div>
     <div class="box" id="painelSupervisor">
       <div class="bh">
         <div><div class="ct">Painel de supervisores</div><div class="cs">Resumo mensal das visitas, metas e indicadores da planilha oficial.</div></div>
@@ -394,6 +390,35 @@
         </div>
       </div>
       <div id="supervisorPanelGrid" class="supervisor-sheet-panel"></div>
+    </div>
+    <div class="box" data-admin-only>
+      <div class="bh">
+        <div><div class="ct">Edicao administrativa</div><div class="cs">Ajuste manual quando a planilha vier incompleta ou quando a atribuicao mudar.</div></div>
+      </div>
+      <form id="supervisorAdminForm" class="supervisor-admin-form">
+        <select class="fi" id="supervisorAdminSelect"></select>
+        <input class="fi" id="supervisorAdminAssigned" type="number" min="0" step="1" placeholder="Escolas">
+        <input class="fi" id="supervisorAdminWeeklyGoal" type="number" min="0" step="1" placeholder="Meta semanal">
+        <input class="fi" id="supervisorAdminWeeklyVisits" type="number" min="0" step="1" placeholder="Visitas semana">
+        <input class="fi" id="supervisorAdminMonthlyGoal" type="number" min="0" step="1" placeholder="Meta mensal">
+        <input class="fi" id="supervisorAdminMonthlyVisits" type="number" min="0" step="1" placeholder="Visitas mes">
+        <input class="fi" id="supervisorAdminCurrentWeek" type="number" min="0" step="1" placeholder="Semana">
+        <select class="fi" id="supervisorAdminWeeklyIndicator">
+          <option value="verde">Semana verde</option>
+          <option value="amarelo">Semana amarelo</option>
+          <option value="vermelho">Semana vermelho</option>
+          <option value="aviso">Semana aviso</option>
+        </select>
+        <select class="fi" id="supervisorAdminMonthlyIndicator">
+          <option value="verde">Mes verde</option>
+          <option value="amarelo">Mes amarelo</option>
+          <option value="vermelho">Mes vermelho</option>
+          <option value="aviso">Mes aviso</option>
+        </select>
+        <input class="fi" id="supervisorAdminSourceUrl" placeholder="Link da planilha">
+        <textarea class="fi" id="supervisorAdminSchools" placeholder="Escolas responsaveis, uma por linha"></textarea>
+        <button class="btn btn-p" type="submit">Salvar supervisor</button>
+      </form>
     </div>
     <div class="box">
       <div class="bh">
@@ -497,15 +522,15 @@
     <div class="ph">
       <div>
         <div class="pt">Inventario</div>
-        <div class="ps">Mapa vivo dos equipamentos por escola, com volume real, criticidade e qualidade da base em primeiro plano.</div>
+        <div class="ps">Equipamentos por escola. Regional primeiro, unidade especifica quando voce seleciona uma escola.</div>
       </div>
     </div>
 
     <section class="inventory-hero">
       <div class="inventory-hero-main">
-        <div class="inventory-kicker">Centro de inventario</div>
-        <h1 id="inventoryHeroTitle">Leitura do parque em tempo real.</h1>
-        <p id="inventoryHeroText">Use os filtros para chegar na escola, familia ou status certo sem perder a visao regional.</p>
+        <div class="inventory-kicker">Inventario</div>
+        <h1 id="inventoryHeroTitle">Inventario regional</h1>
+        <p id="inventoryHeroText">Selecione uma escola para ver somente os equipamentos dela.</p>
         <div id="inventoryHeroStats" class="inventory-hero-stats"></div>
       </div>
       <div class="inventory-hero-side">
@@ -517,8 +542,8 @@
     <section class="box inventory-filter-shell">
       <div class="inventory-filter-head">
         <div>
-          <div class="ct">Filtros do inventario</div>
-          <div class="cs">Pesquise, recorte por escola e alterne status sem sair do painel.</div>
+          <div class="ct">Recorte</div>
+          <div class="cs">Escola, status, categoria e busca direta no inventario.</div>
         </div>
         <div class="setechub-toolbar inventory-status-toolbar">
           <button class="btn btn-g btn-sm active-filter" data-inventory-status="todos" type="button">Todos</button>
@@ -528,7 +553,7 @@
         </div>
       </div>
       <div class="inventory-filter-grid">
-        <input class="fi" id="inventorySearchInput" placeholder="Buscar escola, equipamento, observacao...">
+        <input class="fi" id="inventorySearchInput" placeholder="Buscar escola, equipamento ou observacao">
         <select class="fi" id="inventorySchoolSelect">
           <option value="todas">Todas as escolas</option>
         </select>
@@ -538,50 +563,41 @@
       </div>
     </section>
 
-    <div class="inventory-workspace-grid">
-      <section class="box inventory-focus-card">
+    <section class="inventory-board">
+      <aside class="box inventory-school-panel">
         <div class="bh">
-          <div><div class="ct">Escola em foco</div><div class="cs">Resumo consolidado do parque, alertas e base importada.</div></div>
-        </div>
-        <div id="inventoryFocusPanel" class="stack-list"></div>
-      </section>
-      <section class="box inventory-ranking-card">
-        <div class="bh">
-          <div><div class="ct">Prioridade por escola</div><div class="cs">Ranking ordenado por alerta, defeito e volume total.</div></div>
+          <div><div class="ct">Escolas</div><div class="cs">Clique para abrir o inventario da unidade.</div></div>
         </div>
         <div id="inventorySchoolRanking" class="stack-list"></div>
-      </section>
-    </div>
+      </aside>
+      <div class="inventory-detail-stack">
+        <div class="box inventory-focus-card">
+          <div id="inventoryFocusPanel" class="stack-list"></div>
+        </div>
+        <div class="box inventory-category-card">
+          <div class="bh">
+            <div><div class="ct">Categorias</div><div class="cs">Resumo do recorte atual por familia de equipamento.</div></div>
+          </div>
+          <div id="inventoryCategoryTable" class="inventory-category-strip"></div>
+        </div>
+        <div class="box inventory-detail-card">
+          <div class="bh">
+            <div><div class="ct">Equipamentos</div><div class="cs">Totais consolidados, alertas e observacoes do recorte selecionado.</div></div>
+          </div>
+          <div id="inventoryDetailTable" class="setechub-table-wrap"></div>
+        </div>
+        <div class="box inventory-issues-card">
+          <div class="bh">
+            <div><div class="ct">Alertas do recorte</div><div class="cs">Defeitos, manutencao e dados que pedem revisao.</div></div>
+          </div>
+          <div id="inventoryIssuesList" class="stack-list"></div>
+        </div>
+      </div>
+    </section>
 
-    <div class="setechub-two-col">
-      <div class="box inventory-detail-card">
-        <div class="bh">
-          <div><div class="ct">Familias de equipamentos</div><div class="cs">Tabela principal da escola em foco com totais, leitura e observacoes.</div></div>
-        </div>
-        <div id="inventoryDetailTable" class="setechub-table-wrap"></div>
-      </div>
-      <div class="box inventory-category-card">
-        <div class="bh">
-          <div><div class="ct">Distribuicao da escola</div><div class="cs">Categorias com quantidade e alertas para comparar o peso de cada grupo.</div></div>
-        </div>
-        <div id="inventoryCategoryTable" class="setechub-table-wrap"></div>
-      </div>
-    </div>
-    <div class="box inventory-quality-card">
-      <div class="bh">
-        <div><div class="ct">Saude da base</div><div class="cs">Indicadores de nomes consolidados, familias criticas e pontos que ainda precisam de limpeza.</div></div>
-      </div>
-      <div id="inventoryQualityGrid" class="setechub-monitor-grid"></div>
-    </div>
-    <div class="box inventory-issues-card">
-      <div class="bh">
-        <div><div class="ct">Pontos de atencao</div><div class="cs">Familias com dado fraco, variacao de nome, status misto ou defeito real.</div></div>
-      </div>
-      <div id="inventoryIssuesList" class="stack-list"></div>
-    </div>
     <div class="box inventory-manage-card">
       <div class="bh">
-        <div><div class="ct">Entrada manual</div><div class="cs">Adicione um item ou importe um lote rapido para atualizar a escola selecionada.</div></div>
+        <div><div class="ct">Manutencao do inventario</div><div class="cs">Adicione um item ou importe um lote rapido para a escola selecionada.</div></div>
       </div>
       <form id="schoolAssetForm" class="setechub-form setechub-form-school-asset">
         <select class="fi" id="schoolAssetSchool"></select>
@@ -888,12 +904,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./school-data.js?v=20260504-admin-tools"></script>
-<script src="./storage.js?v=20260504-admin-tools"></script>
-<script src="./app.js?v=20260504-admin-tools"></script>
-<script src="./render.js?v=20260504-admin-tools"></script>
-<script src="./api.js?v=20260504-admin-tools"></script>
-<script src="./actions.js?v=20260504-admin-tools"></script>
-<script src="./bootstrap.js?v=20260504-admin-tools"></script>
+<script src="./school-data.js?v=20260504-supervisor-admin"></script>
+<script src="./storage.js?v=20260504-supervisor-admin"></script>
+<script src="./app.js?v=20260504-supervisor-admin"></script>
+<script src="./render.js?v=20260504-supervisor-admin"></script>
+<script src="./api.js?v=20260504-supervisor-admin"></script>
+<script src="./actions.js?v=20260504-supervisor-admin"></script>
+<script src="./bootstrap.js?v=20260504-supervisor-admin"></script>
 </body>
 </html>

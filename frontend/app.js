@@ -12,6 +12,7 @@ let currentDirectoryFilter = 'todos';
 let currentSchoolZoneFilter = 'todas';
 let currentSchoolSort = 'prioridade';
 let currentSupervisorFilter = 'todos';
+let currentSupervisorAdmin = '';
 let currentAssetFilter = 'todos';
 let currentImportFilter = 'todos';
 let currentImportSchoolContext = '';
