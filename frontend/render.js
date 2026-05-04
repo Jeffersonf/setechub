@@ -16,25 +16,28 @@ function renderDashboardHero() {
   const alertAssets = state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length;
   const pendingItems = pendingQueueItems(99).length;
 
-  title.textContent = focus ? focus.title : 'Painel inicial pronto para abrir a rotina.';
+  title.textContent = focus ? focus.title : 'Operacao pronta para o proximo movimento.';
   text.textContent = focus
     ? `${focus.place || 'Sem local definido'} | ${focus.category || 'Rotina'} | ${focus.time || 'sem horario definido'}`
     : buildSummaryPreview();
 
   const actionItems = [
-    { label: '&#127979; Ver escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
-    { label: '&#128187; Inventario', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
-    { label: '&#127760; Redes', action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: '' },
-    { label: '&#128221; Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
-  ].filter((item) => canAccessPage(item.page) && (item.tone !== 'edit' || canEditData()));
+    { label: 'Abrir CTC', action: `openCtcAgenda()`, page: 'ctc', tone: 'primary', role: 'ctc' },
+    { label: 'Abrir escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
+    { label: 'Inventario em alerta', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
+    { label: 'Sem rede/cameras', action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: '' },
+    { label: 'Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
+  ].filter((item) => canAccessPage(item.page) && (!item.role || item.role === currentUserRole()) && (item.tone !== 'edit' || canEditData()));
 
   actions.innerHTML = actionItems.map((item) => `
     <button class="btn ${item.tone === 'primary' ? 'btn-p' : 'btn-g'} btn-sm" type="button" onclick="${item.action}">${item.label}</button>
   `).join('');
 
   scoreNode.innerHTML = `
-    <div class="sync-meta">Saude da operacao</div>
-    <strong>${esc(String(health.score))}%</strong>
+    <div>
+      <div class="sync-meta">Saude da operacao</div>
+      <strong>${esc(String(health.score))}%</strong>
+    </div>
     <span class="diag-pill ${health.tone}">${esc(health.label)}</span>
   `;
 
@@ -77,7 +80,6 @@ function renderOperationsCenter() {
   }
   if (coverageNode) {
     coverageNode.innerHTML = [
-      { label: 'Escolas com importacao', value: `${coverage.importCoverage}%`, note: `${coverage.schoolsWithImports}/${coverage.totalSchools} unidades` },
       { label: 'Escolas com inventario', value: `${coverage.assetCoverage}%`, note: `${coverage.schoolsWithAssets}/${coverage.totalSchools} unidades` },
       { label: 'Fichas preenchidas', value: `${coverage.profileCoverage}%`, note: `${coverage.schoolsWithProfile}/${coverage.totalSchools} unidades` },
       { label: 'Alertas ativos', value: String(coverage.activeAlerts), note: 'ativos em manutencao ou defeito' }
@@ -116,12 +118,18 @@ function renderOperationsCenter() {
 }
 
 function renderDashboardAccess() {
+  const profileNode = document.getElementById('dashboardProfileSummary');
+  const roleCardsNode = document.getElementById('dashboardRoleCards');
+  const attentionNode = document.getElementById('dashboardAttentionCards');
+  if (profileNode || roleCardsNode || attentionNode) {
+    renderRoleDashboard(profileNode, roleCardsNode, attentionNode);
+  }
+
   const categoryNode = document.getElementById('dashboardCategoryGrid');
   const linksNode = document.getElementById('dashboardQuickLinks');
   const drilldownNode = document.getElementById('dashboardDrilldownGrid');
   const schools = visibleSchools();
   const schoolAlertCount = schools.filter((item) => item.status !== 'estavel').length;
-  const importCount = state.schoolImports.length;
   const inventoryAlertCount = state.schoolAssets.filter((item) => item.status !== 'ok').length;
   const networkCount = state.schoolNetworks.length;
   const cameraSchoolCount = state.schoolNetworks.filter((item) => Number(item.cameraInstalled || 0) > 0 || item.cameraInstalledLabel).length;
@@ -132,16 +140,13 @@ function renderDashboardAccess() {
   const noNetworkSchools = schools.filter((item) => !schoolNetworkRecord(item.name)).length;
   const unresolvedCalls = state.calls.filter((item) => item.status === 'aberto').length;
   const routeCalls = state.calls.filter((item) => item.status === 'em_rota').length;
-  const recentImports = recentSchoolImports(8).length;
-  const pecCount = (state.users || []).filter((item) => item.role === 'pec' && item.active !== false).length;
   const categories = [
     { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atencao`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
-    { icon: '&#128187;', title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `showPage('assets')`, page: 'assets', tone: 'teal', priority: 'primary' },
+    { icon: '&#128187;', title: 'Inventario', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} alertas`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
     { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
     { icon: '&#128247;', title: 'Cameras', meta: `${cameraSchoolCount} escolas com cameras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
     { icon: '&#128736;', title: 'CTC', meta: `${ctcUsers.length} usuarios | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
-    { icon: '&#127891;', title: 'PECs', meta: `${pecCount} acessos | equipe curricular`, action: `showPage('pecs')`, page: 'pecs', tone: 'blue', priority: 'secondary' },
-    { icon: '&#128229;', title: 'Importacoes', meta: `${importCount} registros`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
+    { icon: '&#127891;', title: 'PECs', meta: 'modulo dormente', page: 'pecs', tone: 'blue', priority: 'secondary', inactive: true },
     { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
     { icon: '&#9201;', title: 'Ponto', meta: 'pausado por enquanto', page: 'agenda', tone: 'slate', priority: 'secondary', inactive: true },
     { icon: '&#128221;', title: 'Relatorios', meta: `resumo, notas e redes`, action: `showPage('reports')`, page: 'reports', tone: 'slate', priority: 'secondary' }
@@ -160,7 +165,6 @@ function renderDashboardAccess() {
     const topSchools = topSchoolSignals(3);
     const topCalls = topOpenCalls(3);
     const topAssets = topInventoryAlerts(3);
-    const topImports = recentSchoolImports(3);
     const quickItems = [
       ...(canAccessPage('schools') ? topSchools.map(({ school, signal }) => `
         <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school.name)}')">
@@ -180,12 +184,6 @@ function renderDashboardAccess() {
           <div class="sync-meta">${esc(item.school)} | ${esc(item.title)} | ${esc(badgeText(item.status))}</div>
         </div>
       `) : []),
-      ...(canAccessPage('schools') ? topImports.map((item) => `
-        <div class="setechub-item setechub-clickable" onclick="openSchoolImports('${esc(item.school)}')">
-          <strong>Importacao</strong>
-          <div class="sync-meta">${esc(item.school)} | ${esc(item.label || item.filename || '')} | ${esc(item.type || '')}</div>
-        </div>
-      `) : [])
     ];
     const quickBox = document.getElementById('dashboardQuickBox');
     if (quickBox) quickBox.hidden = !quickItems.length;
@@ -200,7 +198,6 @@ function renderDashboardAccess() {
       { title: 'Infra de rede', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.category === 'infra').length} familia(s)`, action: `openInventoryCategory('todos', 'infra')`, page: 'assets', tone: 'blue' },
       { title: 'Chamados abertos', meta: `${unresolvedCalls} item(ns)`, action: `openCallCategory('aberto')`, page: 'calls', tone: 'red' },
       { title: 'Chamados em rota', meta: `${routeCalls} item(ns)`, action: `openCallCategory('em_rota')`, page: 'calls', tone: 'teal' },
-      { title: 'Importacoes recentes', meta: `${recentImports} item(ns)`, action: `openImportCategory('todos')`, page: 'schools', tone: 'slate' },
       { title: 'Sem rede/cameras', meta: `${noNetworkSchools} escola(s)`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber' }
     ].filter((item) => canAccessPage(item.page));
     const drilldownBox = document.getElementById('dashboardDrilldownBox');
@@ -217,10 +214,8 @@ function renderDashboardAccess() {
 function renderDashboardOperationalLists() {
   const inventoryNode = document.getElementById('dashboardInventoryAlerts');
   const callsNode = document.getElementById('dashboardCallQueue');
-  const importsNode = document.getElementById('dashboardRecentImports');
   const inventoryRows = topInventoryAlerts(5);
   const callRows = topOpenCalls(5);
-  const importRows = recentSchoolImports(5);
   if (inventoryNode) {
     inventoryNode.innerHTML = inventoryRows.map((item) => `
       <div class="setechub-item setechub-clickable" onclick="setInventorySchool('${esc(item.school)}')">
@@ -247,19 +242,185 @@ function renderDashboardOperationalLists() {
       </div>
     `).join('') || '<div class="sync-empty">Nenhum chamado ativo no momento.</div>';
   }
-  if (importsNode) {
-    importsNode.innerHTML = importRows.map((item) => `
-      <div class="setechub-item setechub-clickable" onclick="openSchoolImports('${esc(item.school)}')">
-        <div class="setechub-head">
-          <div>
-            <strong>${esc(item.school)}</strong>
-            <div class="sync-meta">${esc(item.label || item.filename || '')} | ${esc(item.type || '')}</div>
-          </div>
-          <span class="diag-pill">CIE ${esc(schoolByName(item.school)?.cie || '--')}</span>
-        </div>
+}
+
+function renderRoleDashboard(profileNode, roleCardsNode, attentionNode) {
+  const user = currentUser() || {};
+  const role = currentUserRole();
+  const roleLabel = ROLE_LABELS[role] || badgeText(role);
+  const schools = visibleSchools();
+  const allSchools = state.schools || [];
+  const schoolAlerts = schools.filter((school) => schoolAlertUnits(school.name) > 0).length;
+  const inventoryAlerts = aggregateInventoryItems(state.schoolAssets)
+    .filter((item) => canViewSchool(item.school) && item.alertUnits > 0);
+  const ctcOpen = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
+  const supervisorStatsRows = supervisorStats();
+  const activeCalls = state.calls.filter((item) => item.status !== 'resolvido' && canViewSchool(item.school)).length;
+  const pendingItems = pendingQueueItems(99).length;
+  const adminImports = state.schoolImports || [];
+
+  if (profileNode) {
+    const scopeText = isSupervisorUser()
+      ? `${schools.length} escola(s) vinculada(s)`
+      : role === 'ctc'
+        ? 'agenda CTC'
+        : role === 'admin'
+          ? `${allSchools.length} escola(s) na base completa`
+          : `${schools.length} escola(s) disponiveis`;
+    profileNode.innerHTML = `
+      <div class="dashboard-profile-card">
+        <span>Perfil</span>
+        <strong>${esc(roleLabel)}</strong>
+        <small>${esc(user.name || 'Usuario')} | ${esc(scopeText)}</small>
       </div>
-    `).join('') || '<div class="sync-empty">Nenhuma importacao recente.</div>';
+      <div class="dashboard-profile-card">
+        <span>Pendencias</span>
+        <strong>${esc(String(pendingItems))}</strong>
+        <small>${esc(schoolAlerts)} escola(s) com alerta</small>
+      </div>
+      <div class="dashboard-profile-card">
+        <span>Inventario</span>
+        <strong>${esc(String(inventoryAlerts.length))}</strong>
+        <small>familia(s) em alerta visiveis</small>
+      </div>
+      <div class="dashboard-profile-card">
+        <span>Chamados</span>
+        <strong>${esc(String(activeCalls))}</strong>
+        <small>ativos no seu escopo</small>
+      </div>
+    `;
   }
+
+  const mainCards = [
+    {
+      title: isSupervisorUser() ? 'Minhas escolas' : 'Escolas',
+      meta: isSupervisorUser() ? `${schools.length} unidade(s) vinculada(s)` : `${schools.length} unidade(s) visiveis`,
+      value: String(schools.length),
+      tone: 'lime',
+      page: 'schools',
+      action: `showPage('schools')`
+    },
+    {
+      title: 'Supervisores',
+      meta: `${supervisorStatsRows.length} supervisor(es) visiveis`,
+      value: String(supervisorStatsRows.length),
+      tone: 'blue',
+      page: 'supervisors',
+      action: `showPage('supervisors')`
+    },
+    {
+      title: 'Inventario',
+      meta: `${inventoryAlerts.length} familia(s) em alerta`,
+      value: String(state.schoolAssets.filter((item) => canViewSchool(item.school)).length),
+      tone: 'teal',
+      page: 'assets',
+      action: `openInventoryCategory()`
+    },
+    {
+      title: 'CTC',
+      meta: ctcOpen ? `${ctcOpen} visita(s) pendente(s)` : 'agenda de visitas',
+      value: String(ctcOpen),
+      tone: 'teal',
+      page: 'ctc',
+      action: `openCtcAgenda()`
+    },
+    {
+      title: 'Relatorios',
+      meta: 'resumo e automacao',
+      value: String(state.notes.length),
+      tone: 'slate',
+      page: 'reports',
+      action: `showPage('reports')`
+    },
+    {
+      title: 'Informacoes',
+      meta: 'contatos, setores e links',
+      value: String(state.directoryContacts.length),
+      tone: 'amber',
+      page: 'info',
+      action: `showPage('info')`
+    },
+    {
+      title: 'Admin',
+      meta: 'usuarios, backup e diagnostico',
+      value: String((state.users || []).length),
+      tone: 'red',
+      page: 'admin',
+      action: `showPage('admin')`
+    }
+  ].filter((card) => canAccessPage(card.page) && dashboardCardRelevantForRole(card.page));
+
+  if (roleCardsNode) {
+    roleCardsNode.innerHTML = mainCards.map((card) => dashboardRoleCard(card)).join('')
+      || '<div class="sync-empty">Nenhum card disponivel para este perfil.</div>';
+  }
+
+  const attentionCards = [
+    {
+      title: 'Escolas com alerta',
+      meta: `${schoolAlerts} unidade(s) no seu escopo`,
+      value: String(schoolAlerts),
+      tone: schoolAlerts ? 'red' : 'lime',
+      page: 'schools',
+      action: `openSchoolCategory('com_alerta')`
+    },
+    {
+      title: 'Sem rede/cameras',
+      meta: `${schools.filter((school) => !schoolNetworkRecord(school.name)).length} unidade(s)`,
+      value: String(schools.filter((school) => !schoolNetworkRecord(school.name)).length),
+      tone: 'amber',
+      page: 'schools',
+      action: `openSchoolCategory('sem_rede')`
+    },
+    {
+      title: 'Inventario critico',
+      meta: `${inventoryAlerts.filter((item) => item.defectUnits > 0).length} familia(s) com defeito`,
+      value: String(inventoryAlerts.filter((item) => item.defectUnits > 0).length),
+      tone: 'red',
+      page: 'assets',
+      action: `openInventoryCategory('criticos')`
+    },
+    {
+      title: 'Agenda CTC',
+      meta: ctcOpen ? `${ctcOpen} visita(s) pendente(s)` : 'sem pendencia CTC',
+      value: String(ctcOpen),
+      tone: ctcOpen ? 'amber' : 'teal',
+      page: 'ctc',
+      action: `openCtcAgenda()`
+    },
+    {
+      title: 'Importacoes da base',
+      meta: 'informacao administrativa',
+      value: String(adminImports.length),
+      tone: 'slate',
+      page: 'admin',
+      action: `showPage('admin')`
+    }
+  ].filter((card) => canAccessPage(card.page) && dashboardCardRelevantForRole(card.page) && (Number(card.value) > 0 || card.page === 'ctc' || card.page === 'admin'));
+
+  if (attentionNode) {
+    attentionNode.innerHTML = attentionCards.map((card) => dashboardRoleCard(card, 'attention')).join('')
+      || '<div class="sync-empty">Nada critico para este perfil agora.</div>';
+  }
+}
+
+function dashboardRoleCard(card, mode = 'main') {
+  return `
+    <button class="dashboard-role-card ${card.tone} ${mode}" type="button" onclick="${card.action}">
+      <span>${esc(card.title)}</span>
+      <strong>${esc(card.value)}</strong>
+      <small>${esc(card.meta)}</small>
+    </button>
+  `;
+}
+
+function dashboardCardRelevantForRole(page) {
+  const role = currentUserRole();
+  if (role === 'ctc') return page === 'ctc';
+  if (role === 'supervisor') return ['schools', 'supervisors'].includes(page);
+  if (role === 'dirigente') return page !== 'admin';
+  if (role === 'pec') return false;
+  return true;
 }
 
 function renderPendingQueue() {
@@ -407,12 +568,38 @@ function renderSchoolCommandCenter() {
 }
 
 function renderInventoryWorkspace() {
+  const filteredAssets = filteredSchoolAssets();
   const schoolRows = inventorySchoolRows();
   const focusSchool = inventoryFocusSchool();
-  const focusRows = focusSchool ? schoolInventoryRows(focusSchool) : [];
-  const categorySummary = focusSchool ? Object.values(schoolInventoryCategorySummary(focusSchool)) : [];
+  const focusRows = focusSchool
+    ? aggregateInventoryItems(filteredAssets.filter((item) => item.school === focusSchool))
+      .sort((a, b) => b.alertUnits - a.alertUnits || b.units - a.units || a.name.localeCompare(b.name))
+    : [];
+  const categorySummary = focusRows.reduce((acc, item) => {
+    if (!acc[item.category]) {
+      acc[item.category] = { category: item.category, units: 0, alertUnits: 0, items: 0 };
+    }
+    acc[item.category].units += item.units;
+    acc[item.category].alertUnits += item.alertUnits;
+    acc[item.category].items += 1;
+    return acc;
+  }, {});
+  const categorySummaryRows = Object.values(categorySummary);
   const issueRows = focusSchool ? inventoryIssuesForSchool(focusSchool) : [];
   const quality = inventoryQualitySummary();
+  const aggregateRows = aggregateInventoryItems(filteredAssets);
+  const totalUnits = filteredAssets.reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+  const alertUnits = filteredAssets.filter((item) => item.status !== 'ok').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+  const defectUnits = filteredAssets.filter((item) => item.status === 'defeito').reduce((sum, item) => sum + schoolAssetUnits(item), 0);
+  const coveredSchools = new Set(filteredAssets.map((item) => item.school)).size;
+  const totalSchools = visibleSchools().length || 1;
+  const coveragePct = Math.round((coveredSchools / totalSchools) * 100);
+  const riskPct = totalUnits ? Math.round((alertUnits / totalUnits) * 100) : 0;
+  const heroTitle = document.getElementById('inventoryHeroTitle');
+  const heroText = document.getElementById('inventoryHeroText');
+  const heroStats = document.getElementById('inventoryHeroStats');
+  const heroScore = document.getElementById('inventoryHeroScore');
+  const familyStrip = document.getElementById('inventoryFamilyStrip');
   const focusPanel = document.getElementById('inventoryFocusPanel');
   const ranking = document.getElementById('inventorySchoolRanking');
   const table = document.getElementById('inventoryDetailTable');
@@ -445,23 +632,81 @@ function renderInventoryWorkspace() {
   if (searchInput) {
     searchInput.value = currentInventorySearch;
   }
+  if (heroTitle) {
+    heroTitle.textContent = focusSchool && currentInventorySchool !== 'todas'
+      ? `Inventario de ${focusSchool}`
+      : 'Inventario regional consolidado';
+  }
+  if (heroText) {
+    const statusLabel = currentInventoryStatus === 'todos' ? 'todos os status' : badgeText(currentInventoryStatus);
+    const categoryLabel = currentInventoryCategory === 'todas' ? 'todas as categorias' : badgeText(currentInventoryCategory);
+    heroText.textContent = `${coveredSchools} escola(s), ${aggregateRows.length} familia(s) e ${totalUnits} unidade(s) em ${statusLabel.toLowerCase()} / ${categoryLabel.toLowerCase()}.`;
+  }
+  if (heroStats) {
+    heroStats.innerHTML = [
+      { label: 'Unidades', value: String(totalUnits), note: `${aggregateRows.length} familias` },
+      { label: 'Alertas', value: String(alertUnits), note: `${defectUnits} criticas` },
+      { label: 'Escolas', value: String(coveredSchools), note: `${coveragePct}% com inventario no recorte` }
+    ].map((item) => `
+      <div class="inventory-hero-stat">
+        <span>${esc(item.label)}</span>
+        <strong>${esc(item.value)}</strong>
+        <small>${esc(item.note)}</small>
+      </div>
+    `).join('');
+  }
+  if (heroScore) {
+    const scoreTone = riskPct >= 30 ? 'pill-danger' : riskPct >= 12 ? 'pill-warn' : 'pill-ok';
+    heroScore.innerHTML = `
+      <div class="inventory-risk-top">
+        <span>Risco do recorte</span>
+        <strong>${esc(String(riskPct))}%</strong>
+      </div>
+      <div class="inventory-risk-bar"><span style="width:${esc(String(Math.min(100, riskPct)))}%"></span></div>
+      <div class="inventory-risk-foot">
+        <span class="diag-pill ${scoreTone}">${esc(String(alertUnits))} unidade(s) em alerta</span>
+        <span>${esc(String(defectUnits))} com defeito</span>
+      </div>
+    `;
+  }
+  if (familyStrip) {
+    const families = Object.values(aggregateRows.reduce((acc, item) => {
+      if (!acc[item.category]) acc[item.category] = { category: item.category, units: 0, alertUnits: 0 };
+      acc[item.category].units += item.units;
+      acc[item.category].alertUnits += item.alertUnits;
+      return acc;
+    }, {})).sort((a, b) => b.units - a.units).slice(0, 5);
+    familyStrip.innerHTML = families.map((item) => `
+      <button class="inventory-family-chip" type="button" onclick="openInventoryCategory('todos', '${esc(item.category)}')">
+        <span>${esc(badgeText(item.category))}</span>
+        <strong>${esc(String(item.units))}</strong>
+        <small>${esc(String(item.alertUnits))} alerta(s)</small>
+      </button>
+    `).join('') || '<div class="sync-empty">Sem familias no recorte atual.</div>';
+  }
   if (focusPanel) {
-    const totals = schoolAssetTotals(focusSchool);
-    const alerts = schoolAlertUnits(focusSchool);
     const focusMeta = schoolByName(focusSchool);
+    const okUnits = focusRows.reduce((sum, item) => sum + item.okUnits, 0);
+    const focusUnits = focusRows.reduce((sum, item) => sum + item.units, 0);
+    const focusAlerts = focusRows.reduce((sum, item) => sum + item.alertUnits, 0);
+    const focusDefects = focusRows.reduce((sum, item) => sum + item.defectUnits, 0);
     focusPanel.innerHTML = focusSchool ? `
-      <div class="setechub-command-score">
+      <div class="inventory-school-header">
         <div>
-          <div class="sync-meta">Escola em foco</div>
+          <div class="sync-meta">CIE ${esc(focusMeta?.cie || '--')} | ${esc(focusMeta?.zone || 'Municipio nao definido')}</div>
           <strong>${esc(focusSchool)}</strong>
         </div>
-        <span class="diag-pill ${alerts ? 'pill-danger' : 'pill-ok'}">${esc(String(alerts))} alertas</span>
+        <span class="diag-pill ${focusDefects ? 'pill-danger' : focusAlerts ? 'pill-warn' : 'pill-ok'}">${esc(String(focusAlerts))} alertas</span>
       </div>
-      <div class="sync-meta">CIE ${esc(focusMeta?.cie || '--')} | ${esc(focusMeta?.zone || 'Municipio nao definido')}</div>
-      <div class="setechub-inline-metrics">
-        <div class="mini-stat"><span class="ms-l">Tipos</span><strong class="ms-val">${esc(String(focusRows.length))}</strong></div>
-        <div class="mini-stat"><span class="ms-l">Unidades</span><strong class="ms-val">${esc(String(totals.units))}</strong></div>
-        <div class="mini-stat"><span class="ms-l">Importacoes</span><strong class="ms-val">${esc(String(schoolImportCount(focusSchool)))} </strong></div>
+      <div class="inventory-focus-metrics">
+        <div><span>Familias</span><strong>${esc(String(focusRows.length))}</strong></div>
+        <div><span>Unidades</span><strong>${esc(String(focusUnits))}</strong></div>
+        <div><span>Ok</span><strong>${esc(String(okUnits))}</strong></div>
+        <div><span>Defeito</span><strong>${esc(String(focusDefects))}</strong></div>
+      </div>
+      <div class="inventory-focus-actions">
+        <button class="btn btn-p btn-sm" onclick="setInventorySchool('${esc(focusSchool)}')">Ver inventario</button>
+        <button class="btn btn-g btn-sm" onclick="showSchoolDetail('${esc(focusSchool)}')">Dados da escola</button>
       </div>
     ` : '<div class="sync-empty">Nenhuma escola com inventario no filtro atual.</div>';
   }
@@ -482,41 +727,49 @@ function renderInventoryWorkspace() {
   }
   if (issueNode) {
     issueNode.innerHTML = issueRows.map((item) => `
-      <div class="setechub-item">
-        <div class="setechub-head">
+      <div class="inventory-issue-row">
+        <div class="inventory-issue-main">
           <div>
             <strong>${esc(item.name)}</strong>
             <div class="sync-meta">${esc(item.brand)}${item.model ? ` | modelo ${esc(item.model)}` : ''} | ${esc(badgeText(item.category))}</div>
           </div>
-          <div class="setechub-badges">
-            <span class="diag-pill ${item.quality === 'fraco' ? 'pill-danger' : item.quality === 'medio' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(item.quality))}</span>
-            <span class="diag-pill ${item.defectUnits ? 'pill-danger' : item.alertUnits ? 'pill-warn' : 'pill-ok'}">${esc(String(item.alertUnits))} alertas</span>
-          </div>
         </div>
-        <div class="sync-meta">${esc(item.rawNameCount)} variacao(oes) de nome | ${esc(item.originalStatusCount)} status original(is) | BlueMonitor ${esc(String(item.blueMonitorUnits))}</div>
+        <div class="inventory-issue-badges">
+          <span class="diag-pill ${item.quality === 'fraco' ? 'pill-danger' : item.quality === 'medio' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(item.quality))}</span>
+          <span class="diag-pill ${item.defectUnits ? 'pill-danger' : item.alertUnits ? 'pill-warn' : 'pill-ok'}">${esc(String(item.alertUnits))} alertas</span>
+        </div>
+        <div class="inventory-issue-meta">
+          <span>${esc(item.rawNameCount)} nome(s)</span>
+          <span>${esc(item.originalStatusCount)} status</span>
+          <span>BlueMonitor ${esc(String(item.blueMonitorUnits))}</span>
+        </div>
         <div class="sync-meta">${esc(item.notePreview || 'Sem observacao')}</div>
       </div>
     `).join('') || '<div class="sync-empty">Nenhuma inconsistencia importante na escola em foco.</div>';
   }
   if (ranking) {
-    ranking.innerHTML = schoolRows.map((item) => `
-      <div class="setechub-item">
-        <div class="setechub-head">
+    ranking.innerHTML = schoolRows.slice(0, 8).map((item, index) => {
+      const risk = item.totalUnits ? Math.round((item.alertUnits / item.totalUnits) * 100) : 0;
+      return `
+      <div class="inventory-school-row setechub-clickable" onclick="setInventorySchool('${esc(item.school)}')">
+        <div class="inventory-rank">${esc(String(index + 1).padStart(2, '0'))}</div>
+        <div class="inventory-school-row-main">
           <div>
             <strong>${esc(item.school)}</strong>
             <div class="sync-meta">CIE ${esc(schoolByName(item.school)?.cie || '--')} | ${esc(String(item.totalLines))} linhas | ${esc(String(item.categories))} categorias</div>
           </div>
-          <div class="setechub-badges">
-            <span class="diag-pill">${esc(String(item.totalUnits))} unid.</span>
-            <span class="diag-pill ${item.alertUnits ? 'pill-danger' : 'pill-ok'}">${esc(String(item.alertUnits))} alertas</span>
+          <div class="inventory-school-row-metrics">
+            <span><strong>${esc(String(item.totalUnits))}</strong> unid.</span>
+            <span class="${item.alertUnits ? 'danger' : ''}"><strong>${esc(String(item.alertUnits))}</strong> alertas</span>
+            <span><strong>${esc(String(risk))}%</strong> risco</span>
           </div>
         </div>
-        <div class="setechub-action-row left">
-          <button class="btn btn-g btn-sm" onclick="setInventorySchool('${esc(item.school)}')">Focar inventario</button>
-          <button class="btn btn-p btn-sm" onclick="showSchoolDetail('${esc(item.school)}')">Abrir ficha</button>
+        <div class="inventory-row-actions">
+          <button class="btn btn-g btn-sm" onclick="event.stopPropagation(); setInventorySchool('${esc(item.school)}')">Focar inventario</button>
         </div>
       </div>
-    `).join('') || '<div class="sync-empty">Nenhum inventario encontrado nos filtros atuais.</div>';
+    `;
+    }).join('') || '<div class="sync-empty">Nenhum inventario encontrado nos filtros atuais.</div>';
   }
   if (table) {
     table.innerHTML = focusRows.length ? `
@@ -549,7 +802,7 @@ function renderInventoryWorkspace() {
     ` : '<div class="sync-empty">Nenhuma linha detalhada para a escola filtrada.</div>';
   }
   if (categoryTable) {
-    categoryTable.innerHTML = categorySummary.length ? `
+    categoryTable.innerHTML = categorySummaryRows.length ? `
       <table class="setechub-table">
         <thead>
           <tr>
@@ -560,7 +813,7 @@ function renderInventoryWorkspace() {
           </tr>
         </thead>
         <tbody>
-            ${categorySummary.sort((a, b) => b.units - a.units || a.category.localeCompare(b.category)).map((item) => `
+            ${categorySummaryRows.sort((a, b) => b.units - a.units || a.category.localeCompare(b.category)).map((item) => `
               <tr>
                 <td><strong>${esc(badgeText(item.category))}</strong></td>
                 <td>${esc(String(item.items))}</td>
@@ -590,19 +843,28 @@ function renderSetupStats() {
 }
 
 function renderMetrics() {
-  document.getElementById('metricPending').textContent = state.tasks.filter((item) => !item.done).length;
-  document.getElementById('metricCalls').textContent = state.calls.filter((item) => item.status !== 'resolvido').length;
-  document.getElementById('metricSchools').textContent = visibleSchools().filter((item) => item.status !== 'estavel').length;
-  document.getElementById('metricHours').textContent = bankHours();
+  const values = {
+    metricPending: state.tasks.filter((item) => !item.done).length,
+    metricCalls: state.calls.filter((item) => item.status !== 'resolvido').length,
+    metricSchools: visibleSchools().filter((item) => item.status !== 'estavel').length,
+    metricHours: bankHours()
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = value;
+  });
 }
 
 function renderFocus() {
   const focus = nextFocusTask();
-  document.getElementById('focusBadge').textContent = focus ? badgeText(focus.priority) : 'Organizar';
-  document.getElementById('focusTitle').textContent = focus ? focus.title : 'Tudo principal do dia esta concluido.';
-  document.getElementById('focusText').textContent = focus
-    ? `${focus.place} | ${focus.category} | ${focus.time || 'sem horario definido'}`
-    : 'Use a agenda para abrir novas tarefas, revisar escolas ou fechar relatorios.';
+  const badge = document.getElementById('focusBadge');
+  const title = document.getElementById('focusTitle');
+  const text = document.getElementById('focusText');
+  if (badge) badge.textContent = focus ? badgeText(focus.priority) : 'Organizar';
+  if (title) title.textContent = focus ? focus.title : 'Tudo principal do dia esta concluido.';
+  if (text) text.textContent = focus
+      ? `${focus.place} | ${focus.category} | ${focus.time || 'sem horario definido'}`
+      : 'Use a agenda para abrir novas tarefas, revisar escolas ou fechar relatorios.';
 }
 
 function renderWeekBadges() {
@@ -618,6 +880,7 @@ function renderWeekBadges() {
 
 function renderTimeline() {
   const list = document.getElementById('timelineList');
+  if (!list) return;
   list.innerHTML = timelineItems().map((item) => `
     <div class="setechub-item">
       <div class="setechub-head">
@@ -631,6 +894,7 @@ function renderTimeline() {
 
 function renderChecklist() {
   const list = document.getElementById('checklistList');
+  if (!list) return;
   list.innerHTML = state.checklist.map((item) => `
     <div class="setechub-item">
       <div class="setechub-check-row">
@@ -645,13 +909,17 @@ function renderChecklist() {
 }
 
 function renderPonto() {
-  document.getElementById('entryTime').textContent = state.ponto.entrada || '--:--';
-  document.getElementById('exitTime').textContent = state.ponto.saida || '--:--';
-  document.getElementById('workedToday').textContent = workedDuration();
+  const entry = document.getElementById('entryTime');
+  const exit = document.getElementById('exitTime');
+  const worked = document.getElementById('workedToday');
+  if (entry) entry.textContent = state.ponto.entrada || '--:--';
+  if (exit) exit.textContent = state.ponto.saida || '--:--';
+  if (worked) worked.textContent = workedDuration();
 }
 
 function renderRoutes() {
   const list = document.getElementById('routeList');
+  if (!list) return;
   const order = { critico: 0, atencao: 1, estavel: 2 };
   const items = visibleSchools()
     .filter((item) => item.status !== 'estavel')
@@ -906,18 +1174,31 @@ function renderSchoolDetail() {
       : 'pill-ok';
   const networkGap = network ? Math.max(0, Number(network.cameraInstalled || 0) - Number(network.cameraWorking || 0)) : 0;
 
+  const schoolInitials = school.name
+    .replace(/^E\.?E\.?\s+/i, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || 'EE';
+
   document.getElementById('schoolDetailHeader').innerHTML = school ? `
-    <div class="setechub-item">
-      <div class="setechub-head">
-        <div>
-          <strong>${esc(school.name)}</strong>
-          <div class="sync-meta">${esc(school.zone)} | CIE ${esc(school.cie || network?.cie || '--')} | ${esc(school.notes || 'Sem observacoes')}</div>
-        </div>
-        <div class="setechub-badges">
+    <div class="school-record-hero-main">
+      <div class="school-record-avatar">${esc(schoolInitials)}</div>
+      <div class="school-record-title-block">
+        <div class="dashboard-command-kicker">Ficha da escola</div>
+        <h1>${esc(school.name)}</h1>
+        <p>${esc(school.zone)} | CIE ${esc(school.cie || network?.cie || '--')}${school.notes ? ` | ${esc(school.notes)}` : ''}</p>
+        <div class="school-record-chip-row">
           ${school.fixedName ? '<span class="diag-pill">Oficial</span>' : ''}
           <span class="diag-pill ${toneBySchool(school.status)}">${esc(badgeText(school.status))}</span>
-          <button class="btn btn-p btn-sm" type="button" onclick="setInventorySchool('${esc(school.name)}')">Abrir inventario</button>
+          <span class="diag-pill ${riskTone}">${esc(riskLabel)}</span>
         </div>
+      </div>
+      <div class="school-record-hero-actions">
+        <button class="btn btn-p btn-sm" type="button" onclick="setInventorySchool('${esc(school.name)}')">Inventario</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="openSchoolCalls('${esc(school.name)}')">Chamados</button>
       </div>
     </div>
   ` : '<div class="sync-empty">Nenhuma escola selecionada.</div>';
@@ -927,229 +1208,112 @@ function renderSchoolDetail() {
   if (pageTitle) pageTitle.textContent = school ? school.name : 'Pagina da escola';
   if (pageSubtitle) {
     pageSubtitle.textContent = school
-      ? `${school.zone} | CIE ${school.cie || network?.cie || '--'} | inventario, rede, chamados e importacoes da unidade.`
-      : 'Base completa da unidade com inventario, rede, contatos e importacoes.';
+      ? `${school.zone} | CIE ${school.cie || network?.cie || '--'} | dados principais e resumos operacionais.`
+      : 'Dados principais da unidade, com resumos do inventario, rede e historico.';
   }
 
   document.getElementById('schoolDetailExecutive').innerHTML = school ? `
-    <div class="setechub-item">
-      <div class="setechub-head">
-        <strong>Prioridade da unidade</strong>
-        <span class="diag-pill ${riskTone}">${esc(riskLabel)}</span>
+    <div class="school-record-info-list">
+      <div class="school-record-info-row">
+        <span>Municipio</span>
+        <strong>${esc(school.zone)}</strong>
       </div>
-      <div class="sync-meta">
-        ${esc(school.zone)} | ficha ${esc(String(completion))}% | ${esc(String(openCalls.length))} chamado(s) | ${esc(String(plannedTasks.length))} tarefa(s)
+      <div class="school-record-info-row">
+        <span>Codigo CIE</span>
+        <strong>${esc(school.cie || network?.cie || '--')}</strong>
+      </div>
+      <div class="school-record-info-row">
+        <span>Status</span>
+        <strong>${esc(badgeText(school.status))}</strong>
+      </div>
+      <div class="school-record-info-row">
+        <span>Ficha</span>
+        <strong>${esc(String(completion))}%</strong>
       </div>
     </div>
-    <div class="setechub-item">
+    <div class="school-record-note-card">
       <strong>Leitura rapida</strong>
-      <div class="sync-meta">
-        Inventario: ${esc(String(totalUnits))} unidade(s) em ${esc(String(inventoryRows.length))} familia(s) |
-        alertas: ${esc(String(alertUnits))} |
-        criticos: ${esc(String(defectUnits))}
-      </div>
-      <div class="sync-meta">
-        Redes e cameras: ${network ? `${network.cameraWorking || 0}/${network.cameraInstalled || 0} cameras` : 'sem dados de rede'} |
-        banda: ${esc(network?.bandwidth || '--')} |
-        importacoes confirmadas: ${esc(String(approvedImports.length))}
-      </div>
+      <p>${esc(riskLabel)}. ${esc(openCalls.length ? `${openCalls.length} chamado(s) ativo(s).` : 'Sem chamado ativo.')} ${esc(alertUnits ? `${alertUnits} unidade(s) do inventario em alerta.` : 'Inventario sem alerta no resumo.')}</p>
     </div>
   ` : '<div class="sync-empty">Nenhuma escola selecionada.</div>';
 
   document.getElementById('schoolDetailActions').innerHTML = school ? [
     defectUnits > 0
-      ? `<div class="setechub-item"><strong>Inventario critico</strong><div class="sync-meta">${esc(String(defectUnits))} unidade(s) com defeito. Vale abrir o inventario da escola primeiro.</div><div class="setechub-action-row left"><button class="btn btn-p btn-sm" type="button" onclick="setInventorySchool('${esc(school.name)}')">Abrir inventario</button></div></div>`
+      ? `<div class="school-record-action-item danger"><strong>Inventario critico</strong><span>${esc(String(defectUnits))} unidade(s) com defeito.</span><button class="btn btn-p btn-sm" type="button" onclick="setInventorySchool('${esc(school.name)}')">Abrir inventario</button></div>`
       : '',
     openCalls.length > 0
-      ? `<div class="setechub-item"><strong>Chamados em aberto</strong><div class="sync-meta">${esc(String(openCalls.length))} chamado(s) ativo(s) para esta escola.</div><div class="setechub-action-row left"><button class="btn btn-g btn-sm" type="button" onclick="openSchoolCalls('${esc(school.name)}')">Abrir chamados</button></div></div>`
-      : '',
-    pendingImports.length
-      ? `<div class="setechub-item"><strong>Importacao pendente</strong><div class="sync-meta">${esc(String(pendingImports.length))} importacao(oes) aguardando confirmacao ou exclusao.</div><div class="setechub-action-row left"><button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolImportList')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Revisar arquivos</button></div></div>`
+      ? `<div class="school-record-action-item warn"><strong>Chamados em aberto</strong><span>${esc(String(openCalls.length))} chamado(s) ativo(s) para esta escola.</span><button class="btn btn-g btn-sm" type="button" onclick="openSchoolCalls('${esc(school.name)}')">Abrir chamados</button></div>`
       : '',
     missingFields.length
-      ? `<div class="setechub-item"><strong>Ficha incompleta</strong><div class="sync-meta">Ainda faltam: ${esc(missingFields.slice(0, 4).join(', '))}${missingFields.length > 4 ? '...' : ''}.</div></div>`
+      ? `<div class="school-record-action-item"><strong>Ficha incompleta</strong><span>Faltam: ${esc(missingFields.slice(0, 4).join(', '))}${missingFields.length > 4 ? '...' : ''}.</span></div>`
       : '',
     (!network || networkGap > 0)
-      ? `<div class="setechub-item"><strong>Redes e cameras</strong><div class="sync-meta">${esc(!network ? 'Ainda nao ha importacao de rede para a unidade.' : `${networkGap} camera(s) fora da cobertura esperada.`)}</div></div>`
+      ? `<div class="school-record-action-item"><strong>Rede e cameras</strong><span>${esc(!network ? 'Ainda nao ha importacao de rede para a unidade.' : `${networkGap} camera(s) fora da cobertura esperada.`)}</span></div>`
       : '',
-    approvedImports.length === 0
-      ? `<div class="setechub-item"><strong>Sem importacoes</strong><div class="sync-meta">A unidade ainda nao recebeu arquivo vinculado para enriquecer a base.</div></div>`
-      : ''
-  ].filter(Boolean).join('') || '<div class="sync-empty">Nenhuma pendencia critica encontrada para esta escola.</div>' : '<div class="sync-empty">Nenhuma escola selecionada.</div>';
+  ].filter(Boolean).join('') || '<div class="school-record-action-item ok"><strong>Tudo sob controle</strong><span>Nenhuma pendencia critica encontrada para esta escola.</span></div>' : '<div class="sync-empty">Nenhuma escola selecionada.</div>';
 
   document.getElementById('schoolDetailMetrics').innerHTML = [
-    { label: 'CIE', value: school?.cie || network?.cie || '--', note: 'codigo mestre da escola' },
-    { label: 'Chamados', value: String(openCalls.length), note: `${plannedTasks.length} tarefas relacionadas` },
-    { label: 'Criticos', value: String(defectUnits), note: 'unidades com defeito' },
-    { label: 'Alertas', value: String(alertUnits), note: 'unidades em manutencao ou defeito' },
-    { label: 'Equipamentos', value: String(totalUnits), note: `${assets.length} linhas de inventario` },
-    { label: 'Ficha', value: `${completion}%`, note: missingFields.length ? `${missingFields.length} campo(s) faltando` : 'cadastro consistente' },
-    { label: 'Cameras', value: network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--', note: network ? `status ${badgeText(network.status)}` : 'sem importacao de rede' },
-    { label: 'Banda', value: network?.bandwidth || '--', note: network?.wifi ? `Wi-Fi ${network.wifi}` : 'sem wifi informado' },
-    { label: 'Importacoes', value: String(approvedImports.length), note: pendingImports.length ? `${pendingImports.length} pendente(s)` : 'arquivos confirmados' }
+    { label: 'Inventario', value: String(totalUnits), note: `${inventoryRows.length} familias` },
+    { label: 'Alertas', value: String(alertUnits), note: defectUnits ? `${defectUnits} criticos` : 'sem defeito' },
+    { label: 'Cameras', value: network?.cameraInstalled ? `${network.cameraWorking || 0}/${network.cameraInstalled}` : '--', note: network ? badgeText(network.status) : 'sem rede' },
+    { label: 'Chamados', value: String(openCalls.length), note: plannedTasks.length ? `${plannedTasks.length} tarefa(s)` : 'sem tarefa' }
   ].map((item) => `
-    <div class="setechub-monitor-card">
-      <div class="sync-meta">${esc(item.label)}</div>
+    <div class="school-record-metric">
+      <span>${esc(item.label)}</span>
       <strong>${esc(item.value)}</strong>
-      <div class="diag-pill">${esc(item.note)}</div>
+      <small>${esc(item.note)}</small>
     </div>
   `).join('');
 
   document.getElementById('schoolDetailContacts').innerHTML = `
-    <div class="setechub-item">
-      <strong>Gestao</strong>
-      <div class="sync-meta">Direcao: ${esc(profile?.director || 'Nao informado')}</div>
-      <div class="sync-meta">Vice-direcao: ${esc(profile?.viceDirector || 'Nao informado')}</div>
-      <div class="sync-meta">PROATI: ${esc(profile?.proati || 'Nao informado')}</div>
-      <div class="sync-meta">GOE / apoio: ${esc(profile?.goe || 'Nao informado')}</div>
+    <div class="school-record-info-list">
+      <div class="school-record-info-row"><span>Direcao</span><strong>${esc(profile?.director || 'Nao informado')}</strong></div>
+      <div class="school-record-info-row"><span>Vice</span><strong>${esc(profile?.viceDirector || 'Nao informado')}</strong></div>
+      <div class="school-record-info-row"><span>PROATI</span><strong>${esc(profile?.proati || 'Nao informado')}</strong></div>
+      <div class="school-record-info-row"><span>GOE</span><strong>${esc(profile?.goe || 'Nao informado')}</strong></div>
     </div>
-    <div class="setechub-item">
-      <strong>Contato</strong>
+    <div class="school-record-note-card">
+      <strong>Contato rapido</strong>
       <div class="school-link-grid">
         ${profile?.phone ? `<a class="btn btn-g btn-sm" href="tel:${esc(profile.phone)}">Ligar ${esc(profile.phone)}</a>` : '<span class="diag-pill">Sem telefone</span>'}
         ${profile?.mobile ? `<a class="btn btn-g btn-sm" href="https://wa.me/${esc(profile.mobile.replace(/\D/g, ''))}" target="_blank" rel="noreferrer">WhatsApp</a>` : '<span class="diag-pill">Sem celular</span>'}
         ${profile?.email ? `<a class="btn btn-g btn-sm" href="mailto:${esc(profile.email)}">E-mail</a>` : '<span class="diag-pill">Sem e-mail</span>'}
         ${profile?.address ? `<a class="btn btn-g btn-sm" href="https://www.google.com/maps/search/${encodeURIComponent(profile.address)}" target="_blank" rel="noreferrer">Mapa</a>` : '<span class="diag-pill">Sem endereco</span>'}
       </div>
-      <div class="sync-meta">${esc(profile?.address || 'Endereco nao informado')}</div>
-      <div class="sync-meta">${esc(profile?.notes || 'Sem observacoes adicionais')}</div>
+      <p>${esc(profile?.address || 'Endereco nao informado')}</p>
+      <small>${esc(profile?.notes || 'Sem observacoes adicionais')}</small>
     </div>
   `;
 
   document.getElementById('schoolDetailInventory').innerHTML = `
-    <div class="setechub-item school-detail-section">
-      <strong>Resumo do inventario</strong>
-      <div class="school-detail-data-grid">
-        <div class="school-detail-data-card">
-          <span>Familias</span>
-          <strong>${esc(String(inventoryRows.length))}</strong>
-        </div>
-        <div class="school-detail-data-card">
-          <span>Unidades</span>
-          <strong>${esc(String(totalUnits))}</strong>
-        </div>
-        <div class="school-detail-data-card ${alertUnits ? 'is-alert' : ''}">
-          <span>Alertas</span>
-          <strong>${esc(String(alertUnits))}</strong>
-        </div>
-        <div class="school-detail-data-card">
-          <span>Confirmadas</span>
-          <strong>${esc(String(approvedImports.length))}</strong>
-        </div>
+    <div class="school-record-tech-card">
+      <div>
+        <span>Inventario</span>
+        <strong>${esc(String(totalUnits))} unidade(s)</strong>
+        <small>${esc(String(inventoryRows.length))} familia(s) | ${esc(String(alertUnits))} alerta(s)</small>
       </div>
       <div class="school-detail-highlight">
         ${inventoryCategories.length ? inventoryCategories.slice(0, 4).map((item) => `<span class="diag-pill">${esc(badgeText(item.category))}: ${esc(String(item.units))}</span>`).join('') : '<span class="diag-pill">Sem categorias consolidadas</span>'}
       </div>
-    </div>
-    ${inventoryRows.length ? `
-      <div class="setechub-table-wrap school-detail-section">
-        <table class="setechub-table">
-          <thead>
-            <tr>
-              <th>Equipamento</th>
-              <th>Qualidade</th>
-              <th>Total</th>
-              <th>Alertas</th>
-              <th>Criticos</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${inventoryRows.slice(0, 10).map((item) => `
-              <tr>
-                <td><strong>${esc(item.name)}</strong><div class="sync-meta">${esc(item.brand)}${item.model ? ` | ${esc(item.model)}` : ''}</div></td>
-                <td><span class="diag-pill ${item.quality === 'fraco' ? 'pill-danger' : item.quality === 'medio' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(item.quality))}</span></td>
-                <td>${esc(String(item.units))}</td>
-                <td>${esc(String(item.alertUnits))}</td>
-                <td>${esc(String(item.defectUnits))}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    ` : '<div class="sync-empty">Nenhum equipamento vinculado.</div>'}
-    <div class="setechub-item school-detail-section">
-      <strong>Arquivos da escola</strong>
-      ${approvedImports.length ? `
-        <div class="school-detail-file-list">
-          ${approvedImports.slice(0, 3).map((item) => `
-            <div class="school-detail-file-card">
-              <div class="setechub-head">
-                <div>
-                  <strong>${esc(item.label || item.filename || 'Importacao')}</strong>
-                  <div class="sync-meta">${esc(item.type)} | ${esc(item.importedAt || '')}</div>
-                </div>
-                <span class="diag-pill">${esc(item.summary || 'Lido')}</span>
-              </div>
-              <div class="sync-meta">${esc(String(item.preview || '').split('\n').slice(0, 3).join(' | ') || 'Sem preview relevante')}</div>
-            </div>
-          `).join('')}
-        </div>
-      ` : '<div class="sync-empty">Nenhuma importacao confirmada.</div>'}
+      <button class="btn btn-p btn-sm" type="button" onclick="setInventorySchool('${esc(school.name)}')">Abrir inventario da escola</button>
     </div>
   `;
 
   document.getElementById('schoolDetailNetwork').innerHTML = network ? `
-    <div class="setechub-item school-detail-section">
-      <div class="setechub-head">
-        <div>
-          <strong>Cameras e espelhamento</strong>
-          <div class="sync-meta">DE ${esc(network.de || '--')} | CIE ${esc(network.cie || '--')} | espelhamento ${esc(network.mirroringDate || 'nao informado')}</div>
-        </div>
-        <div class="setechub-badges">
-          <span class="diag-pill ${toneBySchool(network.status === 'defeito' ? 'critico' : network.status === 'manutencao' ? 'atencao' : 'estavel')}">${esc(badgeText(network.status))}</span>
-          <span class="diag-pill">${esc(network.cameraWorkingLabel || '--')} / ${esc(network.cameraInstalledLabel || '--')}</span>
-        </div>
+    <div class="school-record-tech-card">
+      <div>
+        <span>Rede e cameras</span>
+        <strong>${esc(network.cameraWorkingLabel || '--')} / ${esc(network.cameraInstalledLabel || '--')}</strong>
+        <small>${esc(network.bandwidth || 'banda nao informada')} | Wi-Fi ${esc(network.wifi || '--')}</small>
       </div>
-      <div class="school-detail-data-grid">
-        <div class="school-detail-data-card">
-          <span>Cameras OK</span>
-          <strong>${esc(network.cameraWorkingLabel || '--')}</strong>
-        </div>
-        <div class="school-detail-data-card">
-          <span>Cameras total</span>
-          <strong>${esc(network.cameraInstalledLabel || '--')}</strong>
-        </div>
-        <div class="school-detail-data-card">
-          <span>Banda</span>
-          <strong>${esc(network.bandwidth || '--')}</strong>
-        </div>
-        <div class="school-detail-data-card">
-          <span>Wi-Fi</span>
-          <strong>${esc(network.wifi || '--')}</strong>
-        </div>
+      <div class="school-detail-highlight">
+        <span class="diag-pill ${toneBySchool(network.status === 'defeito' ? 'critico' : network.status === 'manutencao' ? 'atencao' : 'estavel')}">${esc(badgeText(network.status))}</span>
+        <span class="diag-pill">DVR ${esc(network.dvrBrand || '--')}</span>
+        <span class="diag-pill">Firewall ${esc(network.firewallModel || '--')}</span>
       </div>
+      <small>Gateway ADM ${esc(network.adminGateway || '--')} | Gateway PED ${esc(network.pedGateway || '--')}</small>
     </div>
-    <div class="setechub-item school-detail-section">
-      <strong>Acesso tecnico</strong>
-      <div class="school-detail-kv-list">
-        <div><span>Usuario DVR</span><strong>${esc(network.dvrUser || '--')}</strong></div>
-        <div><span>Senha DVR</span><strong>${esc(network.password || '--')}</strong></div>
-        <div><span>Marca DVR</span><strong>${esc(network.dvrBrand || '--')}</strong></div>
-        <div><span>Tecnicos</span><strong>${esc(network.technicians || '--')}</strong></div>
-      </div>
-    </div>
-    <div class="setechub-item school-detail-section">
-      <strong>Rede administrativa e pedagogica</strong>
-      <div class="school-detail-kv-list">
-        <div><span>ADM</span><strong>${esc(network.adminNetwork || '--')}</strong></div>
-        <div><span>Gateway ADM</span><strong>${esc(network.adminGateway || '--')}</strong></div>
-        <div><span>PED</span><strong>${esc(network.pedNetwork || '--')}</strong></div>
-        <div><span>Gateway PED</span><strong>${esc(network.pedGateway || '--')}</strong></div>
-        <div><span>DNS 1</span><strong>${esc(network.dnsPrimary || '--')}</strong></div>
-        <div><span>DNS 2</span><strong>${esc(network.dnsSecondary || '--')}</strong></div>
-      </div>
-    </div>
-    <div class="setechub-item school-detail-section">
-      <strong>Infra e observacoes</strong>
-      <div class="school-detail-kv-list">
-        <div><span>Firewall</span><strong>${esc(network.firewallModel || '--')}</strong></div>
-        <div><span>VIDEO-DVR1</span><strong>${esc(network.videoDvr1 || '--')}</strong></div>
-        <div><span>VIDEO-DVR2</span><strong>${esc(network.videoDvr2 || '--')}</strong></div>
-        <div><span>VIDEO-DVR3</span><strong>${esc(network.videoDvr3 || '--')}</strong></div>
-      </div>
-      <div class="sync-meta">${esc((network.notes || []).join(' | ') || 'Sem observacoes adicionais na importacao de rede.')}</div>
-    </div>
-  ` : '<div class="sync-empty">Nenhum registro de rede e cameras importado para esta escola ainda.</div>';
+  ` : '<div class="school-record-tech-card"><div><span>Rede e cameras</span><strong>Sem dados importados</strong><small>Nenhum registro de rede e cameras para esta escola ainda.</small></div></div>';
 
   const historyNode = document.getElementById('schoolEventHistory');
   if (historyNode) {
@@ -1961,33 +2125,42 @@ function renderSchools() {
         <span class="diag-pill">${esc(String(items.length))} escolas</span>
       </div>
       <div class="stack-list">
-        ${items.map((school) => `
-          <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school.name)}')">
-            <div class="setechub-head">
+        ${items.map((school) => {
+          const signal = schoolOperationalSnapshot(school);
+          const network = schoolNetworkRecord(school.name);
+          const alertUnits = schoolAlertUnits(school.name);
+          const initials = school.name
+            .replace(/^E\.?E\.?\s+/i, '')
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0])
+            .join('')
+            .toUpperCase() || 'EE';
+          const tone = school.status === 'critico' || alertUnits > 0
+            ? 'danger'
+            : school.status === 'atencao' || signal.riskScore >= 7
+              ? 'warn'
+              : 'ok';
+          return `
+          <button class="school-directory-row ${tone}" type="button" onclick="openSchoolRecord('${esc(school.name)}')">
+            <span class="school-directory-avatar">${esc(initials)}</span>
+            <div class="school-directory-main">
               <div>
                 <strong>${esc(school.name)}</strong>
-                <div class="sync-meta">CIE ${esc(school.cie || '--')} | ${esc(school.notes)}</div>
-                <div class="setechub-inline-meta">
-                  <span class="diag-pill">${esc(String(schoolImportCount(school.name)))} import.</span>
-                  <span class="diag-pill">${esc(String(schoolAssetTotals(school.name).units))} equip.</span>
-                  <span class="diag-pill">${esc(String(schoolProfileCompletion(school.name)))}% ficha</span>
-                  <span class="diag-pill ${schoolAlertUnits(school.name) ? 'pill-danger' : 'pill-ok'}">${esc(String(schoolAlertUnits(school.name)))} alertas</span>
-                  ${schoolNetworkRecord(school.name) ? `<span class="diag-pill ${schoolNetworkRecord(school.name).status === 'defeito' ? 'pill-danger' : schoolNetworkRecord(school.name).status === 'manutencao' ? 'pill-warn' : 'pill-info'}">rede ${esc(badgeText(schoolNetworkRecord(school.name).status))}</span>` : ''}
-                </div>
+                <span>CIE ${esc(school.cie || '--')} | ${esc(school.zone)}${school.notes ? ` | ${esc(school.notes)}` : ''}</span>
               </div>
-              <div class="setechub-badges">
-                ${school.fixedName ? '<span class="diag-pill">Oficial</span>' : ''}
+              <div class="school-directory-meta">
+                <span>${esc(String(signal.completion))}% ficha</span>
+                <span>${esc(String(signal.assetUnits))} equip.</span>
+                <span>${network ? 'rede' : 'sem rede'}</span>
                 <span class="diag-pill ${toneBySchool(school.status)}">${esc(badgeText(school.status))}</span>
               </div>
             </div>
-            <div class="setechub-action-row left">
-              <button class="btn btn-g btn-sm" onclick="event.stopPropagation(); cycleSchool(${school.id})">Mudar status</button>
-              <button class="btn btn-p btn-sm" onclick="event.stopPropagation(); createTaskFromSchool(${school.id})">Criar tarefa</button>
-              <button class="btn btn-g btn-sm" onclick="event.stopPropagation(); openSchoolRecord('${esc(school.name)}')">Abrir ficha</button>
-              ${school.fixedName ? '' : `<button class="btn btn-d btn-sm" onclick="event.stopPropagation(); removeSchool(${school.id})">Remover</button>`}
-            </div>
-          </div>
-        `).join('')}
+            <span class="school-directory-open">Abrir</span>
+          </button>
+        `;
+        }).join('')}
       </div>
     </div>
   `).join('') : '<div class="sync-empty">Nenhuma escola encontrada neste filtro.</div>';
@@ -2068,7 +2241,7 @@ function renderAssets() {
           </div>
           <div class="stack-list">
             ${items.map((asset) => `
-              <div class="setechub-item setechub-clickable" onclick="openSchoolRecord('${esc(school)}')">
+              <div class="setechub-item setechub-clickable" onclick="setInventorySchool('${esc(school)}')">
                 <div class="setechub-head">
                   <div>
                     <strong>${esc(asset.name)}</strong>
@@ -2081,7 +2254,7 @@ function renderAssets() {
                   </div>
                   <div class="setechub-badges">
                     <span class="diag-pill ${toneByAsset(asset.statusLabel)}">${esc(badgeText(asset.statusLabel))}</span>
-                    <button class="btn btn-p btn-sm" onclick="event.stopPropagation(); openSchoolRecord('${esc(school)}')">Abrir ficha</button>
+                    <button class="btn btn-p btn-sm" onclick="event.stopPropagation(); setInventorySchool('${esc(school)}')">Ver inventario</button>
                   </div>
                 </div>
               </div>
@@ -2235,6 +2408,10 @@ function renderReports() {
 function renderDiagnostics() {
   const orphaned = orphanedReferenceSummary();
   const duplicateCies = duplicateSchoolCies();
+  const importRows = state.schoolImports || [];
+  const importSchools = new Set(importRows.map((item) => item.school).filter(Boolean)).size;
+  const pendingImports = importRows.filter((item) => item.reviewStatus === 'pending').length;
+  const confirmedImports = importRows.length - pendingImports;
   const diagnostics = [
     { label: 'Pagina atual', value: currentPage },
     { label: 'Schema do estado', value: `v${state.stateVersion || 1}` },
@@ -2245,7 +2422,6 @@ function renderDiagnostics() {
     { label: 'Servidor local', value: serverStatus.message },
     { label: 'Supabase', value: supabaseStatus.message },
     { label: 'Snapshots no servidor', value: String(serverSnapshots.length) },
-    { label: 'Cobertura de importacao', value: `${operationalCoverage().importCoverage}%` },
     { label: 'Tarefas abertas', value: String(state.tasks.filter((item) => !item.done).length) },
     { label: 'Chamados ativos', value: String(state.calls.filter((item) => item.status !== 'resolvido').length) },
     { label: 'CIE duplicado', value: duplicateCies.length ? duplicateCies.map((item) => item.cie).join(', ') : 'Nenhum' },
@@ -2264,6 +2440,25 @@ function renderDiagnostics() {
     : 'Nenhum estado legado encontrado no navegador atual.';
   const serverMeta = document.getElementById('serverHealthMeta');
   if (serverMeta) serverMeta.textContent = serverStatus.message;
+  const importInfo = document.getElementById('adminImportInfo');
+  if (importInfo) {
+    importInfo.innerHTML = [
+      { label: 'Registros importados', value: String(importRows.length), note: 'total preservado na base local' },
+      { label: 'Escolas vinculadas', value: String(importSchools), note: 'unidades com algum arquivo' },
+      { label: 'Confirmadas', value: String(confirmedImports), note: 'fora do fluxo operacional' },
+      { label: 'Pendentes', value: String(pendingImports), note: 'apenas informativo no admin' }
+    ].map((item) => `
+      <div class="setechub-item">
+        <div class="setechub-head">
+          <div>
+            <strong>${esc(item.label)}</strong>
+            <div class="sync-meta">${esc(item.note)}</div>
+          </div>
+          <span class="diag-pill">${esc(item.value)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
   updateSupabaseStatus(supabaseStatus.message, supabaseStatus.configured);
   const snapshotList = document.getElementById('snapshotList');
   if (snapshotList) {
@@ -2305,14 +2500,65 @@ function renderUsers() {
     <div class="admin-user-row">
       <div class="admin-user-main">
         <strong>${esc(user.name)}</strong>
-        <div class="sync-meta">${esc(user.login || user.name)} | ${esc(ROLE_LABELS[user.role] || badgeText(user.role))}${user.supervisorName ? ` | ${esc(user.supervisorName)}` : ''}</div>
+        <div class="sync-meta">${esc(user.login || user.name)} | ${esc(ROLE_LABELS[user.role] || badgeText(user.role))}${user.supervisorName ? ` | ${esc(user.supervisorName)}` : ''} | PIN ${esc(user.pin || 'sem PIN')}</div>
       </div>
       <div class="admin-user-actions">
         <span class="diag-pill ${user.active === false ? 'pill-warn' : 'pill-ok'}">${user.active === false ? 'Inativo' : 'Ativo'}</span>
+        <button class="btn btn-g btn-sm" type="button" onclick="editUser('${esc(user.id)}')">Editar</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="randomizeUserPin('${esc(user.id)}')">PIN aleatorio</button>
+        <button class="btn btn-g btn-sm" type="button" onclick="resetUserPin('${esc(user.id)}')">Resetar senha</button>
         <button class="btn btn-g btn-sm" type="button" onclick="toggleUserActive('${esc(user.id)}')">${user.active === false ? 'Ativar' : 'Bloquear'}</button>
+        <button class="btn btn-d btn-sm" type="button" onclick="removeUser('${esc(user.id)}')">Remover</button>
       </div>
     </div>
   `).join('') || '<div class="sync-empty">Nenhum usuario cadastrado.</div>';
+}
+
+function renderAdminSchoolTools() {
+  const list = document.getElementById('adminSchoolList');
+  if (!list) return;
+  const schools = (state.schools || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+  const schoolOptions = '<option value="">Selecionar escola para editar</option>' + schools
+    .map((school) => `<option value="${esc(school.id)}">${esc(school.name)}${school.cie ? ` | CIE ${esc(school.cie)}` : ''}</option>`)
+    .join('');
+  const mergeOptions = '<option value="">Escolha a escola</option>' + schools
+    .map((school) => `<option value="${esc(school.id)}">${esc(school.name)}</option>`)
+    .join('');
+  const supervisorOptions = '<option value="">Sem supervisor responsavel</option>' + (state.supervisors || [])
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((supervisor) => `<option value="${esc(supervisor.name)}">${esc(supervisor.name)}</option>`)
+    .join('');
+  const picker = document.getElementById('adminSchoolPicker');
+  const primary = document.getElementById('adminMergePrimary');
+  const duplicate = document.getElementById('adminMergeDuplicate');
+  const supervisorSelect = document.getElementById('adminSchoolSupervisorName');
+  const currentSchoolId = document.getElementById('adminSchoolId')?.value || '';
+  if (picker) {
+    picker.innerHTML = schoolOptions;
+    picker.value = currentSchoolId;
+  }
+  if (primary) primary.innerHTML = mergeOptions;
+  if (duplicate) duplicate.innerHTML = mergeOptions;
+  if (supervisorSelect) supervisorSelect.innerHTML = supervisorOptions;
+  list.innerHTML = schools.map((school) => {
+    const supervisor = supervisorNameForSchool(school.name);
+    const assets = state.schoolAssets.filter((item) => item.school === school.name);
+    const alerts = assets.filter((item) => item.status !== 'ok').length;
+    return `
+      <div class="admin-user-row">
+        <div class="admin-user-main">
+          <strong>${esc(school.name)}</strong>
+          <div class="sync-meta">${esc(school.zone || 'Municipio nao informado')} | ${school.cie ? `CIE ${esc(school.cie)} | ` : ''}${esc(supervisor || 'sem supervisor')} | ${assets.length} item(ns), ${alerts} alerta(s)</div>
+        </div>
+        <div class="admin-user-actions">
+          <span class="diag-pill ${school.status === 'critico' ? 'pill-danger' : school.status === 'atencao' ? 'pill-warn' : 'pill-ok'}">${esc(badgeText(school.status || 'estavel'))}</span>
+          <button class="btn btn-g btn-sm" type="button" onclick="editAdminSchool('${esc(school.id)}')">Editar</button>
+          <button class="btn btn-d btn-sm" type="button" onclick="removeSchool('${esc(school.id)}')">Remover</button>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="sync-empty">Nenhuma escola cadastrada.</div>';
 }
 
 function renderVisitHistory() {

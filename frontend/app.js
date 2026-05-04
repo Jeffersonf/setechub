@@ -32,6 +32,7 @@ const PAGE_KEY = 'setechub_page';
 const CONTEXT_KEY = 'setechub_context';
 const ACTIVE_USER_KEY = 'setechub_active_user';
 const PAUSED_NAV_PAGES = new Set(['calls', 'agenda']);
+const DORMANT_NAV_PAGES = new Set(['pecs']);
 
 const ROLE_LABELS = {
   admin: 'Administrador',
@@ -252,14 +253,19 @@ function canManageUsers() {
 
 function visibleNavigationPages() {
   const pages = isPecUser()
-    ? new Set(['pecs', 'info', 'settings'])
+    ? new Set(['info', 'settings'])
     : isSupervisorUser()
-      ? new Set(['schools', 'school-record', 'supervisors', 'supervisor-record', 'info', 'settings'])
+      ? new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'info', 'settings'])
+      : currentUserRole() === 'ctc'
+        ? new Set(['dashboard', 'ctc', 'info', 'settings'])
+      : currentUserRole() === 'dirigente'
+        ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings'])
       : isRestrictedCtcUser()
         ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'assets', 'reports', 'info', 'settings'])
       : canEditData()
-      ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings'])
-        : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'reports', 'info', 'settings']);
+      ? new Set(['dashboard', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings'])
+        : new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings']);
+  DORMANT_NAV_PAGES.forEach((page) => pages.delete(page));
   if (canManageUsers()) pages.add('admin');
   return pages;
 }
@@ -299,9 +305,8 @@ function canViewSupervisor(name) {
 }
 
 function defaultPageForUser() {
-  if (isPecUser()) return 'pecs';
-  if (currentUserRole() === 'ctc') return 'ctc';
-  return isSupervisorUser() ? 'schools' : 'dashboard';
+  if (isPecUser()) return 'info';
+  return 'dashboard';
 }
 
 function canAccessPage(page) {
@@ -596,13 +601,9 @@ function pendingQueueItems(limit = 20) {
   const items = [];
   visibleSchools().forEach((school) => {
     const missingFields = schoolMissingProfileFields(school.name);
-    const pendingImports = state.schoolImports.filter((item) => item.school === school.name && item.reviewStatus === 'pending').length;
     const network = schoolNetworkRecord(school.name);
     const networkGap = network ? Math.max(0, Number(network.cameraInstalled || 0) - Number(network.cameraWorking || 0)) : 0;
     const alerts = schoolAlertUnits(school.name);
-    if (pendingImports) {
-      items.push({ school: school.name, type: 'importacao', tone: 'pill-warn', text: `${pendingImports} importacao(oes) pendente(s) de revisao.` });
-    }
     if (missingFields.length) {
       items.push({ school: school.name, type: 'ficha', tone: 'pill-info', text: `Ficha incompleta: faltam ${missingFields.slice(0, 3).join(', ')}${missingFields.length > 3 ? '...' : ''}.` });
     }
@@ -615,7 +616,7 @@ function pendingQueueItems(limit = 20) {
       items.push({ school: school.name, type: 'inventario', tone: 'pill-danger', text: `${alerts} unidade(s) em alerta no inventario.` });
     }
   });
-  const priority = { importacao: 0, inventario: 1, rede: 2, ficha: 3 };
+  const priority = { inventario: 0, rede: 1, ficha: 2 };
   return items
     .sort((a, b) => (priority[a.type] ?? 99) - (priority[b.type] ?? 99) || a.school.localeCompare(b.school))
     .slice(0, limit);
@@ -1105,9 +1106,6 @@ function operationalSuggestions() {
   if (coverage.profileCoverage < 65) {
     suggestions.push(`So ${coverage.profileCoverage}% das escolas tem ficha minimamente preenchida. Priorize telefone, email e endereco.`);
   }
-  if (coverage.importCoverage < 60) {
-    suggestions.push(`As importacoes cobrem ${coverage.importCoverage}% das escolas. Ainda ha base para anexar e enriquecer.`);
-  }
   if (coverage.activeAlerts > 0) {
     suggestions.push(`${coverage.activeAlerts} alerta(s) de ativo estao visiveis. Use a tela de ativos para separar manutencao de defeito.`);
   }
@@ -1196,9 +1194,6 @@ function runGlobalSearch(query) {
   const callMatches = state.calls.filter((item) =>
     normalizeKey(`${item.title} ${item.school} ${item.status}`).includes(term)
   );
-  const importMatches = state.schoolImports.filter((item) =>
-    normalizeKey(`${item.school} ${item.label || ''} ${item.filename || ''} ${item.summary || ''} ${item.preview || ''}`).includes(term)
-  );
   const taskMatches = state.tasks.filter((item) =>
     normalizeKey(`${item.title} ${item.place} ${item.category}`).includes(term)
   );
@@ -1238,15 +1233,6 @@ function runGlobalSearch(query) {
     return;
   }
 
-  if (importMatches.length) {
-    const schools = [...new Set(importMatches.map((item) => item.school))];
-    currentImportSchoolContext = schools.length === 1 ? schools[0] : '';
-    showPage('schools');
-    renderSchoolImports();
-    saveUiContext();
-    return;
-  }
-
   if (taskMatches.length) {
     currentTaskFilter = 'todas';
     syncFilterButtons('task');
@@ -1270,7 +1256,7 @@ function handleSearch(query) {
 }
 
 function shiftFocusCard(direction) {
-  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'pecs', 'assets', 'calls', 'agenda', 'reports', 'info', 'settings', 'admin']
+  const pages = ['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'calls', 'agenda', 'reports', 'info', 'settings', 'admin']
     .filter((page) => canAccessPage(page));
   const currentIndex = pages.indexOf(currentPage);
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + direction + pages.length) % pages.length;
@@ -1342,6 +1328,7 @@ function refreshAll() {
   renderReports();
   renderDiagnostics();
   renderUsers();
+  renderAdminSchoolTools();
   applyPrivacy();
   const searchInput = document.getElementById('sidebarSearch');
   if (searchInput && searchInput.value !== currentSearchQuery) {

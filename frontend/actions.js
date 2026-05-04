@@ -87,6 +87,68 @@ function toggleUserActive(id) {
   refreshAll();
 }
 
+function randomPin(length = 6) {
+  const digits = '0123456789';
+  return Array.from({ length }, () => digits[Math.floor(Math.random() * digits.length)]).join('');
+}
+
+function fillRandomUserPin() {
+  const input = document.getElementById('userPin');
+  if (input) input.value = randomPin();
+}
+
+function setUserEditMode(user = null) {
+  const editingId = document.getElementById('editingUserId');
+  const submit = document.getElementById('userSubmitBtn');
+  const cancel = document.getElementById('cancelUserEditBtn');
+  if (editingId) editingId.value = user?.id || '';
+  if (submit) submit.textContent = user ? 'Salvar usuario' : 'Criar usuario';
+  if (cancel) cancel.hidden = !user;
+}
+
+function editUser(id) {
+  if (!canManageUsers()) return;
+  const user = (state.users || []).find((item) => item.id === id);
+  if (!user) return;
+  document.getElementById('userName').value = user.name || '';
+  document.getElementById('userLogin').value = user.login || user.name || '';
+  document.getElementById('userPin').value = user.pin || '';
+  document.getElementById('userRole').value = user.role || 'supervisor';
+  document.getElementById('userSupervisorName').value = user.supervisorName || '';
+  setUserEditMode(user);
+  document.getElementById('userName')?.focus();
+}
+
+function cancelUserEdit() {
+  document.getElementById('userForm')?.reset();
+  setUserEditMode(null);
+}
+
+function randomizeUserPin(id) {
+  if (!canManageUsers()) return;
+  const nextPin = randomPin();
+  state.users = (state.users || []).map((user) => user.id === id ? { ...user, pin: nextPin } : user);
+  refreshAll();
+  alert(`PIN atualizado para ${nextPin}.`);
+}
+
+function resetUserPin(id) {
+  if (!canManageUsers()) return;
+  state.users = (state.users || []).map((user) => user.id === id ? { ...user, pin: '1234' } : user);
+  refreshAll();
+  alert('Senha/PIN resetado para 1234.');
+}
+
+function removeUser(id) {
+  if (!canManageUsers()) return;
+  const user = (state.users || []).find((item) => item.id === id);
+  if (!user || user.id === currentUser()?.id) return;
+  if (!confirm(`Remover o usuario ${user.name}?`)) return;
+  state.users = (state.users || []).filter((item) => item.id !== id);
+  cancelUserEdit();
+  refreshAll();
+}
+
 function findLoginUser(name, pin) {
   const loginKey = normalizeKey(name);
   const pinText = String(pin || '').trim();
@@ -400,7 +462,6 @@ function showSchoolDetail(name) {
     return;
   }
   currentSchoolDetail = name;
-  currentInventorySchool = name;
   currentSchoolSearch = '';
   currentImportSchoolContext = name;
   showPage('school-record');
@@ -409,8 +470,6 @@ function showSchoolDetail(name) {
   renderSchoolImports();
   const schoolDetailSelect = document.getElementById('schoolDetailSelect');
   if (schoolDetailSelect) schoolDetailSelect.value = name;
-  const inventorySelect = document.getElementById('inventorySchoolSelect');
-  if (inventorySelect) inventorySelect.value = name;
 }
 
 function setInventorySchool(name) {
@@ -472,6 +531,18 @@ function openInventoryCategory(status = 'todos', category = 'todas', school = 't
   renderAssets();
 }
 
+function openMainNavigationPage(page) {
+  if (page === 'assets') {
+    currentInventorySchool = 'todas';
+    currentInventoryStatus = 'todos';
+    currentInventoryCategory = 'todas';
+    currentInventorySearch = '';
+  }
+  showPage(page);
+  if (page === 'assets') renderAssets();
+  if (page === 'schools') renderSchools();
+}
+
 function openCallCategory(filter = 'todos') {
   currentCallFilter = filter;
   currentCallSchoolContext = '';
@@ -501,6 +572,10 @@ function renameSchoolReferences(previousName, nextName) {
   state.schoolImports = state.schoolImports.map((item) => item.school === previousName ? { ...item, school: nextName } : item);
   state.schoolAssets = state.schoolAssets.map((item) => item.school === previousName ? { ...item, school: nextName } : item);
   state.schoolNetworks = state.schoolNetworks.map((item) => item.school === previousName ? { ...item, school: nextName } : item);
+  state.supervisors = (state.supervisors || []).map((supervisor) => ({
+    ...supervisor,
+    schools: Array.from(new Set((supervisor.schools || []).map((name) => name === previousName ? nextName : name)))
+  }));
   if (currentSchoolDetail === previousName) currentSchoolDetail = nextName;
   if (currentInventorySchool === previousName) currentInventorySchool = nextName;
   if (currentCallSchoolContext === previousName) currentCallSchoolContext = nextName;
@@ -515,13 +590,136 @@ function purgeSchoolReferences(name) {
   state.schoolImports = state.schoolImports.filter((item) => item.school !== name);
   state.schoolAssets = state.schoolAssets.filter((item) => item.school !== name);
   state.schoolNetworks = state.schoolNetworks.filter((item) => item.school !== name);
+  state.supervisors = (state.supervisors || []).map((supervisor) => ({
+    ...supervisor,
+    schools: (supervisor.schools || []).filter((school) => school !== name)
+  }));
+}
+
+function supervisorNameForSchool(name) {
+  return (state.supervisors || []).find((supervisor) =>
+    (supervisor.schools || []).includes(name)
+  )?.name || '';
+}
+
+function assignSchoolSupervisor(schoolName, supervisorName) {
+  if (!schoolName) return;
+  state.supervisors = (state.supervisors || []).map((supervisor) => {
+    const schools = (supervisor.schools || []).filter((name) => name !== schoolName);
+    if (supervisorName && supervisor.name === supervisorName) schools.push(schoolName);
+    return { ...supervisor, schools: Array.from(new Set(schools)) };
+  });
+}
+
+function clearAdminSchoolForm() {
+  document.getElementById('adminSchoolForm')?.reset();
+  const idInput = document.getElementById('adminSchoolId');
+  const picker = document.getElementById('adminSchoolPicker');
+  if (idInput) idInput.value = '';
+  if (picker) picker.value = '';
+  document.getElementById('adminSchoolName')?.focus();
+}
+
+function editAdminSchool(id) {
+  if (!canManageUsers()) return;
+  const school = (state.schools || []).find((item) => item.id === id);
+  if (!school) return;
+  document.getElementById('adminSchoolId').value = school.id;
+  document.getElementById('adminSchoolPicker').value = school.id;
+  document.getElementById('adminSchoolName').value = school.name || '';
+  document.getElementById('adminSchoolCie').value = school.cie || '';
+  document.getElementById('adminSchoolZone').value = school.zone || '';
+  document.getElementById('adminSchoolStatus').value = school.status || 'estavel';
+  document.getElementById('adminSchoolSupervisorName').value = supervisorNameForSchool(school.name);
+  document.getElementById('adminSchoolName')?.focus();
+}
+
+function schoolSeverity(status) {
+  return { estavel: 0, atencao: 1, critico: 2 }[status] ?? 0;
+}
+
+function saveAdminSchool(event) {
+  event.preventDefault();
+  if (!canManageUsers()) return;
+  const id = document.getElementById('adminSchoolId').value;
+  const name = document.getElementById('adminSchoolName').value.trim();
+  const cie = document.getElementById('adminSchoolCie').value.trim();
+  const zone = document.getElementById('adminSchoolZone').value.trim();
+  const status = document.getElementById('adminSchoolStatus').value || 'estavel';
+  const supervisorName = document.getElementById('adminSchoolSupervisorName').value;
+  if (!name || !zone) return;
+  const duplicate = (state.schools || []).find((school) =>
+    school.id !== id &&
+    (normalizeKey(school.name) === normalizeKey(name) || (cie && normalizeKey(school.cie || '') === normalizeKey(cie)))
+  );
+  if (duplicate) {
+    alert('Ja existe uma escola com este nome ou CIE. Use "Unificar duplicada" para juntar os registros.');
+    return;
+  }
+  const existing = (state.schools || []).find((school) => school.id === id);
+  if (existing) {
+    renameSchoolReferences(existing.name, name);
+    state.schools = state.schools.map((school) => school.id === id ? {
+      ...school,
+      name,
+      cie,
+      zone,
+      status,
+      notes: school.notes || 'Escola atualizada no painel admin.'
+    } : school);
+  } else {
+    state.schools.unshift({
+      id: uid(),
+      name,
+      cie,
+      zone,
+      status,
+      notes: 'Escola criada no painel admin.'
+    });
+  }
+  assignSchoolSupervisor(name, supervisorName);
+  clearAdminSchoolForm();
+  refreshAll();
+}
+
+function mergeAdminSchools() {
+  if (!canManageUsers()) return;
+  const primaryId = document.getElementById('adminMergePrimary')?.value;
+  const duplicateId = document.getElementById('adminMergeDuplicate')?.value;
+  if (!primaryId || !duplicateId || primaryId === duplicateId) return;
+  const primary = (state.schools || []).find((school) => school.id === primaryId);
+  const duplicate = (state.schools || []).find((school) => school.id === duplicateId);
+  if (!primary || !duplicate) return;
+  if (!confirm(`Unificar "${duplicate.name}" dentro de "${primary.name}"? As referencias da duplicada serao movidas para a escola principal.`)) return;
+  const duplicateSupervisor = supervisorNameForSchool(duplicate.name);
+  renameSchoolReferences(duplicate.name, primary.name);
+  state.schools = (state.schools || [])
+    .filter((school) => school.id !== duplicate.id)
+    .map((school) => {
+      if (school.id !== primary.id) return school;
+      const status = schoolSeverity(duplicate.status) > schoolSeverity(primary.status) ? duplicate.status : primary.status;
+      const notes = [primary.notes, duplicate.notes].filter(Boolean).join(' | ');
+      return {
+        ...school,
+        cie: school.cie || duplicate.cie || '',
+        zone: school.zone || duplicate.zone || '',
+        status,
+        notes: notes || 'Registros unificados no painel admin.'
+      };
+    });
+  if (duplicateSupervisor && !supervisorNameForSchool(primary.name)) {
+    assignSchoolSupervisor(primary.name, duplicateSupervisor);
+  } else {
+    assignSchoolSupervisor(primary.name, supervisorNameForSchool(primary.name));
+  }
+  clearAdminSchoolForm();
+  refreshAll();
 }
 
 function copySchoolSummary() {
   const school = state.schools.find((item) => item.name === currentSchoolDetail);
   const profile = currentSchoolProfile();
   const assets = state.schoolAssets.filter((item) => item.school === currentSchoolDetail);
-  const imports = state.schoolImports.filter((item) => item.school === currentSchoolDetail);
   if (!school) return;
   const summary = [
     school.name,
@@ -531,7 +729,6 @@ function copySchoolSummary() {
     `Telefone: ${profile?.phone || 'Nao informado'}`,
     `E-mail: ${profile?.email || 'Nao informado'}`,
     `Equipamentos: ${assets.reduce((sum, item) => sum + schoolAssetUnits(item), 0)}`,
-    `Importacoes: ${imports.length}`,
     `Observacoes: ${profile?.notes || school.notes || 'Sem observacoes'}`
   ].join('\n');
   copyText(summary, 'Resumo da escola copiado.');
@@ -887,7 +1084,7 @@ function setupEventListeners() {
     refreshAll();
   });
 
-  document.getElementById('schoolImportForm').addEventListener('submit', async (event) => {
+  document.getElementById('schoolImportForm')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const school = document.getElementById('importSchoolSelect').value.trim();
     const type = document.getElementById('importSourceType').value;
@@ -1062,16 +1259,35 @@ function setupEventListeners() {
   document.getElementById('loadSupabaseBtn')?.addEventListener('click', loadStateFromSupabase);
   document.getElementById('checkSupabaseBtn')?.addEventListener('click', checkSupabaseConnection);
   document.getElementById('seedSupervisorVisitsBtn')?.addEventListener('click', addSupervisorTestVisits);
+  document.getElementById('randomUserPinBtn')?.addEventListener('click', fillRandomUserPin);
+  document.getElementById('cancelUserEditBtn')?.addEventListener('click', cancelUserEdit);
+  document.getElementById('adminSchoolPicker')?.addEventListener('change', (event) => {
+    if (event.target.value) editAdminSchool(event.target.value);
+    else clearAdminSchoolForm();
+  });
+  document.getElementById('adminSchoolForm')?.addEventListener('submit', saveAdminSchool);
+  document.getElementById('clearAdminSchoolBtn')?.addEventListener('click', clearAdminSchoolForm);
+  document.getElementById('mergeSchoolsBtn')?.addEventListener('click', mergeAdminSchools);
   document.getElementById('userForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!canManageUsers()) return;
+    const editingId = document.getElementById('editingUserId').value;
     const name = document.getElementById('userName').value.trim();
     const login = document.getElementById('userLogin').value.trim() || name;
     const pin = document.getElementById('userPin').value.trim() || '1234';
     const role = document.getElementById('userRole').value;
     const supervisorName = document.getElementById('userSupervisorName').value;
     if (!name || !login) return;
-    const existing = (state.users || []).find((item) => normalizeKey(item.login || item.name) === normalizeKey(login));
+    const existing = editingId
+      ? (state.users || []).find((item) => item.id === editingId)
+      : (state.users || []).find((item) => normalizeKey(item.login || item.name) === normalizeKey(login));
+    const loginTaken = (state.users || []).some((item) =>
+      item.id !== editingId && normalizeKey(item.login || item.name) === normalizeKey(login)
+    );
+    if (loginTaken) {
+      alert('Ja existe um usuario com este login.');
+      return;
+    }
     const nextUser = {
       id: existing?.id || `user-${uid()}`,
       name,
@@ -1079,12 +1295,13 @@ function setupEventListeners() {
       pin,
       role,
       supervisorName: role === 'supervisor' ? supervisorName || name : '',
-      active: true
+      active: existing?.active === false ? false : true
     };
     state.users = existing
       ? state.users.map((item) => item.id === existing.id ? nextUser : item)
       : [nextUser, ...(state.users || [])];
     event.target.reset();
+    setUserEditMode(null);
     refreshAll();
   });
   document.getElementById('supabaseConfigForm')?.addEventListener('submit', (event) => {
@@ -1111,7 +1328,7 @@ function setupEventListeners() {
           event.preventDefault();
           return;
         }
-        showPage(button.dataset.page);
+        openMainNavigationPage(button.dataset.page);
       });
     }
   });
@@ -1120,7 +1337,7 @@ function setupEventListeners() {
     if (!navButton) return;
     event.preventDefault();
     if (navButton.classList.contains('nav-disabled')) return;
-    showPage(navButton.dataset.page);
+    openMainNavigationPage(navButton.dataset.page);
   });
 
   document.querySelectorAll('[data-task-filter]').forEach((button) => {

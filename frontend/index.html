@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260430-supervisor-indicators-aviso">
-<link rel="stylesheet" href="./setechub.css?v=20260430-supervisor-indicators-aviso">
+<link rel="stylesheet" href="./styles.css?v=20260504-admin-tools">
+<link rel="stylesheet" href="./setechub.css?v=20260504-admin-tools">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -43,7 +43,7 @@
   <div class="fn-item active" data-page="dashboard"><span class="fni">&#128202;</span>Inicio</div>
   <div class="fn-item" data-page="schools"><span class="fni">&#127979;</span>Escolas</div>
   <div class="fn-item" data-page="supervisors"><span class="fni">&#128101;</span>Superv.</div>
-  <div class="fn-item" data-page="pecs"><span class="fni">&#127891;</span>PECs</div>
+  <div class="fn-item dormant-page nav-disabled" data-page="pecs"><span class="fni">&#127891;</span>PECs</div>
   <div class="fn-item" data-page="assets"><span class="fni">&#128187;</span>Invent.</div>
   <div class="fn-item acc-n" data-page="calls"><span class="fni">&#128295;</span>Cham.</div>
   <div class="fn-item sl-n" data-page="info"><span class="fni">&#8505;</span>Info</div>
@@ -66,7 +66,7 @@
     <div class="nav-item active" data-page="dashboard"><span class="ico">&#128202;</span>Painel</div>
     <div class="nav-item" data-page="schools"><span class="ico">&#127979;</span>Escolas</div>
     <div class="nav-item" data-page="supervisors"><span class="ico">&#128101;</span>Supervisores</div>
-    <div class="nav-item" data-page="pecs"><span class="ico">&#127891;</span>PECs</div>
+    <div class="nav-item dormant-page nav-disabled" data-page="pecs"><span class="ico">&#127891;</span>PECs</div>
     <div class="nav-item" data-page="ctc"><span class="ico">&#128736;</span>CTC</div>
     <div class="nav-item" data-page="assets"><span class="ico">&#128187;</span>Inventario</div>
     <div class="nav-item an" data-page="calls"><span class="ico">&#128295;</span>Atendimentos</div>
@@ -98,8 +98,8 @@
   <div class="page active" id="page-dashboard">
     <div class="ph">
       <div>
-        <div class="pt">Painel inicial</div>
-        <div class="ps">Centro do dia para organizar rota, chamados, escolas e fechamento.</div>
+        <div class="pt">Painel de operacao</div>
+        <div class="ps">Visao executiva para decidir o proximo passo, acompanhar riscos e abrir as areas certas.</div>
       </div>
       <div class="page-actions">
         <div class="mnav"><button onclick="shiftFocusCard(-1)">&#8249;</button><span class="mname" id="todayLabel">Hoje</span><button onclick="shiftFocusCard(1)">&#8250;</button></div>
@@ -108,9 +108,9 @@
       </div>
     </div>
 
-    <section class="dashboard-command-center">
+    <section class="dashboard-command-center dashboard-redesign-hero">
       <div class="dashboard-command-main">
-        <div class="dashboard-command-kicker">Visao de trabalho</div>
+        <div class="dashboard-command-kicker">Comando do dia</div>
         <h1 id="dashboardHeroTitle">Painel inicial pronto para abrir a rotina.</h1>
         <p id="dashboardHeroText">Priorize chamados, escolas em atencao e pendencias da base sem trocar de tela.</p>
         <div class="dashboard-command-actions" id="dashboardHeroActions"></div>
@@ -121,170 +121,26 @@
       </div>
     </section>
 
-    <div class="insight-grid">
-      <div class="insight-card">
-        <div class="insight-l">Pendentes</div>
-        <div class="insight-v private" id="metricPending">0</div>
-        <div class="sync-meta">tarefas abertas no dia</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Chamados ativos</div>
-        <div class="insight-v private" id="metricCalls">0</div>
-        <div class="sync-meta">abertos ou em rota</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Escolas em atencao</div>
-        <div class="insight-v private" id="metricSchools">0</div>
-        <div class="sync-meta">precisam de visita ou acao</div>
-      </div>
-      <div class="insight-card">
-        <div class="insight-l">Banco de horas</div>
-        <div class="insight-v private" id="metricHours">0h</div>
-        <div class="sync-meta">saldo calculado do ponto</div>
-      </div>
-    </div>
-
-    <div class="setechub-command-grid dashboard-access-grid">
-      <section class="box" id="dashboardCategoryBox">
-        <div class="bh">
-          <div><div class="ct">Acesso por categoria</div><div class="cs">Tudo que importa no dia para cair direto na area certa.</div></div>
-        </div>
-        <div id="dashboardCategoryGrid" class="dashboard-category-grid"></div>
-      </section>
-    </div>
-
-    <div class="dash-widgets setechub-grid">
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Foco do dia</div><div class="cs">O item mais importante aparece aqui.</div></div>
-          <span class="diag-pill" id="focusBadge">Organizar</span>
-        </div>
-        <div class="hero-focus">
-          <div class="hero-title" id="focusTitle">Abrir o dia com rota e prioridades.</div>
-          <p class="hero-copy" id="focusText">Comece pelas escolas em atencao e pelo chamado que esta travando sua fila.</p>
-        </div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Escolas em atencao</div><div class="cs">Locais que pedem visita ou acompanhamento.</div></div>
-          <button class="btn btn-g btn-sm" onclick="openSchoolCategory('com_alerta')">Abrir escolas</button>
-        </div>
-        <div id="routeList" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Inventario em alerta</div><div class="cs">Atalhos para o parque que precisa de acao agora.</div></div>
-          <button class="btn btn-g btn-sm" onclick="openInventoryCategory('alerta')">Abrir inventario</button>
-        </div>
-        <div id="dashboardInventoryAlerts" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Chamados ativos</div><div class="cs">Fila viva para abrir direto no atendimento certo.</div></div>
-          <button class="btn btn-g btn-sm" onclick="openCallCategory('todos')">Abrir chamados</button>
-        </div>
-        <div id="dashboardCallQueue" class="stack-list"></div>
-      </section>
-    </div>
-
-    <div class="box" id="dashboardDrilldownBox">
+    <section class="box dashboard-profile-panel">
       <div class="bh">
-        <div><div class="ct">Atalhos por recorte</div><div class="cs">Subcategorias clicaveis para chegar direto no filtro certo.</div></div>
+        <div><div class="ct">Seu painel</div><div class="cs">Cards liberados para o seu perfil. Cada card abre exatamente o recorte indicado.</div></div>
       </div>
-      <div id="dashboardDrilldownGrid" class="dashboard-drilldown-grid"></div>
-    </div>
+      <div id="dashboardProfileSummary" class="dashboard-profile-summary"></div>
+    </section>
 
-    <div class="box">
-      <div class="bh">
-        <div><div class="ct">Fila de pendencias</div><div class="cs">O que ainda precisa ser revisado, confirmado ou preenchido na base.</div></div>
+    <section class="dashboard-card-section">
+      <div class="dashboard-section-head">
+        <div><div class="ct">Acessos principais</div><div class="cs">O que faz sentido para o perfil logado.</div></div>
       </div>
-      <div id="pendingQueueList" class="stack-list"></div>
-    </div>
+      <div id="dashboardRoleCards" class="dashboard-role-card-grid"></div>
+    </section>
 
-    <div class="setechub-command-grid">
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Saude da operacao</div><div class="cs">Leitura rapida da base, cobertura e fila viva.</div></div>
-        </div>
-        <div id="opsHealthPanel" class="stack-list"></div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Cobertura da base</div><div class="cs">Mostra onde o app ja esta rico em dados e onde ainda falta preencher.</div></div>
-        </div>
-        <div id="coverageGrid" class="setechub-monitor-grid"></div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Acoes sugeridas</div><div class="cs">Prioridades automaticas com base no que ja foi importado.</div></div>
-        </div>
-        <div id="opsSuggestionList" class="stack-list"></div>
-      </section>
-    </div>
-
-    <div class="dash-widgets setechub-grid">
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Linha do dia</div><div class="cs">Tarefas, chamados e movimento principal em ordem de ataque.</div></div>
-          <button class="btn btn-g btn-sm nav-disabled" type="button" disabled>Agenda pausada</button>
-        </div>
-        <div id="timelineList" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Checklist de abertura</div><div class="cs">Rotina curta para nao comecar no improviso.</div></div>
-        </div>
-        <div id="checklistList" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Ponto do dia</div><div class="cs">Controle simples da jornada.</div></div>
-        </div>
-        <div class="setechub-split">
-          <div class="mini-stat"><span class="ms-l">Entrada</span><strong class="ms-val private" id="entryTime">--:--</strong></div>
-          <div class="mini-stat"><span class="ms-l">Saida</span><strong class="ms-val private" id="exitTime">--:--</strong></div>
-          <div class="mini-stat"><span class="ms-l">Total</span><strong class="ms-val private" id="workedToday">0h00</strong></div>
-        </div>
-        <div class="setechub-action-row">
-          <button class="btn btn-p" onclick="stampPonto('entrada')">Registrar entrada</button>
-          <button class="btn btn-g" onclick="stampPonto('saida')">Registrar saida</button>
-        </div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Importacoes recentes</div><div class="cs">Ultimas cargas para cair direto na escola e conferir os dados.</div></div>
-          <button class="btn btn-g btn-sm" onclick="openImportCategory('todos')">Abrir importacoes</button>
-        </div>
-        <div id="dashboardRecentImports" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Cobertura regional</div><div class="cs">Municipios e distribuicao atual da base oficial.</div></div>
-        </div>
-        <div id="municipalityList" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Base oficial</div><div class="cs">Links e referencias que voce usa no dia.</div></div>
-        </div>
-        <div id="officialList" class="stack-list"></div>
-      </section>
-
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Semana</div><div class="cs">Marcadores rapidos para orientar sua rotina.</div></div>
-        </div>
-        <div id="weekBadges" class="setechub-chip-row"></div>
-      </section>
-    </div>
+    <section class="dashboard-card-section">
+      <div class="dashboard-section-head">
+        <div><div class="ct">Precisa de atencao</div><div class="cs">Atalhos para problemas ou recortes relevantes do seu acesso.</div></div>
+      </div>
+      <div id="dashboardAttentionCards" class="dashboard-attention-grid"></div>
+    </section>
   </div>
 
   <div class="page" id="page-ctc">
@@ -413,114 +269,101 @@
   <div class="page" id="page-schools">
     <div class="ph">
       <div>
-        <div class="pt">Base de Escolas</div>
-        <div class="ps">Cards de resumo por escola. Clique em uma unidade para abrir a ficha completa.</div>
+        <div class="pt">Escolas</div>
+      <div class="ps">Lista direta das unidades. Clique em uma escola para abrir os dados principais dela.</div>
       </div>
     </div>
-    <div class="box">
-      <div class="bh">
-        <div><div class="ct">Escolas</div><div class="cs">Cada card mostra o essencial; os dados completos ficam na pagina da escola.</div></div>
+    <div class="box school-directory-shell">
+      <div class="school-directory-filters">
+        <input class="fi" id="schoolMasterSearch" placeholder="Buscar por escola, CIE ou municipio">
+        <select class="fi" id="schoolZoneFilterSelect">
+          <option value="todas">Todos os municipios</option>
+        </select>
+        <select class="fi" id="schoolSortSelect">
+          <option value="nome">Nome</option>
+          <option value="municipio">Municipio</option>
+          <option value="prioridade">Prioridade</option>
+          <option value="inventario">Inventario</option>
+          <option value="alertas">Alertas</option>
+          <option value="dados">Dados</option>
+        </select>
       </div>
-      <div id="schoolOverviewMatrix" class="school-overview-matrix"></div>
+      <div class="setechub-toolbar" id="schoolFilterBar">
+        <button class="btn btn-g btn-sm active-filter" data-school-filter="todas" type="button">Todas</button>
+        <button class="btn btn-g btn-sm" data-school-filter="com_alerta" type="button">Com alerta</button>
+        <button class="btn btn-g btn-sm" data-school-filter="sem_ficha" type="button">Sem ficha</button>
+        <button class="btn btn-g btn-sm" data-school-filter="sem_rede" type="button">Sem rede</button>
+        <button class="btn btn-g btn-sm" data-school-filter="sem_inventario" type="button">Sem inventario</button>
+      </div>
+      <div id="schoolList" class="school-directory-list"></div>
     </div>
   </div>
 
   <div class="page" id="page-school-record">
     <div class="ph">
-      <div>
-        <div class="pt" id="schoolRecordTitle">Pagina da escola</div>
-        <div class="ps" id="schoolRecordSubtitle">Base completa da unidade com inventario, rede, contatos e importacoes.</div>
+      <div class="record-title-row">
+        <button class="record-back-btn" type="button" onclick="showPage('schools')" aria-label="Voltar para escolas" title="Voltar para escolas">&#8249;</button>
+        <div>
+          <div class="pt" id="schoolRecordTitle">Dados da escola</div>
+          <div class="ps" id="schoolRecordSubtitle">Dados principais da unidade, com resumos do inventario, rede e historico.</div>
+        </div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-g btn-sm" type="button" onclick="showPage('schools')">Voltar para escolas</button>
         <button class="btn btn-g btn-sm" id="openSchoolMapsBtn" type="button">Abrir mapa</button>
         <button class="btn btn-g btn-sm" id="copySchoolSummaryBtn" type="button">Copiar resumo</button>
       </div>
     </div>
-    <div class="box">
-      <div class="school-record-nav">
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolDetailExecutive')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Resumo</button>
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolDetailInventory')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Inventario</button>
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolDetailNetwork')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Rede</button>
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolDetailContacts')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Contatos</button>
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolImportList')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Arquivos</button>
-        <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('schoolEventHistory')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Historico</button>
-      </div>
-      <div id="schoolDetailHeader" class="stack-list"></div>
-      <div class="setechub-two-col setechub-monitor-layout">
-        <div class="setechub-table-card">
-          <div class="ct">Resumo executivo</div>
-          <div class="sync-meta">O que importa primeiro para agir na escola.</div>
-          <div id="schoolDetailExecutive" class="stack-list"></div>
+    <section class="school-record-hero">
+      <div id="schoolDetailHeader"></div>
+      <div id="schoolDetailMetrics" class="school-record-metric-grid"></div>
+    </section>
+    <div class="school-record-grid">
+      <section class="box school-record-primary-card">
+        <div class="bh">
+          <div><div class="ct">Dados principais</div><div class="cs">Identidade, contatos e situacao atual da unidade.</div></div>
         </div>
-        <div class="setechub-table-card">
-          <div class="ct">Proximas acoes</div>
-          <div class="sync-meta">Atalhos e pendencias imediatas da unidade.</div>
-          <div id="schoolDetailActions" class="stack-list"></div>
+        <div id="schoolDetailExecutive" class="stack-list"></div>
+      </section>
+      <section class="box school-record-primary-card">
+        <div class="bh">
+          <div><div class="ct">Contatos</div><div class="cs">Gestao e meios de contato da unidade.</div></div>
         </div>
-      </div>
-      <div class="setechub-monitor-grid" id="schoolDetailMetrics"></div>
-      <div class="setechub-two-col setechub-monitor-layout">
-        <div class="setechub-table-card">
-          <div class="ct">Inventario e importacoes</div>
-          <div class="sync-meta">Visao principal da unidade com parque, quantidades, criticidade e arquivos.</div>
+        <div id="schoolDetailContacts" class="stack-list"></div>
+      </section>
+    </div>
+    <div class="school-record-grid">
+      <section class="box school-record-action-card">
+        <div class="bh">
+          <div><div class="ct">O que olhar agora</div><div class="cs">Pendencias e atalhos realmente uteis para esta escola.</div></div>
+        </div>
+        <div id="schoolDetailActions" class="stack-list"></div>
+      </section>
+      <section class="box school-record-action-card">
+        <div class="bh">
+          <div><div class="ct">Resumo tecnico</div><div class="cs">Inventario e rede resumidos. O detalhe fica em suas abas.</div></div>
+        </div>
+        <div class="school-record-mini-grid">
           <div id="schoolDetailInventory" class="stack-list"></div>
-        </div>
-        <div class="setechub-table-card school-network-card">
-          <div class="ct">Rede, DVR e acesso</div>
-          <div class="sync-meta">IPs, gateways, DNS, banda, espelhamento e credenciais importadas do CSV.</div>
           <div id="schoolDetailNetwork" class="stack-list"></div>
         </div>
-      </div>
-      <div class="setechub-two-col setechub-monitor-layout">
-        <div class="setechub-table-card">
-          <div class="ct">Contatos e gestao</div>
-          <div class="sync-meta">Tudo clicavel para consulta e acao rapida.</div>
-          <div id="schoolDetailContacts" class="stack-list"></div>
-        </div>
-        <div class="setechub-table-card">
-          <div class="ct">Atualizacao da ficha</div>
-          <div class="sync-meta">Direcao, contato e observacoes da unidade.</div>
-          <form id="schoolProfileForm" class="setechub-form setechub-form-school-profile">
-            <input class="fi" id="schoolProfileDirector" placeholder="Diretor(a)">
-            <input class="fi" id="schoolProfileViceDirector" placeholder="Vice-diretor(a)">
-            <input class="fi" id="schoolProfileProati" placeholder="PROATI">
-            <input class="fi" id="schoolProfileGoe" placeholder="GOE / apoio">
-            <input class="fi" id="schoolProfilePhone" placeholder="Telefone">
-            <input class="fi" id="schoolProfileMobile" placeholder="Celular / WhatsApp">
-            <input class="fi" id="schoolProfileEmail" placeholder="E-mail">
-            <input class="fi" id="schoolProfileAddress" placeholder="Endereco">
-            <input class="fi" id="schoolProfileNotes" placeholder="Observacoes da unidade">
-            <button class="btn btn-p" type="submit">Salvar ficha</button>
-          </form>
-        </div>
-      </div>
+      </section>
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Importacao por escola</div><div class="cs">Arquivos e previews ligados diretamente a esta unidade.</div></div>
+        <div><div class="ct">Atualizacao da ficha</div><div class="cs">Direcao, contato e observacoes da unidade.</div></div>
       </div>
-      <form id="schoolImportForm" class="setechub-form setechub-form-import">
-        <input id="importSchoolSelect" type="hidden">
-        <select class="fi" id="importSourceType">
-          <option value="excel">Excel / CSV</option>
-          <option value="image">Foto com OCR</option>
-          <option value="text">TXT / texto</option>
-        </select>
-        <input class="fi" id="importLabel" placeholder="Rotulo do material">
-        <label class="btn btn-g" for="schoolImportFile">Selecionar arquivo</label>
-        <input id="schoolImportFile" type="file" accept=".csv,.tsv,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp,.bmp,.pdf" hidden>
-        <button class="btn btn-p" type="submit">Importar para a escola</button>
+      <form id="schoolProfileForm" class="setechub-form setechub-form-school-profile">
+        <input class="fi" id="schoolProfileDirector" placeholder="Diretor(a)">
+        <input class="fi" id="schoolProfileViceDirector" placeholder="Vice-diretor(a)">
+        <input class="fi" id="schoolProfileProati" placeholder="PROATI">
+        <input class="fi" id="schoolProfileGoe" placeholder="GOE / apoio">
+        <input class="fi" id="schoolProfilePhone" placeholder="Telefone">
+        <input class="fi" id="schoolProfileMobile" placeholder="Celular / WhatsApp">
+        <input class="fi" id="schoolProfileEmail" placeholder="E-mail">
+        <input class="fi" id="schoolProfileAddress" placeholder="Endereco">
+        <input class="fi" id="schoolProfileNotes" placeholder="Observacoes da unidade">
+        <button class="btn btn-p" type="submit">Salvar ficha</button>
       </form>
-      <div class="sync-meta" id="schoolImportStatus">Nenhum arquivo processado nesta sessao.</div>
-      <div class="setechub-toolbar" id="schoolImportFilterBar">
-        <button class="btn btn-g btn-sm active-filter" data-import-filter="todos" type="button">Todas</button>
-        <button class="btn btn-g btn-sm" data-import-filter="documentos" type="button">Documentos</button>
-        <button class="btn btn-g btn-sm" data-import-filter="planilhas" type="button">Planilhas</button>
-        <button class="btn btn-g btn-sm" data-import-filter="imagens" type="button">Imagens</button>
-        <button class="btn btn-g btn-sm" data-import-filter="com_preview" type="button">Com preview</button>
-      </div>
-      <div id="schoolImportList" class="stack-list"></div>
     </div>
     <div class="box">
       <div class="bh">
@@ -562,12 +405,14 @@
 
   <div class="page" id="page-supervisor-record">
     <div class="ph">
-      <div>
-        <div class="pt" id="supervisorRecordTitle">Pagina do supervisor</div>
-        <div class="ps" id="supervisorRecordSubtitle">Meta, calendario, visitas e escolas vinculadas.</div>
+      <div class="record-title-row">
+        <button class="record-back-btn" type="button" onclick="showPage('supervisors')" aria-label="Voltar para supervisores" title="Voltar para supervisores">&#8249;</button>
+        <div>
+          <div class="pt" id="supervisorRecordTitle">Pagina do supervisor</div>
+          <div class="ps" id="supervisorRecordSubtitle">Meta, calendario, visitas e escolas vinculadas.</div>
+        </div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-g btn-sm" type="button" onclick="showPage('supervisors')">Voltar para supervisores</button>
         <button class="btn btn-p btn-sm" id="refreshSupervisorSheetBtn" type="button" onclick="syncCurrentSupervisorVisitSource()" hidden>Atualizar planilha</button>
         <button class="btn btn-g btn-sm" type="button" onclick="document.getElementById('supervisorRecordVisitForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">Registrar visita</button>
       </div>
@@ -651,73 +496,92 @@
   <div class="page" id="page-assets">
     <div class="ph">
       <div>
-        <div class="pt">Inventario de Ativos</div>
-        <div class="ps">Equipamentos, quantidades reais e alertas por escola, com leitura mais forte do inventario.</div>
+        <div class="pt">Inventario</div>
+        <div class="ps">Mapa vivo dos equipamentos por escola, com volume real, criticidade e qualidade da base em primeiro plano.</div>
       </div>
     </div>
-    <div class="setechub-command-grid inventory-command-grid">
-      <section class="box">
+
+    <section class="inventory-hero">
+      <div class="inventory-hero-main">
+        <div class="inventory-kicker">Centro de inventario</div>
+        <h1 id="inventoryHeroTitle">Leitura do parque em tempo real.</h1>
+        <p id="inventoryHeroText">Use os filtros para chegar na escola, familia ou status certo sem perder a visao regional.</p>
+        <div id="inventoryHeroStats" class="inventory-hero-stats"></div>
+      </div>
+      <div class="inventory-hero-side">
+        <div id="inventoryHeroScore" class="inventory-risk-card"></div>
+        <div id="inventoryFamilyStrip" class="inventory-family-strip"></div>
+      </div>
+    </section>
+
+    <section class="box inventory-filter-shell">
+      <div class="inventory-filter-head">
+        <div>
+          <div class="ct">Filtros do inventario</div>
+          <div class="cs">Pesquise, recorte por escola e alterne status sem sair do painel.</div>
+        </div>
+        <div class="setechub-toolbar inventory-status-toolbar">
+          <button class="btn btn-g btn-sm active-filter" data-inventory-status="todos" type="button">Todos</button>
+          <button class="btn btn-g btn-sm" data-inventory-status="alerta" type="button">Alertas</button>
+          <button class="btn btn-g btn-sm" data-inventory-status="criticos" type="button">Criticos</button>
+          <button class="btn btn-g btn-sm" data-inventory-status="ok" type="button">Ok</button>
+        </div>
+      </div>
+      <div class="inventory-filter-grid">
+        <input class="fi" id="inventorySearchInput" placeholder="Buscar escola, equipamento, observacao...">
+        <select class="fi" id="inventorySchoolSelect">
+          <option value="todas">Todas as escolas</option>
+        </select>
+        <select class="fi" id="inventoryCategorySelect">
+          <option value="todas">Todas as categorias</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="inventory-workspace-grid">
+      <section class="box inventory-focus-card">
         <div class="bh">
-          <div><div class="ct">Foco do inventario</div><div class="cs">Escolha uma escola e leia o parque dela de forma consolidada.</div></div>
+          <div><div class="ct">Escola em foco</div><div class="cs">Resumo consolidado do parque, alertas e base importada.</div></div>
         </div>
         <div id="inventoryFocusPanel" class="stack-list"></div>
       </section>
-      <section class="box">
+      <section class="box inventory-ranking-card">
         <div class="bh">
-          <div><div class="ct">Filtros do inventario</div><div class="cs">Corte por escola, status e categoria sem perder o volume real.</div></div>
-        </div>
-        <div class="setechub-action-col">
-          <input class="fi" id="inventorySearchInput" placeholder="Buscar escola, equipamento, observacao...">
-          <select class="fi" id="inventorySchoolSelect">
-            <option value="todas">Todas as escolas</option>
-          </select>
-          <select class="fi" id="inventoryCategorySelect">
-            <option value="todas">Todas as categorias</option>
-          </select>
-          <div class="setechub-toolbar">
-            <button class="btn btn-g btn-sm active-filter" data-inventory-status="todos" type="button">Todos</button>
-            <button class="btn btn-g btn-sm" data-inventory-status="alerta" type="button">Alertas</button>
-            <button class="btn btn-g btn-sm" data-inventory-status="criticos" type="button">Criticos</button>
-            <button class="btn btn-g btn-sm" data-inventory-status="ok" type="button">Ok</button>
-          </div>
-        </div>
-      </section>
-      <section class="box">
-        <div class="bh">
-          <div><div class="ct">Escolas com maior carga</div><div class="cs">Ranking por quantidade e alerta para chegar mais rapido no que importa.</div></div>
+          <div><div class="ct">Prioridade por escola</div><div class="cs">Ranking ordenado por alerta, defeito e volume total.</div></div>
         </div>
         <div id="inventorySchoolRanking" class="stack-list"></div>
       </section>
     </div>
+
     <div class="setechub-two-col">
-      <div class="box">
+      <div class="box inventory-detail-card">
         <div class="bh">
-          <div><div class="ct">Detalhe do inventario</div><div class="cs">Tabela principal da escola em foco com totais e alertas por equipamento.</div></div>
+          <div><div class="ct">Familias de equipamentos</div><div class="cs">Tabela principal da escola em foco com totais, leitura e observacoes.</div></div>
         </div>
         <div id="inventoryDetailTable" class="setechub-table-wrap"></div>
       </div>
-      <div class="box">
+      <div class="box inventory-category-card">
         <div class="bh">
-          <div><div class="ct">Categorias da escola</div><div class="cs">Distribuicao do parque por notebooks, tablets, desktops, rede e afins.</div></div>
+          <div><div class="ct">Distribuicao da escola</div><div class="cs">Categorias com quantidade e alertas para comparar o peso de cada grupo.</div></div>
         </div>
         <div id="inventoryCategoryTable" class="setechub-table-wrap"></div>
       </div>
     </div>
-    <div class="box">
+    <div class="box inventory-quality-card">
       <div class="bh">
-        <div><div class="ct">Qualidade do inventario</div><div class="cs">Mostra o quanto a base esta consolidada e onde o dado ainda esta fraco.</div></div>
+        <div><div class="ct">Saude da base</div><div class="cs">Indicadores de nomes consolidados, familias criticas e pontos que ainda precisam de limpeza.</div></div>
       </div>
       <div id="inventoryQualityGrid" class="setechub-monitor-grid"></div>
     </div>
-    <div class="box">
+    <div class="box inventory-issues-card">
       <div class="bh">
-        <div><div class="ct">Inconsistencias da escola em foco</div><div class="cs">Mostra familias com nome ruim, status misto, defeitos ou muitas variacoes.</div></div>
+        <div><div class="ct">Pontos de atencao</div><div class="cs">Familias com dado fraco, variacao de nome, status misto ou defeito real.</div></div>
       </div>
       <div id="inventoryIssuesList" class="stack-list"></div>
     </div>
-    <div class="box">
+    <div class="box inventory-manage-card">
       <div class="bh">
-        <div><div class="ct">Equipamentos por escola</div><div class="cs">Agora o inventario aparece consolidado por tipo, quantidade e criticidade.</div></div>
+        <div><div class="ct">Entrada manual</div><div class="cs">Adicione um item ou importe um lote rapido para atualizar a escola selecionada.</div></div>
       </div>
       <form id="schoolAssetForm" class="setechub-form setechub-form-school-asset">
         <select class="fi" id="schoolAssetSchool"></select>
@@ -878,7 +742,7 @@
       <div class="setechub-toolbar" id="directoryFilterBar">
         <button class="btn btn-g btn-sm active-filter" data-directory-filter="todos" type="button">Todos</button>
         <button class="btn btn-g btn-sm" data-directory-filter="supervisao" type="button">Supervisao</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="pecs" type="button">PECs</button>
+        <button class="btn btn-g btn-sm dormant-page nav-disabled" data-directory-filter="pecs" type="button" disabled>PECs</button>
         <button class="btn btn-g btn-sm" data-directory-filter="tecnologia" type="button">Tecnologia</button>
         <button class="btn btn-g btn-sm" data-directory-filter="gestao" type="button">Gestao</button>
       </div>
@@ -910,6 +774,7 @@
         <div><div class="ct">Usuarios e permissoes</div><div class="cs">Crie acessos locais por perfil. No Supabase, estes perfis viram regras de acesso.</div></div>
       </div>
       <form id="userForm" class="admin-user-form">
+        <input id="editingUserId" type="hidden">
         <input class="fi" id="userName" placeholder="Nome exibido">
         <input class="fi" id="userLogin" placeholder="Login">
         <input class="fi" id="userPin" placeholder="PIN">
@@ -922,10 +787,40 @@
           <option value="admin">Administrador</option>
         </select>
         <select class="fi" id="userSupervisorName"></select>
-        <button class="btn btn-p" type="submit">Criar usuario</button>
+        <button class="btn btn-g" id="randomUserPinBtn" type="button">PIN aleatorio</button>
+        <button class="btn btn-p" id="userSubmitBtn" type="submit">Criar usuario</button>
+        <button class="btn btn-g" id="cancelUserEditBtn" type="button" hidden>Cancelar edicao</button>
       </form>
       <div class="admin-panel-note">Supervisor enxerga Supervisores e Escolas do proprio vinculo. PEC e Dirigente visualizam a base. SEINTEC, CTC e administrador podem editar dados.</div>
       <div id="userList" class="stack-list"></div>
+    </div>
+    <div class="box admin-module" data-admin-only>
+      <div class="bh">
+        <div><div class="ct">Escolas e vinculos</div><div class="cs">Edite escolas, responsaveis e resolva duplicidades sem abrir o codigo.</div></div>
+      </div>
+      <form id="adminSchoolForm" class="admin-school-form">
+        <input id="adminSchoolId" type="hidden">
+        <select class="fi" id="adminSchoolPicker">
+          <option value="">Selecionar escola para editar</option>
+        </select>
+        <input class="fi" id="adminSchoolName" placeholder="Nome da escola">
+        <input class="fi" id="adminSchoolCie" placeholder="CIE">
+        <input class="fi" id="adminSchoolZone" placeholder="Municipio">
+        <select class="fi" id="adminSchoolStatus">
+          <option value="estavel">Estavel</option>
+          <option value="atencao">Atencao</option>
+          <option value="critico">Critico</option>
+        </select>
+        <select class="fi" id="adminSchoolSupervisorName"></select>
+        <button class="btn btn-p" type="submit">Salvar escola</button>
+        <button class="btn btn-g" id="clearAdminSchoolBtn" type="button">Nova escola</button>
+      </form>
+      <div class="admin-merge-row">
+        <select class="fi" id="adminMergePrimary"></select>
+        <select class="fi" id="adminMergeDuplicate"></select>
+        <button class="btn btn-d" id="mergeSchoolsBtn" type="button">Unificar duplicada</button>
+      </div>
+      <div id="adminSchoolList" class="stack-list"></div>
     </div>
     <div class="box admin-module" data-admin-only>
       <div class="bh">
@@ -964,6 +859,12 @@
         </div>
         <div id="diagnosticList" class="stack-list"></div>
       </div>
+      <div class="box admin-module">
+        <div class="bh">
+          <div><div class="ct">Importacoes da base</div><div class="cs">Resumo informativo para administracao. Fora do fluxo operacional.</div></div>
+        </div>
+        <div id="adminImportInfo" class="stack-list"></div>
+      </div>
     </div>
   </div>
 
@@ -987,12 +888,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./school-data.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./storage.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./app.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./render.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./api.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./actions.js?v=20260430-supervisor-indicators-aviso"></script>
-<script src="./bootstrap.js?v=20260430-supervisor-indicators-aviso"></script>
+<script src="./school-data.js?v=20260504-admin-tools"></script>
+<script src="./storage.js?v=20260504-admin-tools"></script>
+<script src="./app.js?v=20260504-admin-tools"></script>
+<script src="./render.js?v=20260504-admin-tools"></script>
+<script src="./api.js?v=20260504-admin-tools"></script>
+<script src="./actions.js?v=20260504-admin-tools"></script>
+<script src="./bootstrap.js?v=20260504-admin-tools"></script>
 </body>
 </html>

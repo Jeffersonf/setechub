@@ -2740,10 +2740,29 @@ select:focus-visible,
 }
 .admin-user-form{
   display:grid;
-  grid-template-columns:1.2fr 1fr 1fr .8fr auto;
+  grid-template-columns:1.2fr 1fr .75fr .85fr 1fr auto auto;
   gap:8px;
   padding:12px 16px;
   border-top:1px solid var(--bd);
+}
+.admin-school-form{
+  display:grid;
+  grid-template-columns:1.25fr 1.25fr .72fr .92fr .78fr 1fr auto auto;
+  gap:8px;
+  padding:12px 16px;
+  border-top:1px solid var(--bd);
+}
+.admin-merge-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+  gap:8px;
+  padding:0 16px 12px;
+}
+.admin-school-form .fi,
+.admin-merge-row .fi{
+  min-width:0;
+  padding:8px 10px;
+  font-size:12px;
 }
 .admin-panel-note{
   margin:0 16px 10px;
@@ -2765,7 +2784,18 @@ select:focus-visible,
   border-bottom:1px solid var(--bd);
 }
 .admin-user-main{min-width:0;}
-.admin-user-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.admin-user-main strong,
+.admin-user-main .sync-meta{
+  overflow-wrap:anywhere;
+}
+.admin-user-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+  flex-shrink:0;
+}
 .admin-role-select{width:112px;padding:7px 9px;font-size:12px;}
 @media(max-width:700px){
   .settings-simple-grid,
@@ -2797,8 +2827,12 @@ select:focus-visible,
   .import-review-list{
     max-height:none;
   }
-  .admin-user-form{grid-template-columns:1fr 1fr;}
-  .admin-user-form button{grid-column:1/-1;}
+  .admin-user-form,
+  .admin-school-form,
+  .admin-merge-row{grid-template-columns:1fr;}
+  .admin-user-form button,
+  .admin-school-form button,
+  .admin-merge-row button{width:100%;}
   .admin-user-row{align-items:flex-start;flex-direction:column;}
   .admin-user-actions{width:100%;justify-content:space-between;}
   .admin-role-select{flex:1;width:auto;}
