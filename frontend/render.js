@@ -418,6 +418,7 @@ function dashboardCardRelevantForRole(page) {
   const role = currentUserRole();
   if (role === 'ctc') return page === 'ctc';
   if (role === 'supervisor') return ['schools', 'supervisors'].includes(page);
+  if (role === 'seom') return ['schools', 'assets'].includes(page);
   if (role === 'dirigente') return page !== 'admin';
   if (role === 'pec') return false;
   return true;
@@ -1164,6 +1165,12 @@ function renderSchoolDetail() {
   const pendingImports = imports.filter((item) => item.reviewStatus === 'pending');
   const assets = state.schoolAssets.filter((item) => item.school === currentSchoolDetail);
   const network = schoolNetworkRecord(currentSchoolDetail);
+  const responsibleSupervisors = (state.supervisors || [])
+    .filter((supervisor) => (supervisor.schools || []).includes(currentSchoolDetail))
+    .map((supervisor) => supervisor.name);
+  const responsibleSupervisorText = responsibleSupervisors.length
+    ? responsibleSupervisors.join(', ')
+    : 'Sem supervisor vinculado';
   const inventoryRows = schoolInventoryRows(currentSchoolDetail);
   const inventoryCategories = Object.values(schoolInventoryCategorySummary(currentSchoolDetail)).sort((a, b) => b.units - a.units);
   const openCalls = state.calls.filter((item) => item.school === currentSchoolDetail && item.status !== 'resolvido');
@@ -1205,6 +1212,7 @@ function renderSchoolDetail() {
           ${school.fixedName ? '<span class="diag-pill">Oficial</span>' : ''}
           <span class="diag-pill ${toneBySchool(school.status)}">${esc(badgeText(school.status))}</span>
           <span class="diag-pill ${riskTone}">${esc(riskLabel)}</span>
+          <span class="diag-pill">${esc(responsibleSupervisorText)}</span>
         </div>
       </div>
       <div class="school-record-hero-actions">
@@ -1238,6 +1246,10 @@ function renderSchoolDetail() {
         <strong>${esc(badgeText(school.status))}</strong>
       </div>
       <div class="school-record-info-row">
+        <span>Supervisao</span>
+        <strong>${esc(responsibleSupervisorText)}</strong>
+      </div>
+      <div class="school-record-info-row">
         <span>Ficha</span>
         <strong>${esc(String(completion))}%</strong>
       </div>
@@ -1247,6 +1259,15 @@ function renderSchoolDetail() {
       <p>${esc(riskLabel)}. ${esc(openCalls.length ? `${openCalls.length} chamado(s) ativo(s).` : 'Sem chamado ativo.')} ${esc(alertUnits ? `${alertUnits} unidade(s) do inventario em alerta.` : 'Inventario sem alerta no resumo.')}</p>
     </div>
   ` : '<div class="sync-empty">Nenhuma escola selecionada.</div>';
+  const schoolSupervisorSelect = document.getElementById('schoolSupervisorSelect');
+  if (schoolSupervisorSelect) {
+    schoolSupervisorSelect.innerHTML = '<option value="">Sem supervisor vinculado</option>' + (state.supervisors || [])
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((supervisor) => `<option value="${esc(supervisor.name)}">${esc(supervisor.name)}</option>`)
+      .join('');
+    schoolSupervisorSelect.value = responsibleSupervisors[0] || '';
+  }
 
   document.getElementById('schoolDetailActions').innerHTML = school ? [
     defectUnits > 0
@@ -1541,7 +1562,6 @@ function renderSupervisors() {
       </div>
     `).join('') || '<div class="sync-empty">Nenhum supervisor cadastrado.</div>';
   }
-  renderSupervisorAdminEditor(stats);
 
   const overviewPanel = document.getElementById('supervisorOverviewPanel');
   if (overviewPanel) {
@@ -1783,37 +1803,6 @@ function renderSupervisors() {
         </tbody>
       </table>
     ` : '<div class="sync-empty">Nenhuma visita registrada neste recorte.</div>';
-  }
-}
-
-function renderSupervisorAdminEditor(stats = supervisorStats()) {
-  const select = document.getElementById('supervisorAdminSelect');
-  if (!select) return;
-  if (!canManageUsers()) return;
-  const supervisors = stats.map((item) => item.supervisor);
-  if (!currentSupervisorAdmin) currentSupervisorAdmin = supervisors[0]?.name || '';
-  select.innerHTML = supervisors.map((supervisor) => `<option value="${esc(supervisor.name)}">${esc(supervisor.name)}</option>`).join('');
-  select.value = currentSupervisorAdmin;
-  const stat = stats.find((item) => item.supervisor.name === currentSupervisorAdmin) || stats[0];
-  const supervisor = stat?.supervisor;
-  if (!supervisor) return;
-  const metrics = supervisorSheetMetrics(stat);
-  const setValue = (id, value) => {
-    const node = document.getElementById(id);
-    if (node && node.value !== String(value ?? '')) node.value = value ?? '';
-  };
-  setValue('supervisorAdminAssigned', metrics.assigned);
-  setValue('supervisorAdminWeeklyGoal', metrics.weeklyGoal);
-  setValue('supervisorAdminWeeklyVisits', metrics.weeklyVisits);
-  setValue('supervisorAdminMonthlyGoal', metrics.monthlyGoal);
-  setValue('supervisorAdminMonthlyVisits', metrics.monthlyVisits);
-  setValue('supervisorAdminCurrentWeek', supervisor.currentWeek || '');
-  setValue('supervisorAdminWeeklyIndicator', metrics.weeklyIndicator);
-  setValue('supervisorAdminMonthlyIndicator', metrics.monthlyIndicator);
-  setValue('supervisorAdminSourceUrl', supervisor.visitSourceUrl || '');
-  const schoolsNode = document.getElementById('supervisorAdminSchools');
-  if (schoolsNode && schoolsNode.value === '') {
-    schoolsNode.value = (supervisor.schools || []).join('\n');
   }
 }
 

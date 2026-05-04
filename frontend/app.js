@@ -12,7 +12,6 @@ let currentDirectoryFilter = 'todos';
 let currentSchoolZoneFilter = 'todas';
 let currentSchoolSort = 'prioridade';
 let currentSupervisorFilter = 'todos';
-let currentSupervisorAdmin = '';
 let currentAssetFilter = 'todos';
 let currentImportFilter = 'todos';
 let currentImportSchoolContext = '';
@@ -39,6 +38,7 @@ const ROLE_LABELS = {
   admin: 'Administrador',
   dirigente: 'Dirigente',
   seintec: 'SEINTEC',
+  seom: 'SEOM',
   ctc: 'CTC',
   pec: 'PEC',
   supervisor: 'Supervisor'
@@ -257,6 +257,8 @@ function visibleNavigationPages() {
     ? new Set(['info', 'settings'])
     : isSupervisorUser()
       ? new Set(['dashboard', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'info', 'settings'])
+      : currentUserRole() === 'seom'
+        ? new Set(['dashboard', 'schools', 'school-record', 'assets', 'info', 'settings'])
       : currentUserRole() === 'ctc'
         ? new Set(['dashboard', 'ctc', 'info', 'settings'])
       : currentUserRole() === 'dirigente'

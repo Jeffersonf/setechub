@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260504-supervisor-admin">
-<link rel="stylesheet" href="./setechub.css?v=20260504-supervisor-admin">
+<link rel="stylesheet" href="./styles.css?v=20260504-seom-user">
+<link rel="stylesheet" href="./setechub.css?v=20260504-seom-user">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -135,12 +135,6 @@
       <div id="dashboardRoleCards" class="dashboard-role-card-grid"></div>
     </section>
 
-    <section class="dashboard-card-section">
-      <div class="dashboard-section-head">
-        <div><div class="ct">Precisa de atencao</div><div class="cs">Atalhos para problemas ou recortes relevantes do seu acesso.</div></div>
-      </div>
-      <div id="dashboardAttentionCards" class="dashboard-attention-grid"></div>
-    </section>
   </div>
 
   <div class="page" id="page-ctc">
@@ -166,7 +160,7 @@
         <button class="btn btn-p" type="submit">Agendar</button>
       </form>
     </div>
-    <div class="setechub-two-col">
+    <div class="setechub-two-col ctc-agenda-grid">
       <div class="box">
         <div class="bh">
           <div><div class="ct">Agenda Bruno</div><div class="cs">Visitas CTC programadas.</div></div>
@@ -323,6 +317,10 @@
           <div><div class="ct">Dados principais</div><div class="cs">Identidade, contatos e situacao atual da unidade.</div></div>
         </div>
         <div id="schoolDetailExecutive" class="stack-list"></div>
+        <form id="schoolSupervisorForm" class="school-supervisor-form" data-admin-only>
+          <select class="fi" id="schoolSupervisorSelect"></select>
+          <button class="btn btn-p btn-sm" type="submit">Trocar supervisor</button>
+        </form>
       </section>
       <section class="box school-record-primary-card">
         <div class="bh">
@@ -390,35 +388,6 @@
         </div>
       </div>
       <div id="supervisorPanelGrid" class="supervisor-sheet-panel"></div>
-    </div>
-    <div class="box" data-admin-only>
-      <div class="bh">
-        <div><div class="ct">Edicao administrativa</div><div class="cs">Ajuste manual quando a planilha vier incompleta ou quando a atribuicao mudar.</div></div>
-      </div>
-      <form id="supervisorAdminForm" class="supervisor-admin-form">
-        <select class="fi" id="supervisorAdminSelect"></select>
-        <input class="fi" id="supervisorAdminAssigned" type="number" min="0" step="1" placeholder="Escolas">
-        <input class="fi" id="supervisorAdminWeeklyGoal" type="number" min="0" step="1" placeholder="Meta semanal">
-        <input class="fi" id="supervisorAdminWeeklyVisits" type="number" min="0" step="1" placeholder="Visitas semana">
-        <input class="fi" id="supervisorAdminMonthlyGoal" type="number" min="0" step="1" placeholder="Meta mensal">
-        <input class="fi" id="supervisorAdminMonthlyVisits" type="number" min="0" step="1" placeholder="Visitas mes">
-        <input class="fi" id="supervisorAdminCurrentWeek" type="number" min="0" step="1" placeholder="Semana">
-        <select class="fi" id="supervisorAdminWeeklyIndicator">
-          <option value="verde">Semana verde</option>
-          <option value="amarelo">Semana amarelo</option>
-          <option value="vermelho">Semana vermelho</option>
-          <option value="aviso">Semana aviso</option>
-        </select>
-        <select class="fi" id="supervisorAdminMonthlyIndicator">
-          <option value="verde">Mes verde</option>
-          <option value="amarelo">Mes amarelo</option>
-          <option value="vermelho">Mes vermelho</option>
-          <option value="aviso">Mes aviso</option>
-        </select>
-        <input class="fi" id="supervisorAdminSourceUrl" placeholder="Link da planilha">
-        <textarea class="fi" id="supervisorAdminSchools" placeholder="Escolas responsaveis, uma por linha"></textarea>
-        <button class="btn btn-p" type="submit">Salvar supervisor</button>
-      </form>
     </div>
     <div class="box">
       <div class="bh">
@@ -798,6 +767,7 @@
           <option value="supervisor">Supervisor</option>
           <option value="dirigente">Dirigente</option>
           <option value="seintec">SEINTEC</option>
+          <option value="seom">SEOM</option>
           <option value="ctc">CTC</option>
           <option value="pec">PEC</option>
           <option value="admin">Administrador</option>
@@ -807,7 +777,7 @@
         <button class="btn btn-p" id="userSubmitBtn" type="submit">Criar usuario</button>
         <button class="btn btn-g" id="cancelUserEditBtn" type="button" hidden>Cancelar edicao</button>
       </form>
-      <div class="admin-panel-note">Supervisor enxerga Supervisores e Escolas do proprio vinculo. PEC e Dirigente visualizam a base. SEINTEC, CTC e administrador podem editar dados.</div>
+      <div class="admin-panel-note">Supervisor enxerga Supervisores e Escolas do proprio vinculo. SEOM consulta Escolas e Inventario. PEC e Dirigente visualizam a base. SEINTEC, CTC e administrador podem editar dados.</div>
       <div id="userList" class="stack-list"></div>
     </div>
     <div class="box admin-module" data-admin-only>
@@ -904,12 +874,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="./school-data.js?v=20260504-supervisor-admin"></script>
-<script src="./storage.js?v=20260504-supervisor-admin"></script>
-<script src="./app.js?v=20260504-supervisor-admin"></script>
-<script src="./render.js?v=20260504-supervisor-admin"></script>
-<script src="./api.js?v=20260504-supervisor-admin"></script>
-<script src="./actions.js?v=20260504-supervisor-admin"></script>
-<script src="./bootstrap.js?v=20260504-supervisor-admin"></script>
+<script src="./school-data.js?v=20260504-seom-user"></script>
+<script src="./storage.js?v=20260504-seom-user"></script>
+<script src="./app.js?v=20260504-seom-user"></script>
+<script src="./render.js?v=20260504-seom-user"></script>
+<script src="./api.js?v=20260504-seom-user"></script>
+<script src="./actions.js?v=20260504-seom-user"></script>
+<script src="./bootstrap.js?v=20260504-seom-user"></script>
 </body>
 </html>

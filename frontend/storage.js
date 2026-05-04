@@ -162,26 +162,33 @@ const SCHOOL_MASTER = [
 
 function mergeSchools(baseSchools, savedSchools) {
   const baseMap = new Map(baseSchools.map((item) => [normalizeKey(item.name), item]));
-  const merged = [];
+  const mergedMap = new Map();
   savedSchools.forEach((item) => {
     const canonicalName = canonicalSchoolName(item.name);
     const key = normalizeKey(canonicalName);
     if (baseMap.has(key)) {
       const official = baseMap.get(key);
-      merged.push({
+      const existing = mergedMap.get(key) || {};
+      mergedMap.set(key, {
+        ...existing,
         ...item,
         name: official.name,
-        cie: item.cie || official.cie || '',
-        zone: item.zone || official.zone,
-        notes: item.notes || official.notes,
+        cie: existing.cie || item.cie || official.cie || '',
+        zone: existing.zone || item.zone || official.zone,
+        status: existing.status || item.status || official.status,
+        notes: existing.notes || item.notes || official.notes,
         fixedName: true
       });
       baseMap.delete(key);
       return;
     }
-    merged.push(item);
+    mergedMap.set(key, {
+      ...(mergedMap.get(key) || {}),
+      ...item,
+      name: canonicalName
+    });
   });
-  return [...merged, ...Array.from(baseMap.values())];
+  return [...Array.from(mergedMap.values()), ...Array.from(baseMap.values())];
 }
 
 function defaultSchoolProfiles(schools) {
@@ -418,6 +425,14 @@ function defaultUsers(supervisors, pecs = defaultPecs()) {
       login: 'Elcio',
       pin: '1234',
       role: 'seintec',
+      active: true
+    },
+    {
+      id: 'user-seom-nelio',
+      name: 'Nelio',
+      login: 'Nelio',
+      pin: '1234',
+      role: 'seom',
       active: true
     },
     {
@@ -711,7 +726,12 @@ function mergeState(saved) {
   const savedCalls = Array.isArray(repaired.calls)
     ? repaired.calls.map((item) => ({ ...item, school: canonicalSchoolName(item.school) || item.school }))
     : base.calls;
-  const savedSupervisors = Array.isArray(repaired.supervisors) ? repaired.supervisors : [];
+  const savedSupervisors = Array.isArray(repaired.supervisors)
+    ? repaired.supervisors.map((supervisor) => ({
+      ...supervisor,
+      schools: Array.from(new Set((supervisor.schools || []).map((school) => canonicalSchoolName(school)).filter(Boolean)))
+    }))
+    : [];
   const savedSupervisorVisits = Array.isArray(repaired.supervisorVisits)
     ? repaired.supervisorVisits.map((item) => ({ ...item, school: canonicalSchoolName(item.school) || item.school }))
     : [];
