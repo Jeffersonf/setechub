@@ -637,6 +637,7 @@ async function syncSupervisorSourceList(sources, options = {}) {
 async function syncSupervisorVisitSources(options = {}) {
   const sources = Array.isArray(SUPERVISOR_VISIT_SOURCES) ? SUPERVISOR_VISIT_SOURCES : [];
   if (!sources.length) return;
+  currentViewDate = new Date();
   const silent = options.silent === true;
   const toast = silent ? null : showToast('Lendo planilha dos supervisores...', 'syncing', { persist: true });
   const { importedCount, errorCount } = await syncSupervisorSourceList(sources, { refresh: false });

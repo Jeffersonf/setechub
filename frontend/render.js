@@ -1642,6 +1642,34 @@ function supervisorOfficialWeeklyVisits(supervisor) {
   return Number.isFinite(Number(supervisor.weeklyVisits)) ? Number(supervisor.weeklyVisits) : 0;
 }
 
+function supervisorWeekOfMonth(date) {
+  return Math.ceil(Number(date.getDate() || 1) / 7);
+}
+
+function supervisorLastWeekOfViewMonth() {
+  return supervisorWeekOfMonth(new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() + 1, 0));
+}
+
+function supervisorVisitsInViewWeek(visits, supervisorName, weekNumber) {
+  return (visits || []).filter((visit) => {
+    if (visit.supervisor !== supervisorName) return false;
+    const date = new Date(`${visit.date}T00:00:00`);
+    return date.getFullYear() === currentViewDate.getFullYear() &&
+      date.getMonth() === currentViewDate.getMonth() &&
+      supervisorWeekOfMonth(date) === weekNumber;
+  }).length;
+}
+
+function supervisorIndicatorFromGoal(visits, goal) {
+  if (!Number(goal || 0)) return 'aviso';
+  if (Number(visits || 0) >= Number(goal || 0)) return 'verde';
+  return Number(visits || 0) > 0 ? 'amarelo' : 'vermelho';
+}
+
+function supervisorWeeklyVisitsForView(supervisor, fallback) {
+  return supervisorViewMonthIsCurrent() ? supervisorOfficialWeeklyVisits(supervisor) : fallback;
+}
+
 function supervisorGoalPct(visits, goal) {
   const total = Number(goal || 0);
   if (!total) return 0;
@@ -1653,7 +1681,8 @@ function supervisorSheetMetrics(item) {
   const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools?.length || supervisor.schools?.length || 0);
   const weeklyGoal = Number(supervisor.weeklyGoal || 0);
   const monthlyGoal = Number(supervisor.monthlyGoal || assigned || 1);
-  const weeklyVisits = supervisorOfficialWeeklyVisits(supervisor);
+  const fallbackWeeklyVisits = Number.isFinite(Number(item.weeklyVisitFallback)) ? Number(item.weeklyVisitFallback) : 0;
+  const weeklyVisits = supervisorWeeklyVisitsForView(supervisor, fallbackWeeklyVisits);
   const fallbackVisits = Number.isFinite(Number(item.monthlyVisitFallback)) ? Number(item.monthlyVisitFallback) : item.visits || 0;
   const monthlyVisits = supervisorMonthlyVisitsForView(supervisor, fallbackVisits);
   return {
@@ -1663,8 +1692,8 @@ function supervisorSheetMetrics(item) {
     weeklyVisits,
     monthlyVisits,
     pendingMonth: Math.max(0, monthlyGoal - monthlyVisits),
-    weeklyIndicator: supervisor.weeklyIndicator || 'aviso',
-    monthlyIndicator: supervisor.monthlyIndicator || 'aviso'
+    weeklyIndicator: supervisorViewMonthIsCurrent() ? supervisor.weeklyIndicator || 'aviso' : supervisorIndicatorFromGoal(weeklyVisits, weeklyGoal),
+    monthlyIndicator: supervisorViewMonthIsCurrent() ? supervisor.monthlyIndicator || 'aviso' : supervisorIndicatorFromGoal(monthlyVisits, monthlyGoal)
   };
 }
 
@@ -1707,8 +1736,6 @@ function renderSupervisors() {
   }
   const visitDate = document.getElementById('visitDate');
   if (visitDate && !visitDate.value) visitDate.value = new Date().toISOString().slice(0, 10);
-  const monthPicker = document.getElementById('supervisorMonthPicker');
-  if (monthPicker && monthPicker.value !== viewMonthKey) monthPicker.value = viewMonthKey;
 
   const panelGrid = document.getElementById('supervisorPanelGrid');
   if (panelGrid) {
@@ -1720,20 +1747,22 @@ function renderSupervisors() {
     const sheetRows = stats.map((item) => {
       const supervisor = item.supervisor;
       const localCount = monthVisits.filter((visit) => visit.supervisor === supervisor.name).length;
+      const currentWeek = supervisorViewMonthIsCurrent() ? Number(supervisor.currentWeek || 0) : supervisorLastWeekOfViewMonth();
+      const localWeekCount = supervisorVisitsInViewWeek(visits, supervisor.name, currentWeek);
       const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools.length || 0);
       const weeklyGoal = Number(supervisor.weeklyGoal || 0);
       const monthlyGoal = Number(supervisor.monthlyGoal || item.assignedSchools.length || 1);
-      const weeklyVisits = supervisorOfficialWeeklyVisits(supervisor);
+      const weeklyVisits = supervisorWeeklyVisitsForView(supervisor, localWeekCount);
       const monthlyVisits = supervisorMonthlyVisitsForView(supervisor, localCount);
-      const weeklyIndicator = supervisor.weeklyIndicator || 'aviso';
-      const monthlyIndicator = supervisor.monthlyIndicator || 'aviso';
+      const weeklyIndicator = supervisorViewMonthIsCurrent() ? supervisor.weeklyIndicator || 'aviso' : supervisorIndicatorFromGoal(weeklyVisits, weeklyGoal);
+      const monthlyIndicator = supervisorViewMonthIsCurrent() ? supervisor.monthlyIndicator || 'aviso' : supervisorIndicatorFromGoal(monthlyVisits, monthlyGoal);
       return {
         item,
         supervisor,
         assigned,
         weeklyGoal,
         monthlyGoal,
-        currentWeek: Number(supervisor.currentWeek || 0),
+        currentWeek,
         weeklyVisits,
         monthlyVisits,
         weeklyIndicator,
@@ -1797,7 +1826,8 @@ function renderSupervisors() {
             const date = new Date(`${visit.date}T00:00:00`);
             return visit.supervisor === item.supervisor.name && date.getFullYear() === currentViewDate.getFullYear() && date.getMonth() === currentViewDate.getMonth();
           }).length;
-          const metrics = supervisorSheetMetrics({ ...item, monthlyVisitFallback: selectedMonthCount });
+          const selectedWeekCount = supervisorVisitsInViewWeek(visits, item.supervisor.name, supervisorViewMonthIsCurrent() ? Number(item.supervisor.currentWeek || 0) : supervisorLastWeekOfViewMonth());
+          const metrics = supervisorSheetMetrics({ ...item, monthlyVisitFallback: selectedMonthCount, weeklyVisitFallback: selectedWeekCount });
           const monthlyIndicator = metrics.monthlyIndicator;
           return `
             <div class="setechub-head">
@@ -2087,9 +2117,11 @@ function renderSupervisorRecord() {
     const date = new Date(`${visit.date}T00:00:00`);
     return date.getFullYear() === year && date.getMonth() === month;
   });
+  const selectedWeek = supervisorViewMonthIsCurrent() ? Number(supervisor.currentWeek || 0) : supervisorLastWeekOfViewMonth();
+  const selectedWeekVisits = supervisorVisitsInViewWeek(allVisits, supervisor.name, selectedWeek);
   const visitedSchoolSet = new Set(monthVisits.map((visit) => visit.school));
   const pendingSchools = selectedStat.assignedSchools.filter((school) => !visitedSchoolSet.has(school));
-  const sheetMetrics = supervisorSheetMetrics({ ...selectedStat, monthlyVisitFallback: monthVisits.length });
+  const sheetMetrics = supervisorSheetMetrics({ ...selectedStat, monthlyVisitFallback: monthVisits.length, weeklyVisitFallback: selectedWeekVisits });
   const monthlyGoal = sheetMetrics.monthlyGoal;
   const weeklyGoal = sheetMetrics.weeklyGoal;
   const monthlyVisitCount = sheetMetrics.monthlyVisits;
@@ -2299,14 +2331,6 @@ function renderOfficialData() {
         </div>
       </div>
     `).join('');
-  }
-  const monthlyActions = document.getElementById('monthlySupervisorSheetActions');
-  if (monthlyActions) {
-    const links = supervisorMonthlySheetLinks();
-    monthlyActions.innerHTML = links.slice(0, 6).map((item) => `
-      <a class="btn btn-g btn-sm" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.label || `Planilha ${supervisorSheetMonthLabel(item.monthKey)}`)}</a>
-    `).join('');
-    monthlyActions.hidden = !links.length;
   }
   const monthlyList = document.getElementById('monthlySupervisorSheetsList');
   if (monthlyList) {

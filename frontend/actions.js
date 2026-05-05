@@ -535,13 +535,6 @@ function selectSupervisor(name) {
   saveUiContext();
 }
 
-function setSupervisorViewMonth(monthKey) {
-  if (!/^\d{4}-\d{2}$/.test(monthKey || '')) return;
-  const [year, month] = monthKey.split('-').map(Number);
-  currentViewDate = new Date(year, month - 1, 1);
-  refreshAll();
-}
-
 function openSupervisorRecord(name) {
   if (!canViewSupervisor(name)) {
     showPage('supervisors');
@@ -1852,7 +1845,6 @@ function setupEventListeners() {
   document.getElementById('checkSupabaseBtn')?.addEventListener('click', checkSupabaseConnection);
   document.getElementById('seedSupervisorVisitsBtn')?.addEventListener('click', addSupervisorTestVisits);
   document.getElementById('syncSupervisorSourcesBtn')?.addEventListener('click', syncSupervisorVisitSources);
-  document.getElementById('supervisorMonthPicker')?.addEventListener('change', (event) => setSupervisorViewMonth(event.target.value));
   document.getElementById('supervisorFullscreenBtn')?.addEventListener('click', toggleSupervisorPanelFullscreen);
   document.getElementById('refreshSupervisorSheetBtn')?.addEventListener('click', syncCurrentSupervisorVisitSource);
   document.getElementById('randomUserPinBtn')?.addEventListener('click', fillRandomUserPin);
