@@ -153,6 +153,55 @@ function fillRandomUserPin() {
   if (input) input.value = randomPin();
 }
 
+let pendingPinChangeUserId = '';
+
+function restrictPinInput(event) {
+  event.target.value = String(event.target.value || '').replace(/\D/g, '').slice(0, 4);
+}
+
+function showForcePinForm(user) {
+  pendingPinChangeUserId = user?.id || '';
+  const loginForm = document.getElementById('loginForm');
+  const forceForm = document.getElementById('forcePinForm');
+  const title = document.getElementById('loginTitle');
+  const intro = document.querySelector('.setup-auth-intro');
+  const error = document.getElementById('forcePinError');
+  if (loginForm) loginForm.hidden = true;
+  if (forceForm) forceForm.hidden = false;
+  if (title) title.textContent = 'Crie um novo PIN';
+  if (intro) intro.textContent = 'Seu acesso ainda usa o PIN padrão 1234. Escolha um novo PIN de 4 dígitos para continuar.';
+  if (error) {
+    error.textContent = '';
+    error.classList.remove('show');
+  }
+  document.getElementById('forcePinNew')?.focus();
+}
+
+function resetLoginPinForm() {
+  pendingPinChangeUserId = '';
+  const loginForm = document.getElementById('loginForm');
+  const forceForm = document.getElementById('forcePinForm');
+  const title = document.getElementById('loginTitle');
+  const intro = document.querySelector('.setup-auth-intro');
+  if (loginForm) loginForm.hidden = false;
+  if (forceForm) {
+    forceForm.hidden = true;
+    forceForm.reset();
+  }
+  if (title) title.textContent = 'Entrar no PainelURE';
+  if (intro) intro.textContent = 'Use seu nome de acesso e PIN. A base online vai substituir o armazenamento local nas próximas etapas.';
+}
+
+function completeLogin(user) {
+  sessionStorage.setItem(SESSION_KEY, 'ok');
+  sessionStorage.setItem(ACTIVE_USER_KEY, user.id);
+  setLoginVisible(false);
+  resetLoginPinForm();
+  currentPage = defaultPageForUser();
+  refreshAll();
+  showPage(currentPage);
+}
+
 function setUserEditMode(user = null) {
   const editingId = document.getElementById('editingUserId');
   const submit = document.getElementById('userSubmitBtn');
@@ -246,6 +295,7 @@ function loginNameExists(name) {
 function logoutToLogin() {
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(ACTIVE_USER_KEY);
+  resetLoginPinForm();
   const pinInput = document.getElementById('loginPin');
   const nameInput = document.getElementById('loginName');
   const error = document.getElementById('loginError');
@@ -1533,20 +1583,53 @@ function setupEventListeners() {
       }
     }
     if (user) {
-      sessionStorage.setItem(SESSION_KEY, 'ok');
-      sessionStorage.setItem(ACTIVE_USER_KEY, user.id);
-      setLoginVisible(false);
       error.textContent = '';
       error.classList.remove('show');
-      currentPage = defaultPageForUser();
-      refreshAll();
-      showPage(currentPage);
+      if (String(user.pin || '') === '1234') {
+        showForcePinForm(user);
+        return;
+      }
+      completeLogin(user);
       return;
     }
     error.textContent = loginNameExists(name)
       ? 'PIN incorreto para este usuario.'
       : 'Usuario nao encontrado. Confira o login ou nome cadastrado.';
     error.classList.add('show');
+  });
+
+  document.getElementById('forcePinForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const pin = normalizePin(document.getElementById('forcePinNew').value, '');
+    const confirmPin = normalizePin(document.getElementById('forcePinConfirm').value, '');
+    const error = document.getElementById('forcePinError');
+    const user = (state.users || []).find((item) => item.id === pendingPinChangeUserId);
+    const fail = (message) => {
+      if (!error) return;
+      error.textContent = message;
+      error.classList.add('show');
+    };
+    if (!user) {
+      fail('Sessao expirada. Entre novamente.');
+      resetLoginPinForm();
+      return;
+    }
+    if (pin.length !== 4 || confirmPin.length !== 4) {
+      fail('O novo PIN precisa ter exatamente 4 digitos.');
+      return;
+    }
+    if (pin === '1234') {
+      fail('Escolha um PIN diferente de 1234.');
+      return;
+    }
+    if (pin !== confirmPin) {
+      fail('Os PINs nao conferem.');
+      return;
+    }
+    state.users = (state.users || []).map((item) => item.id === user.id ? { ...item, pin } : item);
+    if (user.role === 'admin') state.profile = { ...state.profile, pin };
+    saveState();
+    completeLogin({ ...user, pin });
   });
 
   document.getElementById('backupBtn')?.addEventListener('click', exportJson);
@@ -1678,9 +1761,9 @@ function setupEventListeners() {
   document.getElementById('supervisorFullscreenBtn')?.addEventListener('click', toggleSupervisorPanelFullscreen);
   document.getElementById('refreshSupervisorSheetBtn')?.addEventListener('click', syncCurrentSupervisorVisitSource);
   document.getElementById('randomUserPinBtn')?.addEventListener('click', fillRandomUserPin);
-  document.getElementById('userPin')?.addEventListener('input', (event) => {
-    event.target.value = String(event.target.value || '').replace(/\D/g, '').slice(0, 4);
-  });
+  document.getElementById('userPin')?.addEventListener('input', restrictPinInput);
+  document.getElementById('forcePinNew')?.addEventListener('input', restrictPinInput);
+  document.getElementById('forcePinConfirm')?.addEventListener('input', restrictPinInput);
   document.getElementById('cancelUserEditBtn')?.addEventListener('click', cancelUserEdit);
   document.getElementById('adminSchoolPicker')?.addEventListener('change', (event) => {
     if (event.target.value) editAdminSchool(event.target.value);

@@ -14,8 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260505-admin-pin">
-<link rel="stylesheet" href="./setechub.css?v=20260505-admin-pin">
+<link rel="stylesheet" href="./styles.css?v=20260505-pin-emoji">
+<link rel="stylesheet" href="./setechub.css?v=20260505-pin-emoji">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -23,7 +23,7 @@
     <aside class="setup-auth">
       <div class="setup-auth-panel">
         <div class="slogo"><span style="color:var(--ac)">painel</span> <span style="color:var(--tx);font-weight:700">ure</span></div>
-        <div class="setup-auth-badge">Login</div>
+        <div class="setup-auth-badge">🔐 Login</div>
         <div class="auth-title" id="loginTitle">Entrar no PainelURE</div>
         <div class="setup-auth-intro">Use seu nome de acesso e PIN. A base online vai substituir o armazenamento local nas próximas etapas.</div>
         <form id="loginForm">
@@ -33,6 +33,14 @@
           <input type="password" class="sinp" id="loginPin" placeholder="PIN local" autocomplete="current-password" inputmode="numeric" aria-label="PIN local" required>
           <div id="loginError" class="serr"></div>
           <button class="sbtn" type="submit">Entrar no painel</button>
+        </form>
+        <form id="forcePinForm" hidden>
+          <label class="slbl">Novo PIN</label>
+          <input type="password" class="sinp" id="forcePinNew" placeholder="4 dígitos" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" aria-label="Novo PIN" required>
+          <label class="slbl">Confirmar PIN</label>
+          <input type="password" class="sinp" id="forcePinConfirm" placeholder="Repita o PIN" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" aria-label="Confirmar novo PIN" required>
+          <div id="forcePinError" class="serr"></div>
+          <button class="sbtn" type="submit">Salvar novo PIN</button>
         </form>
         <div class="setup-auth-note">Use o acesso informado pelo administrador.</div>
       </div>
@@ -107,7 +115,7 @@
     <section class="dashboard-finanza-grid dashboard-agenda-stack">
       <div class="box dashboard-focus-box">
         <div class="bh">
-          <div><div class="ct">Agenda compartilhada</div><div class="cs">Carros oficiais e eventos da URE.</div></div>
+        <div><div class="ct">🗓️ Agenda compartilhada</div><div class="cs">Carros oficiais e eventos da URE.</div></div>
           <button class="btn btn-g btn-sm" type="button" onclick="openAgendaWithScope('ure')">Adicionar evento</button>
         </div>
         <div id="dashboardSharedAgenda" class="dashboard-mini-calendar"></div>
@@ -115,7 +123,7 @@
       </div>
       <div class="box dashboard-focus-box">
         <div class="bh">
-          <div><div class="ct">Agenda pessoal</div><div class="cs">Compromissos vinculados ao usuario logado.</div></div>
+        <div><div class="ct">⭐ Agenda pessoal</div><div class="cs">Compromissos vinculados ao usuario logado.</div></div>
           <button class="btn btn-g btn-sm" type="button" onclick="openAgendaWithScope('pessoal')">Adicionar evento</button>
         </div>
         <div id="dashboardPersonalAgenda" class="dashboard-mini-calendar"></div>
@@ -134,7 +142,7 @@
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Nova visita CTC</div><div class="cs">Agende uma visita para Bruno ou Danilo.</div></div>
+        <div><div class="ct">🚗 Nova visita CTC</div><div class="cs">Agende uma visita para Bruno ou Danilo.</div></div>
       </div>
       <form id="ctcVisitForm" class="setechub-form setechub-form-wide">
         <select class="fi" id="ctcVisitOwner" aria-label="Responsável pela visita CTC">
@@ -173,7 +181,7 @@
     </div>
     <div class="box" id="directoryContactsBox">
       <div class="bh">
-        <div><div class="ct">Novo agendamento</div><div class="cs">Crie agenda pessoal, evento da URE ou reserva de carro.</div></div>
+        <div><div class="ct">➕ Novo agendamento</div><div class="cs">Crie agenda pessoal, evento da URE ou reserva de carro.</div></div>
       </div>
       <form id="taskForm" class="setechub-form setechub-form-wide">
         <input class="fi" id="taskTitle" placeholder="Título" aria-label="Título do agendamento">
@@ -206,7 +214,7 @@
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Agenda</div><div class="cs">Itens ordenados por data, horário e responsável.</div></div>
+        <div><div class="ct">📅 Agenda</div><div class="cs">Itens ordenados por data, horário e responsável.</div></div>
         <div class="mini-actions">
           <label class="btn btn-g btn-sm" for="fleetScheduleInput">Importar frota Excel</label>
           <input id="fleetScheduleInput" type="file" accept=".xlsx,.xls" hidden>
@@ -629,7 +637,7 @@
     <div class="setechub-two-col">
       <div class="box">
         <div class="bh">
-          <div><div class="ct">Resumo e histórico</div><div class="cs">Relatórios, visitas e notas operacionais.</div></div>
+          <div><div class="ct">📝 Resumo e histórico</div><div class="cs">Relatórios, visitas e notas operacionais.</div></div>
         </div>
         <div class="setechub-progress"><span id="taskProgressBar"></span></div>
         <div class="setechub-summary-card">
@@ -646,7 +654,7 @@
       </div>
       <div class="box">
         <div class="bh">
-          <div><div class="ct">Automacao de redes</div><div class="cs">Renomeie os arquivos como 170.docx, selecione a pasta e processe.</div></div>
+          <div><div class="ct">📄 Automacao de redes</div><div class="cs">Renomeie os arquivos como 170.docx, selecione a pasta e processe.</div></div>
         </div>
         <form id="redeAutomationForm" class="setechub-form setechub-note-form">
           <input class="fi" id="redeFolderPath" placeholder="Caminho da pasta com as redes" aria-label="Caminho da pasta com as redes">
@@ -759,13 +767,13 @@
     <div class="admin-module-grid">
     <div class="box admin-module" data-admin-only>
       <div class="bh">
-        <div><div class="ct">Categorias ocultas</div><div class="cs">Itens guardados para atualização futura, fora do menu operacional.</div></div>
+        <div><div class="ct">🗂️ Categorias ocultas</div><div class="cs">Itens guardados para atualização futura, fora do menu operacional.</div></div>
       </div>
       <div class="setechub-action-col">
         <div class="setechub-item">
           <div class="setechub-head">
             <div>
-              <strong>PECs</strong>
+              <strong>🎓 PECs</strong>
               <div class="sync-meta">Página preservada, sem entrada no menu principal.</div>
             </div>
             <span class="diag-pill pill-warn">Oculta</span>
@@ -774,7 +782,7 @@
         <div class="setechub-item">
           <div class="setechub-head">
             <div>
-              <strong>Atendimentos</strong>
+              <strong>🛠️ Atendimentos</strong>
               <div class="sync-meta">Fluxo mantido no código, sem atalho na navegação.</div>
             </div>
             <span class="diag-pill pill-warn">Oculta</span>
@@ -784,7 +792,7 @@
     </div>
     <div class="box admin-module" data-admin-only>
       <div class="bh">
-        <div><div class="ct">Usuários e permissões</div><div class="cs">Crie acessos locais por perfil. No Supabase, estes perfis viram regras de acesso.</div></div>
+        <div><div class="ct">👥 Usuários e permissões</div><div class="cs">Crie acessos locais por perfil. No Supabase, estes perfis viram regras de acesso.</div></div>
       </div>
       <form id="userForm" class="admin-user-form">
         <input id="editingUserId" type="hidden">
@@ -810,7 +818,7 @@
     </div>
     <div class="box admin-module" data-admin-only>
       <div class="bh">
-        <div><div class="ct">Escolas e vínculos</div><div class="cs">Edite escolas, responsáveis e resolva duplicidades sem abrir o código.</div></div>
+        <div><div class="ct">🏫 Escolas e vínculos</div><div class="cs">Edite escolas, responsáveis e resolva duplicidades sem abrir o código.</div></div>
       </div>
       <form id="adminSchoolForm" class="admin-school-form">
         <input id="adminSchoolId" type="hidden">
@@ -838,7 +846,7 @@
     </div>
     <div class="box admin-module" data-admin-only>
       <div class="bh">
-        <div><div class="ct">Banco local</div><div class="cs">Exporte, importe ou redefina o estado completo do app.</div></div>
+        <div><div class="ct">💾 Banco local</div><div class="cs">Exporte, importe ou redefina o estado completo do app.</div></div>
       </div>
       <div class="setechub-action-col">
         <button class="btn btn-p" id="backupBtn" type="button">Exportar backup JSON</button>
@@ -849,7 +857,7 @@
     </div>
     <div class="box admin-module">
       <div class="bh">
-        <div><div class="ct">Servidor local</div><div class="cs">Salve e carregue o estado por uma API local quando o app estiver rodando pelo Node.</div></div>
+        <div><div class="ct">🖥️ Servidor local</div><div class="cs">Salve e carregue o estado por uma API local quando o app estiver rodando pelo Node.</div></div>
       </div>
       <div class="setechub-action-col">
         <button class="btn btn-p" id="saveServerBtn" type="button">Salvar no servidor local</button>
@@ -860,7 +868,7 @@
     </div>
       <div class="box admin-module">
         <div class="bh">
-          <div><div class="ct">Migração do protótipo</div><div class="cs">Puxe os dados do setec_daily_app para a base nova em um clique.</div></div>
+          <div><div class="ct">🚚 Migração do protótipo</div><div class="cs">Puxe os dados do setec_daily_app para a base nova em um clique.</div></div>
         </div>
         <div class="setechub-action-col">
           <button class="btn btn-p" id="importLegacyBtn" type="button">Importar dados do protótipo antigo</button>
@@ -869,13 +877,13 @@
       </div>
       <div class="box admin-module">
         <div class="bh">
-          <div><div class="ct">Diagnóstico local</div><div class="cs">Leitura rápida do estado salvo neste navegador.</div></div>
+          <div><div class="ct">🧪 Diagnóstico local</div><div class="cs">Leitura rápida do estado salvo neste navegador.</div></div>
         </div>
         <div id="diagnosticList" class="stack-list"></div>
       </div>
       <div class="box admin-module">
         <div class="bh">
-          <div><div class="ct">Importações da base</div><div class="cs">Resumo informativo para administração. Fora do fluxo operacional.</div></div>
+          <div><div class="ct">📥 Importações da base</div><div class="cs">Resumo informativo para administração. Fora do fluxo operacional.</div></div>
         </div>
         <div id="adminImportInfo" class="stack-list"></div>
       </div>
@@ -900,12 +908,12 @@
 
 <datalist id="officialSchoolOptions"></datalist>
 
-<script src="./school-data.js?v=20260505-admin-pin"></script>
-<script src="./storage.js?v=20260505-admin-pin"></script>
-<script src="./app.js?v=20260505-admin-pin"></script>
-<script src="./render.js?v=20260505-admin-pin"></script>
-<script src="./api.js?v=20260505-admin-pin"></script>
-<script src="./actions.js?v=20260505-admin-pin"></script>
-<script src="./bootstrap.js?v=20260505-admin-pin"></script>
+<script src="./school-data.js?v=20260505-pin-emoji"></script>
+<script src="./storage.js?v=20260505-pin-emoji"></script>
+<script src="./app.js?v=20260505-pin-emoji"></script>
+<script src="./render.js?v=20260505-pin-emoji"></script>
+<script src="./api.js?v=20260505-pin-emoji"></script>
+<script src="./actions.js?v=20260505-pin-emoji"></script>
+<script src="./bootstrap.js?v=20260505-pin-emoji"></script>
 </body>
 </html>
