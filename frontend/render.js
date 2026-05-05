@@ -851,12 +851,12 @@ function renderInventoryWorkspace() {
         <div class="inventory-school-row-main">
           <div>
             <strong>${esc(item.school)}</strong>
-            <div class="sync-meta">CIE ${esc(item.cie || '--')} | ${esc(item.zone || '--')} | ${esc(String(item.categories))} categoria(s)</div>
+            <div class="sync-meta">CIE ${esc(item.cie || '--')} | ${esc(item.zone || '--')}</div>
           </div>
           <div class="inventory-school-row-metrics">
-            <span><strong>${esc(String(item.totalUnits))}</strong> unid.</span>
-            <span class="${item.alertUnits ? 'danger' : ''}"><strong>${esc(String(item.alertUnits))}</strong> manut./defeito</span>
-            <span><strong>${esc(String(item.defectUnits))}</strong> defeito</span>
+            <span><strong>${esc(String(item.totalUnits))}</strong> total</span>
+            <span><strong>${esc(String(item.categories))}</strong> tipos</span>
+            <span class="${item.alertUnits ? 'danger' : ''}"><strong>${esc(String(item.alertUnits))}</strong> nao ok</span>
           </div>
         </div>
       </div>
@@ -2274,6 +2274,28 @@ function renderSchools() {
   if (sortSelect) sortSelect.value = currentSchoolSort;
   if (searchInput && searchInput.value !== currentSchoolSearch) searchInput.value = currentSchoolSearch;
   const schools = sortSchoolsByCurrentView(filteredSchools());
+  const statsNode = document.getElementById('schoolDirectoryStats');
+  if (statsNode) {
+    const baseSchools = visibleSchools();
+    const visibleNames = new Set(schools.map((school) => normalizeKey(school.name)));
+    const shownAssets = state.schoolAssets.filter((item) => visibleNames.has(normalizeKey(item.school)));
+    const assetSchools = new Set(shownAssets.map((item) => normalizeKey(item.school)));
+    const alertSchools = schools.filter((school) => schoolAlertUnits(school.name) > 0 || schoolOperationalSnapshot(school).openCalls > 0).length;
+    const noInventory = schools.filter((school) => !assetSchools.has(normalizeKey(school.name))).length;
+    const recordsOk = schools.filter((school) => schoolOperationalSnapshot(school).completion >= 80).length;
+    statsNode.innerHTML = [
+      { label: 'No filtro', value: String(schools.length), note: `${baseSchools.length} unidade(s) visiveis` },
+      { label: 'Com inventario', value: String(assetSchools.size), note: `${noInventory} sem inventario` },
+      { label: 'Em atencao', value: String(alertSchools), note: 'chamado ou equipamento' },
+      { label: 'Ficha 80%+', value: String(recordsOk), note: 'dados principais completos' }
+    ].map((item) => `
+      <div class="school-directory-stat">
+        <span>${esc(item.label)}</span>
+        <strong>${esc(item.value)}</strong>
+        <small>${esc(item.note)}</small>
+      </div>
+    `).join('');
+  }
   const groups = schools.reduce((acc, school) => {
     if (!acc[school.zone]) acc[school.zone] = [];
     acc[school.zone].push(school);

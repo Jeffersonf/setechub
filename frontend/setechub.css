@@ -603,9 +603,9 @@ textarea {
 
 .inventory-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .8fr);
-  gap: 14px;
-  margin: 14px 0;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, .64fr);
+  gap: 12px;
+  margin: 12px 0 14px;
 }
 
 .inventory-hero-main,
@@ -613,24 +613,25 @@ textarea {
   border: 1px solid color-mix(in srgb, var(--bd) 82%, transparent);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(90,245,200,.10), rgba(200,245,90,.05) 42%, rgba(255,255,255,.02)),
+    linear-gradient(135deg, rgba(90,245,200,.065), rgba(200,245,90,.035) 42%, rgba(255,255,255,.018)),
     color-mix(in srgb, var(--sf) 90%, transparent);
-  padding: 20px;
+  padding: 16px;
   overflow: hidden;
 }
 
 .inventory-hero-main h1 {
-  margin: 5px 0 8px;
-  font-size: clamp(28px, 4vw, 48px);
-  line-height: 1.02;
+  margin: 3px 0 8px;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.08;
   letter-spacing: 0;
   font-family: var(--font-display);
 }
 
 .inventory-hero-main p {
-  max-width: 70ch;
+  max-width: 82ch;
   color: var(--tx2);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .inventory-kicker {
@@ -644,8 +645,8 @@ textarea {
 .inventory-hero-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 18px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .inventory-hero-stat,
@@ -660,7 +661,7 @@ textarea {
 }
 
 .inventory-hero-stat {
-  padding: 13px;
+  padding: 11px 12px;
 }
 
 .inventory-hero-stat span,
@@ -675,22 +676,22 @@ textarea {
 .inventory-hero-stat strong {
   display: block;
   margin: 4px 0 2px;
-  font-size: 25px;
+  font-size: 23px;
   line-height: 1;
   font-family: var(--font-display);
 }
 
 .inventory-hero-side {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: stretch;
   background:
-    linear-gradient(160deg, rgba(245,200,90,.08), rgba(90,245,200,.06)),
+    linear-gradient(160deg, rgba(245,200,90,.045), rgba(90,245,200,.045)),
     color-mix(in srgb, var(--sf) 90%, transparent);
 }
 
 .inventory-risk-card {
-  padding: 15px;
+  padding: 12px;
 }
 
 .inventory-risk-top {
@@ -701,13 +702,13 @@ textarea {
 }
 
 .inventory-risk-top strong {
-  font-size: 36px;
+  font-size: 30px;
   line-height: 1;
 }
 
 .inventory-risk-bar {
-  height: 9px;
-  margin: 14px 0 12px;
+  height: 8px;
+  margin: 11px 0 10px;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(255,255,255,.06);
@@ -734,8 +735,8 @@ textarea {
 }
 
 .inventory-type-chip {
-  min-height: 58px;
-  padding: 10px 12px;
+  min-height: 50px;
+  padding: 9px 11px;
   color: var(--tx);
   cursor: pointer;
   display: grid;
@@ -756,7 +757,7 @@ textarea {
 }
 
 .inventory-type-chip strong {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
@@ -767,7 +768,8 @@ textarea {
 }
 
 .inventory-filter-shell {
-  margin-top: 0;
+  margin: 0 0 14px;
+  padding: 14px;
 }
 
 .inventory-filter-head {
@@ -775,7 +777,7 @@ textarea {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .inventory-status-toolbar {
@@ -791,7 +793,7 @@ textarea {
 
 .inventory-board {
   display: grid;
-  grid-template-columns: minmax(280px, .38fr) minmax(0, 1fr);
+  grid-template-columns: minmax(300px, .34fr) minmax(0, 1fr);
   gap: 14px;
   align-items: start;
 }
@@ -801,11 +803,12 @@ textarea {
   top: 78px;
   max-height: calc(100vh - 96px);
   overflow: auto;
+  padding: 14px;
 }
 
 .inventory-detail-stack {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -823,6 +826,7 @@ textarea {
 .inventory-issues-card,
 .inventory-manage-card {
   border-color: color-mix(in srgb, var(--bd) 78%, rgba(90,245,200,.16));
+  padding: 14px;
 }
 
 .inventory-school-header {
@@ -835,7 +839,7 @@ textarea {
 .inventory-school-header strong {
   display: block;
   margin-top: 3px;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.1;
 }
 
@@ -843,17 +847,17 @@ textarea {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .inventory-focus-metrics > div {
-  padding: 11px;
+  padding: 10px;
 }
 
 .inventory-focus-metrics strong {
   display: block;
   margin-top: 3px;
-  font-size: 20px;
+  font-size: 19px;
   line-height: 1;
 }
 
@@ -866,10 +870,10 @@ textarea {
 
 .inventory-school-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
   align-items: center;
-  padding: 12px;
+  padding: 10px;
 }
 
 .inventory-school-row.active {
@@ -880,8 +884,8 @@ textarea {
 }
 
 .inventory-rank {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border-radius: 8px;
@@ -893,7 +897,7 @@ textarea {
 
 .inventory-school-row-main {
   display: grid;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
@@ -902,6 +906,7 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 13px;
 }
 
 .inventory-school-row-metrics {
@@ -911,7 +916,7 @@ textarea {
 }
 
 .inventory-school-row-metrics span {
-  padding: 5px 8px;
+  padding: 4px 7px;
   border-radius: 8px;
   background: rgba(255,255,255,.04);
   color: var(--tx2);
@@ -931,7 +936,7 @@ textarea {
 }
 
 .inventory-issue-row {
-  padding: 13px;
+  padding: 12px;
   display: grid;
   gap: 10px;
 }
@@ -965,13 +970,13 @@ textarea {
 
 .inventory-category-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+  gap: 8px;
 }
 
 .inventory-category-chip {
-  min-height: 88px;
-  padding: 13px;
+  min-height: 78px;
+  padding: 11px;
   border: 1px solid var(--bd);
   border-radius: 8px;
   background: rgba(255,255,255,.032);
@@ -999,7 +1004,7 @@ textarea {
   margin: 6px 0 5px;
   color: var(--tx);
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
 }
 
@@ -1052,12 +1057,13 @@ textarea {
 
 .school-directory-shell {
   display: grid;
-  gap: 16px;
+  gap: 12px;
+  padding: 14px;
 }
 
 .school-directory-filters {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(190px, .45fr) minmax(160px, .35fr);
+  grid-template-columns: minmax(300px, 1fr) minmax(210px, .42fr) minmax(170px, .32fr);
   gap: 10px;
 }
 
@@ -1068,8 +1074,8 @@ textarea {
 }
 
 .school-directory-stat {
-  min-height: 86px;
-  padding: 14px;
+  min-height: 78px;
+  padding: 12px;
   border: 1px solid color-mix(in srgb, var(--bd) 84%, transparent);
   border-radius: 8px;
   background:
@@ -1086,10 +1092,10 @@ textarea {
 
 .school-directory-stat strong {
   display: block;
-  margin-top: 6px;
+  margin-top: 5px;
   color: var(--tx);
   font-family: var(--font-display);
-  font-size: 25px;
+  font-size: 23px;
   line-height: 1;
 }
 
@@ -1102,13 +1108,13 @@ textarea {
 
 .school-directory-list {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .school-directory-row {
   width: 100%;
-  min-height: 84px;
-  padding: 13px;
+  min-height: 76px;
+  padding: 12px;
   border: 1px solid var(--bd);
   border-radius: 8px;
   background:
@@ -1118,20 +1124,25 @@ textarea {
   text-align: left;
   cursor: pointer;
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  box-shadow: none;
 }
 
 .school-directory-row::before {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
-  width: 4px;
+  width: 3px;
   background: var(--ac2);
+}
+
+.school-directory-row::after {
+  content: none;
+  display: none;
 }
 
 .school-directory-row.ok::before {
@@ -1154,30 +1165,30 @@ textarea {
 }
 
 .school-directory-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(90,245,200,.18);
   border-radius: 8px;
   background: rgba(90,245,200,.09);
   color: var(--ac2);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
   line-height: 1;
 }
 
 .school-directory-main {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .school-directory-main strong {
   display: block;
   color: var(--tx);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -1188,7 +1199,7 @@ textarea {
   display: block;
   margin-top: 3px;
   color: var(--mt);
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
 .school-directory-main > div:first-child {
@@ -1205,7 +1216,7 @@ textarea {
 
 .school-directory-meta > span:not(.diag-pill) {
   margin: 0;
-  padding: 5px 8px;
+  padding: 4px 7px;
   border-radius: 8px;
   background: rgba(255,255,255,.04);
   color: var(--tx2);
@@ -1213,13 +1224,24 @@ textarea {
 }
 
 .school-directory-open {
-  padding: 7px 10px;
+  padding: 6px 9px;
   border: 1px solid color-mix(in srgb, var(--ac) 22%, var(--bd));
   border-radius: 8px;
   background: rgba(200,245,90,.08);
   color: var(--ac);
   font-size: 11px;
   font-weight: 800;
+}
+
+.school-directory-shell .setechub-group {
+  border: 1px solid color-mix(in srgb, var(--bd) 72%, transparent);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+.school-directory-shell .setechub-group-head {
+  margin-bottom: 9px;
 }
 
 .dormant-page,

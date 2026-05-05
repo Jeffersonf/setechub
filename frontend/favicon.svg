@@ -9,8 +9,7 @@
       <stop offset="1" stop-color="#5af5c8"/>
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)"/>
-  <rect x="8" y="8" width="48" height="48" rx="10" fill="none" stroke="url(#accent)" stroke-width="3"/>
-  <text x="32" y="38" fill="url(#accent)" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900" text-anchor="middle">URE</text>
-  <path d="M18 46h28" stroke="#e7f0f6" stroke-width="3" stroke-linecap="round" opacity=".82"/>
+  <rect width="64" height="64" rx="10" fill="url(#bg)"/>
+  <text x="32" y="42" fill="url(#accent)" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="900" text-anchor="middle">URE</text>
+  <path d="M13 49h38" stroke="#e7f0f6" stroke-width="4" stroke-linecap="round" opacity=".82"/>
 </svg>
