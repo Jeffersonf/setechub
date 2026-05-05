@@ -1,6 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SETECHUB">
-  <rect width="64" height="64" rx="14" fill="#0b0f14"/>
-  <path d="M18 21c3.4-5.2 11.1-7.3 18.1-5.5 4.5 1.2 7.9 3.7 10.2 7.2l-8.2 5.1c-1.4-2.1-3.5-3.3-6.5-3.3-3.1 0-5.1 1.1-5.1 2.9 0 2.1 3.3 2.7 7.6 3.5 7.1 1.3 14.2 3.6 14.2 12.1 0 8.1-6.8 13-16.6 13-7.9 0-13.7-2.8-17.3-8.4l8.3-5.1c2 3 4.8 4.6 9 4.6 4 0 6.2-1.2 6.2-3.5 0-2.1-2.7-2.8-7.4-3.7-7.5-1.4-14.4-3.7-14.4-12 0-2.5.6-4.8 1.9-6.9z" fill="#c8f55a"/>
-  <circle cx="48" cy="17" r="5" fill="#5af5c8"/>
-  <path d="M43.8 20.3 38 25.2" stroke="#5af5c8" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PainelURE">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset=".55" stop-color="#0b1114"/>
+      <stop offset="1" stop-color="#07100d"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="14" y1="16" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c8f55a"/>
+      <stop offset="1" stop-color="#5af5c8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <path d="M14 18.5c0-3 2.4-5.5 5.5-5.5h25c3 0 5.5 2.4 5.5 5.5v18c0 3-2.4 5.5-5.5 5.5h-9.8l-8.2 7.3c-1.5 1.3-3.8.3-3.8-1.7V42h-3.2c-3 0-5.5-2.4-5.5-5.5v-18z" fill="url(#mark)"/>
+  <text x="32" y="34" fill="#07100d" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="900" text-anchor="middle" letter-spacing="-.6">URE</text>
+  <circle cx="49" cy="16" r="5" fill="#5af5c8"/>
+  <path d="M18 50h28" stroke="#c8f55a" stroke-width="4" stroke-linecap="round"/>
 </svg>
