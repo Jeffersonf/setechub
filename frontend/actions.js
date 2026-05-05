@@ -1516,6 +1516,32 @@ function setupEventListeners() {
     refreshAll();
   });
 
+  document.getElementById('monthlySupervisorSheetForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!canManageUsers()) return;
+    const monthKey = document.getElementById('monthlySupervisorSheetMonth')?.value || '';
+    const url = document.getElementById('monthlySupervisorSheetUrl')?.value.trim() || '';
+    const customLabel = document.getElementById('monthlySupervisorSheetLabel')?.value.trim() || '';
+    if (!monthKey || !url) {
+      alert('Informe o mes e o link da planilha.');
+      return;
+    }
+    const label = customLabel || `Planilha supervisores - ${supervisorSheetMonthLabel(monthKey)}`;
+    const existing = (state.officialLinks || []).find((item) =>
+      item.category === 'supervisor-sheet' && item.monthKey === monthKey
+    );
+    const panelGid = googleSheetGidFromUrl(url);
+    if (existing) {
+      state.officialLinks = state.officialLinks.map((item) =>
+        item.id === existing.id ? { ...item, label, url, category: 'supervisor-sheet', monthKey, panelGid } : item
+      );
+    } else {
+      state.officialLinks.unshift({ id: uid(), label, url, category: 'supervisor-sheet', monthKey, panelGid });
+    }
+    event.target.reset();
+    refreshAll();
+  });
+
   document.getElementById('sectorForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!canManageUsers()) return;

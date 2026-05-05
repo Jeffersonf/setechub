@@ -2240,6 +2240,19 @@ function renderSupervisorRecord() {
   ` : '<div class="sync-empty">Nenhuma visita registrada para este supervisor.</div>';
 }
 
+function supervisorSheetMonthLabel(monthKey) {
+  const [year, month] = String(monthKey || '').split('-').map(Number);
+  const names = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  if (!year || !month || month < 1 || month > 12) return 'mes nao informado';
+  return `${names[month - 1]} de ${year}`;
+}
+
+function supervisorMonthlySheetLinks() {
+  return (state.officialLinks || [])
+    .filter((item) => item.category === 'supervisor-sheet')
+    .sort((a, b) => String(b.monthKey || '').localeCompare(String(a.monthKey || '')));
+}
+
 function renderOfficialData() {
   const list = document.getElementById('officialList');
   const adminActions = canManageUsers();
@@ -2266,6 +2279,30 @@ function renderOfficialData() {
         </div>
       </div>
     `).join('');
+  }
+  const monthlyActions = document.getElementById('monthlySupervisorSheetActions');
+  if (monthlyActions) {
+    const links = supervisorMonthlySheetLinks();
+    monthlyActions.innerHTML = links.slice(0, 6).map((item) => `
+      <a class="btn btn-g btn-sm" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.label || `Planilha ${supervisorSheetMonthLabel(item.monthKey)}`)}</a>
+    `).join('');
+    monthlyActions.hidden = !links.length;
+  }
+  const monthlyList = document.getElementById('monthlySupervisorSheetsList');
+  if (monthlyList) {
+    const links = supervisorMonthlySheetLinks();
+    monthlyList.innerHTML = links.map((item) => `
+      <div class="setechub-item">
+        <div class="setechub-head">
+          <div>
+            <strong>${esc(item.label || `Planilha ${supervisorSheetMonthLabel(item.monthKey)}`)}</strong>
+            <div class="sync-meta">${esc(supervisorSheetMonthLabel(item.monthKey))}</div>
+            <div class="sync-meta"><a href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(item.url)}</a></div>
+          </div>
+          ${adminActions ? `<div class="mini-actions"><button class="btn btn-p btn-sm" onclick="syncSupervisorMonthlySheet(${item.id})">Atualizar dados</button><button class="btn btn-d btn-sm" onclick="removeOfficialLink(${item.id})">Remover</button></div>` : ''}
+        </div>
+      </div>
+    `).join('') || '<div class="sync-empty">Nenhuma planilha mensal cadastrada ainda.</div>';
   }
   const office = document.getElementById('officeContact');
   if (office) {

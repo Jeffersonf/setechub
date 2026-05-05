@@ -334,6 +334,11 @@ function googleSheetCsvUrl(url) {
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
+function googleSheetGidFromUrl(url) {
+  const match = String(url || '').match(/[?&#]gid=(\d+)/i);
+  return match ? match[1] : '';
+}
+
 function googleSheetGidCsvUrl(url, gid) {
   const text = String(url || '').trim();
   if (!gid) return googleSheetCsvUrl(text);
@@ -346,6 +351,28 @@ function googleSheetGidCsvUrl(url, gid) {
     return `https://docs.google.com/spreadsheets/d/${regularMatch[1]}/export?format=csv&gid=${encodeURIComponent(gid)}`;
   }
   return googleSheetCsvUrl(text);
+}
+
+function supervisorMonthlySheetSource(link) {
+  if (!link?.url) return null;
+  return {
+    id: `supervisor-monthly-${link.monthKey || 'sem-mes'}-${link.id}`,
+    url: link.url,
+    label: link.label || `Planilha supervisores - ${supervisorSheetMonthLabel(link.monthKey)}`,
+    primary: true,
+    aggregate: true,
+    requireSupervisorColumn: true,
+    panelGid: link.panelGid || googleSheetGidFromUrl(link.url),
+    tabPrefix: 'DADOS_',
+    monthKey: link.monthKey
+  };
+}
+
+function supervisorMonthlySheetSources() {
+  return (state.officialLinks || [])
+    .filter((item) => item.category === 'supervisor-sheet' && item.url)
+    .map(supervisorMonthlySheetSource)
+    .filter(Boolean);
 }
 
 function supervisorSheetTabName(supervisorName, source = {}) {
@@ -548,16 +575,14 @@ async function syncSupervisorVisitSource(source) {
   return mergeSupervisorVisitSourceRows({ ...source, requireSupervisorColumn: fallbackToSourceCsv }, records);
 }
 
-async function syncSupervisorVisitSources(options = {}) {
-  if (!Array.isArray(SUPERVISOR_VISIT_SOURCES) || !SUPERVISOR_VISIT_SOURCES.length) return;
-  const silent = options.silent === true;
-  const toast = silent ? null : showToast('Lendo planilha dos supervisores...', 'syncing', { persist: true });
+async function syncSupervisorSourceList(sources, options = {}) {
+  if (!Array.isArray(sources) || !sources.length) return 0;
   let importedCount = 0;
   let errorCount = 0;
-  for (const source of SUPERVISOR_VISIT_SOURCES) {
+  for (const source of sources) {
     if (source.aggregate) {
       try {
-        importedCount += await syncSupervisorPanelSource(source);
+        if (source.panelGid) importedCount += await syncSupervisorPanelSource(source);
         importedCount += await syncSupervisorVisitSource(source);
       } catch (error) {
         errorCount += 1;
@@ -582,6 +607,16 @@ async function syncSupervisorVisitSources(options = {}) {
       }
     }
   }
+  if (options.refresh !== false && importedCount) refreshAll();
+  return { importedCount, errorCount };
+}
+
+async function syncSupervisorVisitSources(options = {}) {
+  const sources = Array.isArray(SUPERVISOR_VISIT_SOURCES) ? SUPERVISOR_VISIT_SOURCES : [];
+  if (!sources.length) return;
+  const silent = options.silent === true;
+  const toast = silent ? null : showToast('Lendo planilha dos supervisores...', 'syncing', { persist: true });
+  const { importedCount, errorCount } = await syncSupervisorSourceList(sources, { refresh: false });
   if (importedCount) refreshAll();
   if (toast) {
     if (importedCount) {
@@ -591,6 +626,32 @@ async function syncSupervisorVisitSources(options = {}) {
     } else {
       toast.update('Planilha lida, mas nenhum registro novo foi encontrado.', 'success');
     }
+  }
+}
+
+async function syncSupervisorMonthlySheet(linkId) {
+  const link = (state.officialLinks || []).find((item) =>
+    item.category === 'supervisor-sheet' && String(item.id) === String(linkId)
+  );
+  const source = supervisorMonthlySheetSource(link);
+  if (!source) {
+    showToast('Planilha mensal nao encontrada.', 'error');
+    return;
+  }
+  const toast = showToast(`Atualizando ${source.label}...`, 'syncing', { persist: true });
+  try {
+    const { importedCount, errorCount } = await syncSupervisorSourceList([source], { refresh: false });
+    if (importedCount) refreshAll();
+    if (importedCount) {
+      toast.update(`${importedCount} visita(s) importada(s) de ${source.label}.`, 'success');
+    } else if (errorCount) {
+      toast.update('Nao foi possivel ler esta planilha mensal.', 'error', { duration: 4200 });
+    } else {
+      toast.update('Planilha lida, mas nenhum registro novo foi encontrado.', 'success');
+    }
+  } catch (error) {
+    toast.update('Nao foi possivel atualizar esta planilha.', 'error', { duration: 4200 });
+    console.warn(`Nao foi possivel sincronizar ${source.label}:`, error);
   }
 }
 
