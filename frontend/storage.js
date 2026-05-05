@@ -83,6 +83,7 @@ const SCHOOL_ALIASES = {
   'EE DR ANTONIO DEFFUNE': 'EE Doutor Antonio Deffune',
   'EE DR. RAUL VENTURELLI': 'EE Doutor Raul Venturelli',
   'EE DR RAUL VENTURELLI': 'EE Doutor Raul Venturelli',
+  'EE BAIRRO FERREIRA DOS MATOS': 'EE Bairro Ferreira dos Matos',
   'EE FRANCELINA FRANCO': 'PEI EE Professora Francelina Franco',
   'EE GERSON DE BARROS MARGARIDO': 'EE Professor Gerson de Barros Margarido',
   'EE IDALICIO MENDES LIMA': 'PEI EE Idalicio Mendes Lima',

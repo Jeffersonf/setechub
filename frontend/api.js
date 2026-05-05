@@ -274,8 +274,9 @@ function normalizeCsvHeader(value) {
 
 function csvValue(record, names) {
   const wanted = names.map(normalizeCsvHeader);
-  const entry = Object.entries(record).find(([key]) => wanted.includes(key));
-  return repairMojibakeString(entry?.[1] || '').trim();
+  const entries = Object.entries(record).filter(([key]) => wanted.includes(key));
+  const filled = entries.find(([, value]) => String(value || '').trim());
+  return repairMojibakeString((filled || entries[0])?.[1] || '').trim();
 }
 
 function csvRecords(headers, dataRows) {
