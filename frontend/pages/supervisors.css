@@ -53,8 +53,8 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #202235;
-  color: #eef2ff;
+  background: var(--sf);
+  color: var(--mt);
   font-size: 11px;
   text-transform: uppercase;
 }
@@ -64,21 +64,12 @@
   left: 0;
   z-index: 3;
   min-width: 164px;
-  background: #202235;
+  background: var(--sf);
   text-align: left;
 }
 
 .supervisor-weekly-matrix td.week-col {
-  background: #171a27;
-}
-
-.supervisor-weekly-matrix .signal-col {
-  position: sticky;
-  right: 0;
-  z-index: 3;
-  min-width: 118px;
-  color: #fff;
-  text-transform: uppercase;
+  background: var(--sf2);
 }
 
 .supervisor-weekly-matrix td {
@@ -110,26 +101,39 @@
 }
 
 .supervisor-weekly-matrix td.visited {
-  background: rgba(22, 163, 74, .18);
+  background: color-mix(in srgb, var(--ok) 13%, transparent);
 }
 
 .supervisor-weekly-matrix td.visited strong {
-  color: #dcfce7;
+  color: var(--tx);
 }
 
-.supervisor-weekly-matrix .matrix-green {
-  background: #10b981;
+.supervisor-weekly-matrix td.matrix-green {
+  background: color-mix(in srgb, var(--ok) 9%, transparent);
 }
 
-.supervisor-weekly-matrix .matrix-red {
-  background: #991b1b;
+.supervisor-weekly-matrix td.matrix-red {
+  background: color-mix(in srgb, var(--er) 8%, transparent);
 }
 
-.supervisor-weekly-matrix .matrix-wait {
-  background: #4b5563;
+.supervisor-weekly-matrix td.matrix-wait {
+  background: rgba(255,255,255,.025);
 }
 
-.supervisor-weekly-matrix .signal-col strong,
-.supervisor-weekly-matrix .signal-col span {
-  color: #fff;
+.supervisor-weekly-matrix .diag-pill.matrix-green {
+  background: color-mix(in srgb, var(--ok) 18%, transparent);
+  border-color: color-mix(in srgb, var(--ok) 36%, var(--bd));
+  color: var(--ok);
+}
+
+.supervisor-weekly-matrix .diag-pill.matrix-red {
+  background: color-mix(in srgb, var(--er) 16%, transparent);
+  border-color: color-mix(in srgb, var(--er) 36%, var(--bd));
+  color: var(--er);
+}
+
+.supervisor-weekly-matrix .diag-pill.matrix-wait {
+  background: rgba(255,255,255,.06);
+  border-color: var(--bd);
+  color: var(--mt);
 }

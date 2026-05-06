@@ -77,12 +77,6 @@ function supervisorWeeklyMatrixStatus(visitedCount, totalSchools, weekEnd) {
   return selectedMonthEnded || weekEnded ? 'vermelho' : 'aguardando';
 }
 
-function supervisorWeeklyMatrixStatusLabel(status) {
-  if (status === 'verde') return 'Verde';
-  if (status === 'vermelho') return 'Vermelho';
-  return 'Aguardando';
-}
-
 function supervisorWeeklyMatrixStatusClass(status) {
   if (status === 'verde') return 'matrix-green';
   if (status === 'vermelho') return 'matrix-red';
@@ -95,35 +89,24 @@ function supervisorWeeklyMatrixIcon(count, status) {
   return '&#10060;';
 }
 
-function renderSupervisorWeeklyMatrix(stats, visits) {
-  const panel = document.getElementById('supervisorWeeklyMatrixPanel');
+function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
+  const panel = document.getElementById('supervisorRecordWeeklyMatrix');
   if (!panel) return;
-  const selectedStat = stats.find((item) => normalizeKey(item.supervisor.name) === currentSupervisorFilter) || stats[0];
   if (!selectedStat) {
-    panel.innerHTML = '<div class="sync-empty">Nenhum supervisor cadastrado para montar a matriz semanal.</div>';
+    panel.innerHTML = '<div class="sync-empty">Nenhum supervisor selecionado para montar a matriz semanal.</div>';
     return;
   }
   const supervisor = selectedStat.supervisor;
   const schools = (selectedStat.assignedSchools || supervisor.schools || []).filter(Boolean);
   const weekCount = Math.max(1, supervisorLastWeekOfViewMonth());
   const weeks = Array.from({ length: weekCount }, (_, index) => index + 1);
-  const viewMonthKey = `${currentViewDate.getFullYear()}-${String(currentViewDate.getMonth() + 1).padStart(2, '0')}`;
-  const viewMonthLabel = supervisorSheetMonthLabel(viewMonthKey);
   panel.innerHTML = `
-    <div class="supervisor-weekly-matrix-head">
-      <div>
-        <strong>Tabela semanal de visitas</strong>
-        <span>${esc(supervisor.name)} | ${esc(viewMonthLabel)}</span>
-      </div>
-      <button class="btn btn-g btn-sm" type="button" onclick="openSupervisorRecord('${esc(supervisor.name)}')">Abrir supervisor</button>
-    </div>
     <div class="supervisor-weekly-matrix-wrap">
       <table class="supervisor-weekly-matrix">
         <thead>
           <tr>
             <th class="week-col">Semana</th>
             ${schools.map((school) => `<th>${esc(school)}</th>`).join('')}
-            <th class="signal-col">Farol</th>
           </tr>
         </thead>
         <tbody>
@@ -150,10 +133,6 @@ function renderSupervisorWeeklyMatrix(stats, visits) {
                     <span>${supervisorWeeklyMatrixIcon(cell.count, status)}</span>
                   </td>
                 `).join('')}
-                <td class="signal-col ${statusClass}">
-                  <strong>${esc(supervisorWeeklyMatrixStatusLabel(status))}</strong>
-                  <span>${esc(String(visitedCount))}/${esc(String(schools.length))}</span>
-                </td>
               </tr>
             `;
           }).join('')}
@@ -173,7 +152,6 @@ window.renderSupervisors = function renderSupervisorsPage() {
     console.error('Falha ao carregar supervisao', error);
     renderDeferredPlaceholders([
       '#supervisorPanelGrid',
-      '#supervisorWeeklyMatrixPanel',
       '#supervisorSelectorList'
     ], 'Nao foi possivel carregar a supervisao. Atualize a pagina.');
   }

@@ -1840,8 +1840,6 @@ function renderSupervisors() {
       </div>
     `;
   }
-  renderSupervisorWeeklyMatrix(stats, visits);
-
   const selectorList = document.getElementById('supervisorSelectorList');
   if (selectorList) {
     selectorList.innerHTML = stats.map((item) => `
@@ -2214,6 +2212,10 @@ function renderSupervisorRecord() {
       <div class="supervisor-metric-note">${esc(item.note)}</div>
     </div>
   `).join('');
+
+  if (typeof renderSupervisorWeeklyMatrixForRecord === 'function') {
+    renderSupervisorWeeklyMatrixForRecord(selectedStat, allVisits);
+  }
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstWeekday = new Date(year, month, 1).getDay();

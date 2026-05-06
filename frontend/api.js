@@ -810,18 +810,10 @@ function mergeSupervisorVisitSourceRows(source, rows) {
     ...incoming
   ];
 
-  const schoolsBySupervisor = incoming.reduce((acc, item) => {
-    if (!acc[item.supervisor]) acc[item.supervisor] = new Set();
-    acc[item.supervisor].add(item.school);
-    return acc;
-  }, {});
   state.supervisors = (state.supervisors || []).map((item) => {
-    const schoolsFromSource = [...(schoolsBySupervisor[item.name] || [])];
-    if (!schoolsFromSource.length) return item;
+    if (!importedSupervisors.has(item.name)) return item;
     return {
       ...item,
-      schools: [...new Set([...(item.schools || []), ...schoolsFromSource])],
-      monthlyGoal: Math.max(Number(item.monthlyGoal || 0), schoolsFromSource.length || 1),
       visitSourceId: source.id,
       visitSourceUrl: source.url,
       visitSourceLabel: source.label,

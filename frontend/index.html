@@ -15,8 +15,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css?v=20260505-login-refresh">
-<link rel="stylesheet" href="./setechub.css?v=20260506-refactor-fix">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260506-refactor-fix">
+<link rel="stylesheet" href="./setechub.css?v=20260506-supervisor-record-matrix">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260506-supervisor-record-matrix">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -407,7 +407,6 @@
         </div>
       </div>
       <div id="supervisorPanelGrid" class="supervisor-sheet-panel"></div>
-      <div id="supervisorWeeklyMatrixPanel" class="supervisor-weekly-matrix-panel"></div>
     </div>
     <div class="box">
       <div class="bh">
@@ -434,6 +433,7 @@
     <div class="box">
       <div class="school-record-nav">
         <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordProfile">Resumo</button>
+        <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordWeeklyMatrixBox">Semanal</button>
         <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordCalendar">Calendário</button>
         <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordVisited">Visitadas</button>
         <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordPending">Faltantes</button>
@@ -454,6 +454,12 @@
         </div>
         <div id="supervisorRecordMetrics" class="setechub-monitor-grid compact-grid"></div>
       </div>
+    </div>
+    <div class="box" id="supervisorRecordWeeklyMatrixBox">
+      <div class="bh">
+        <div><div class="ct">Tabela semanal de visitas</div></div>
+      </div>
+      <div id="supervisorRecordWeeklyMatrix" class="supervisor-weekly-matrix-panel"></div>
     </div>
     <div class="box" id="supervisorRecordCalendar">
       <div class="bh">
@@ -927,14 +933,14 @@
 <script src="./school-data.js?v=20260505-login-refresh"></script>
 <script src="./storage.js?v=20260506-online-db"></script>
 <script src="./app.js?v=20260506-page-modules-2"></script>
-<script src="./render.js?v=20260506-supervisor-matrix"></script>
+<script src="./render.js?v=20260506-supervisor-record-matrix"></script>
 <script src="./utils/defer.js?v=20260506-page-modules-2"></script>
 <script src="./components/avatar.js?v=20260506-page-modules-2"></script>
 <script src="./components/school-card.js?v=20260506-page-modules-2"></script>
 <script src="./pages/schools.js?v=20260506-page-modules-2"></script>
 <script src="./pages/school-record.js?v=20260506-page-modules-2"></script>
 <script src="./pages/inventory.js?v=20260506-refactor-fix"></script>
-<script src="./pages/supervisors.js?v=20260506-refactor-fix"></script>
+<script src="./pages/supervisors.js?v=20260506-supervisor-record-matrix"></script>
 <script src="./pages/admin.js?v=20260506-refactor-fix"></script>
 <script src="./api.js?v=20260506-layered-schools"></script>
 <script src="./actions.js?v=20260506-layered-schools"></script>

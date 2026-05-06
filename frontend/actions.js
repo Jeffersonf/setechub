@@ -839,10 +839,16 @@ function supervisorNameForSchool(name) {
 
 function assignSchoolSupervisor(schoolName, supervisorName) {
   if (!schoolName) return;
+  const updatedAt = new Date().toISOString();
   state.supervisors = (state.supervisors || []).map((supervisor) => {
     const schools = (supervisor.schools || []).filter((name) => name !== schoolName);
     if (supervisorName && supervisor.name === supervisorName) schools.push(schoolName);
-    return { ...supervisor, schools: Array.from(new Set(schools)) };
+    return {
+      ...supervisor,
+      schools: Array.from(new Set(schools)),
+      schoolAssignmentsLocked: true,
+      schoolAssignmentsUpdatedAt: updatedAt
+    };
   });
 }
 
