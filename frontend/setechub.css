@@ -111,6 +111,63 @@ body[data-page="admin"] .admin-module {
   font-size: 12px;
 }
 
+.school-card-grid-lite {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.school-card-lite {
+  min-width: 0;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--sf2);
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.school-card-lite-main {
+  width: 100%;
+  min-height: 78px;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--tx);
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.school-card-lite-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.school-card-lite-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.school-card-lite-copy small,
+.school-card-lite-foot {
+  color: var(--mt);
+  font-size: 12px;
+}
+
+.school-card-lite-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px 12px 70px;
+}
+
 body[data-page="school-record"] .school-record-hero {
   margin-bottom: 12px;
 }

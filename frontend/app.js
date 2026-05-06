@@ -1379,11 +1379,7 @@ function runGlobalSearch(query) {
     currentInventorySearch = '';
     currentCallSchoolContext = '';
     currentImportSchoolContext = '';
-    renderTasks();
-    renderCalls();
-    renderSchools();
-    renderAssets();
-    renderSchoolImports();
+    renderCurrentPage();
     saveUiContext();
     return;
   }
@@ -1556,7 +1552,6 @@ function renderCurrentPage(page = currentPage) {
   }
   if (page === 'school-record') {
     renderSchoolDetail();
-    renderSchoolImports();
     return;
   }
   if (page === 'supervisors') {
