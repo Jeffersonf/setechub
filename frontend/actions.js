@@ -676,7 +676,6 @@ function showSchoolDetail(name) {
   currentImportSchoolContext = name;
   showPage('school-record');
   renderSchoolDetail();
-  renderAssets();
   renderSchoolImports();
   const schoolDetailSelect = document.getElementById('schoolDetailSelect');
   if (schoolDetailSelect) schoolDetailSelect.value = name;

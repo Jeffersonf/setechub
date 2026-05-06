@@ -59,6 +59,83 @@ body[data-page="admin"] .admin-module {
   contain-intrinsic-size: 280px;
 }
 
+.school-compact-list {
+  display: grid;
+  gap: 8px;
+}
+
+.school-compact-list .school-widget-card {
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--sf2);
+  padding: 0;
+}
+
+.school-compact-list .school-widget-main {
+  min-height: 56px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.school-compact-list .school-widget-avatar,
+.school-compact-list .school-widget-main i {
+  display: none;
+}
+
+.school-compact-list .school-widget-copy {
+  min-width: 0;
+}
+
+.school-compact-list .school-widget-copy strong {
+  font-size: 15px;
+}
+
+.school-compact-list .school-widget-copy small {
+  font-size: 12px;
+}
+
+body[data-page="school-record"] .school-record-hero {
+  margin-bottom: 12px;
+}
+
+body[data-page="school-record"] .school-record-hero-main {
+  display: block;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+body[data-page="school-record"] .school-record-avatar {
+  display: none;
+}
+
+body[data-page="school-record"] .school-record-title-block h1 {
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+body[data-page="school-record"] .school-record-chip-row {
+  gap: 6px;
+}
+
+body[data-page="school-record"] .school-record-hero-actions {
+  margin-top: 12px;
+}
+
+body[data-page="school-record"] .school-record-metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+body[data-page="school-record"] .school-record-metric,
+body[data-page="school-record"] .school-record-note-card,
+body[data-page="school-record"] .school-record-action-item,
+body[data-page="school-record"] .school-record-tech-card {
+  border-radius: 8px;
+  padding: 12px;
+}
+
 [hidden] {
   display: none !important;
 }

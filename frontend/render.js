@@ -2568,7 +2568,7 @@ function renderSchools() {
   const schoolList = document.getElementById('schoolList');
   if (schoolList) {
     schoolList.innerHTML = schools.length ? `
-      <div class="school-widget-grid">
+      <div class="school-compact-list">
         ${schools.map((school) => {
           return `
             <article class="school-widget-card">
