@@ -48,6 +48,7 @@ function renderSupervisors() {
   renderSupervisorQuickSelectors();
   renderDeferredPlaceholders([
     '#supervisorPanelGrid',
+    '#supervisorWeeklyMatrixPanel',
     '#supervisorSelectorList',
     '#supervisorOverviewPanel',
     '#supervisorAttentionList',
