@@ -1,6 +1,6 @@
 'use strict';
 
-const legacyRenderSupervisors = renderSupervisors;
+const legacyRenderSupervisors = window.renderSupervisors;
 let supervisorsRenderTicket = null;
 
 function renderSupervisorQuickMetrics() {
@@ -163,7 +163,7 @@ function renderSupervisorWeeklyMatrix(stats, visits) {
   `;
 }
 
-function renderSupervisors() {
+window.renderSupervisors = function renderSupervisorsPage() {
   cancelIdleRender(supervisorsRenderTicket);
   renderSupervisorQuickMetrics();
   renderSupervisorQuickSelectors();
@@ -177,4 +177,4 @@ function renderSupervisors() {
       '#supervisorSelectorList'
     ], 'Nao foi possivel carregar a supervisao. Atualize a pagina.');
   }
-}
+};

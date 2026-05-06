@@ -1,6 +1,6 @@
 'use strict';
 
-const legacyRenderAssets = renderAssets;
+const legacyRenderAssets = window.renderAssets;
 let inventoryRenderTicket = null;
 
 function renderInventoryQuickHeader() {
@@ -65,7 +65,7 @@ function renderInventorySelectsQuickly() {
   if (searchInput) searchInput.value = currentInventorySearch;
 }
 
-function renderAssets() {
+window.renderAssets = function renderAssetsPage() {
   cancelIdleRender(inventoryRenderTicket);
   renderInventoryQuickHeader();
   renderInventorySelectsQuickly();
@@ -78,4 +78,4 @@ function renderAssets() {
       '#schoolAssetList'
     ], 'Nao foi possivel carregar o inventario. Atualize a pagina.');
   }
-}
+};

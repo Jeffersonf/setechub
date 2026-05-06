@@ -1,8 +1,8 @@
 'use strict';
 
-const legacyRenderDiagnostics = renderDiagnostics;
-const legacyRenderUsers = renderUsers;
-const legacyRenderAdminSchoolTools = renderAdminSchoolTools;
+const legacyRenderDiagnostics = window.renderDiagnostics;
+const legacyRenderUsers = window.renderUsers;
+const legacyRenderAdminSchoolTools = window.renderAdminSchoolTools;
 let adminRenderTicket = null;
 
 function renderAdminPage() {
