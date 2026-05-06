@@ -1,94 +1,86 @@
 .supervisor-weekly-matrix-panel {
-  margin-top: 14px;
-  border: 1px solid var(--bd);
-  border-radius: 8px;
-  background: var(--sf2);
+  margin-top: 0;
+  border: 0;
+  background: transparent;
   overflow: hidden;
-}
-
-.supervisor-weekly-matrix-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--bd);
-}
-
-.supervisor-weekly-matrix-head > div {
-  display: grid;
-  gap: 3px;
-}
-
-.supervisor-weekly-matrix-head strong {
-  color: var(--tx);
-  font-size: 15px;
-}
-
-.supervisor-weekly-matrix-head span {
-  color: var(--mt);
-  font-size: 12px;
 }
 
 .supervisor-weekly-matrix-wrap {
   overflow: auto;
   max-height: min(58vh, 620px);
+  padding-bottom: 2px;
 }
 
 .supervisor-weekly-matrix {
   width: max-content;
   min-width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 8px;
+  margin: -8px;
 }
 
 .supervisor-weekly-matrix th,
 .supervisor-weekly-matrix td {
-  border: 1px solid rgba(255,255,255,.09);
-  padding: 9px 10px;
+  min-width: 126px;
   text-align: center;
-  min-width: 138px;
 }
 
 .supervisor-weekly-matrix th {
   position: sticky;
   top: 0;
   z-index: 2;
+  padding: 8px 10px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
   background: var(--sf);
   color: var(--mt);
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 700;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .supervisor-weekly-matrix .week-col {
   position: sticky;
   left: 0;
   z-index: 3;
-  min-width: 164px;
-  background: var(--sf);
+  min-width: 154px;
   text-align: left;
+}
+
+.supervisor-weekly-matrix th.week-col {
+  background: var(--sf);
+}
+
+.supervisor-weekly-matrix td {
+  padding: 10px 12px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: rgba(255,255,255,.025);
+  vertical-align: middle;
 }
 
 .supervisor-weekly-matrix td.week-col {
   background: var(--sf2);
 }
 
-.supervisor-weekly-matrix td {
-  background: rgba(255,255,255,.03);
-}
-
 .supervisor-weekly-matrix td strong,
-.supervisor-weekly-matrix td span {
+.supervisor-weekly-matrix td span,
+.supervisor-weekly-matrix td small {
   display: block;
 }
 
 .supervisor-weekly-matrix td strong {
-  font-size: 20px;
   color: var(--tx);
+  font-size: 19px;
+  line-height: 1.05;
 }
 
-.supervisor-weekly-matrix td span {
+.supervisor-weekly-matrix td span,
+.supervisor-weekly-matrix td small {
   color: var(--mt);
-  font-size: 12px;
+  font-size: 11.5px;
+  line-height: 1.25;
 }
 
 .supervisor-weekly-matrix .week-col strong {
@@ -97,43 +89,33 @@
 }
 
 .supervisor-weekly-matrix .week-col span {
-  margin-top: 4px;
+  margin-top: 5px;
+}
+
+.supervisor-weekly-matrix .week-col small {
+  margin-top: 7px;
+  color: var(--ac);
+  font-weight: 700;
 }
 
 .supervisor-weekly-matrix td.visited {
-  background: color-mix(in srgb, var(--ok) 13%, transparent);
+  border-color: color-mix(in srgb, var(--ok) 34%, var(--bd));
+  background: color-mix(in srgb, var(--ok) 11%, transparent);
 }
 
 .supervisor-weekly-matrix td.visited strong {
-  color: var(--tx);
-}
-
-.supervisor-weekly-matrix td.matrix-green {
-  background: color-mix(in srgb, var(--ok) 9%, transparent);
-}
-
-.supervisor-weekly-matrix td.matrix-red {
-  background: color-mix(in srgb, var(--er) 8%, transparent);
-}
-
-.supervisor-weekly-matrix td.matrix-wait {
-  background: rgba(255,255,255,.025);
-}
-
-.supervisor-weekly-matrix .diag-pill.matrix-green {
-  background: color-mix(in srgb, var(--ok) 18%, transparent);
-  border-color: color-mix(in srgb, var(--ok) 36%, var(--bd));
   color: var(--ok);
 }
 
-.supervisor-weekly-matrix .diag-pill.matrix-red {
-  background: color-mix(in srgb, var(--er) 16%, transparent);
-  border-color: color-mix(in srgb, var(--er) 36%, var(--bd));
-  color: var(--er);
+.supervisor-weekly-matrix td.matrix-green {
+  background: rgba(255,255,255,.025);
 }
 
-.supervisor-weekly-matrix .diag-pill.matrix-wait {
-  background: rgba(255,255,255,.06);
-  border-color: var(--bd);
-  color: var(--mt);
+.supervisor-weekly-matrix td.matrix-red {
+  border-color: color-mix(in srgb, var(--er) 26%, var(--bd));
+  background: color-mix(in srgb, var(--er) 7%, transparent);
+}
+
+.supervisor-weekly-matrix td.matrix-wait {
+  background: rgba(255,255,255,.02);
 }

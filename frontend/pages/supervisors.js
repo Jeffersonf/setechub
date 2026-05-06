@@ -83,12 +83,6 @@ function supervisorWeeklyMatrixStatusClass(status) {
   return 'matrix-wait';
 }
 
-function supervisorWeeklyMatrixIcon(count, status) {
-  if (count > 0) return '&#9989;';
-  if (status === 'aguardando') return '&#9203;';
-  return '&#10060;';
-}
-
 function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
   const panel = document.getElementById('supervisorRecordWeeklyMatrix');
   if (!panel) return;
@@ -98,6 +92,10 @@ function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
   }
   const supervisor = selectedStat.supervisor;
   const schools = (selectedStat.assignedSchools || supervisor.schools || []).filter(Boolean);
+  if (!schools.length) {
+    panel.innerHTML = '<div class="sync-empty">Este supervisor ainda nao possui escolas vinculadas.</div>';
+    return;
+  }
   const weekCount = Math.max(1, supervisorLastWeekOfViewMonth());
   const weeks = Array.from({ length: weekCount }, (_, index) => index + 1);
   panel.innerHTML = `
@@ -124,13 +122,13 @@ function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
               <tr>
                 <td class="week-col">
                   <strong>Semana ${esc(String(weekNumber))}</strong>
-                  <span><b>Inicio</b> ${esc(rangeLabel.start)}</span>
-                  <span><b>Fim</b> ${esc(rangeLabel.end)}</span>
+                  <span>${esc(rangeLabel.start)} - ${esc(rangeLabel.end)}</span>
+                  <small>${esc(String(visitedCount))}/${esc(String(schools.length))} escola(s)</small>
                 </td>
                 ${cells.map((cell) => `
                   <td class="${cell.count > 0 ? 'visited' : statusClass}">
                     <strong>${esc(String(cell.count))}</strong>
-                    <span>${supervisorWeeklyMatrixIcon(cell.count, status)}</span>
+                    <span>${cell.count > 0 ? 'visita(s)' : status === 'aguardando' ? 'aguardando' : 'sem visita'}</span>
                   </td>
                 `).join('')}
               </tr>
