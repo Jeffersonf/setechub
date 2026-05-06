@@ -1578,9 +1578,7 @@ function renderCurrentPage(page = currentPage) {
     return;
   }
   if (page === 'admin') {
-    renderDiagnostics();
-    renderUsers();
-    renderAdminSchoolTools();
+    renderAdminPage();
   }
 }
 
