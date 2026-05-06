@@ -7,17 +7,16 @@ let adminRenderTicket = null;
 
 function renderAdminPage() {
   cancelIdleRender(adminRenderTicket);
-  renderDeferredPlaceholders([
-    '#diagnosticList',
-    '#userList',
-    '#adminSchoolList',
-    '#adminImportInfo',
-    '#snapshotList'
-  ], 'Carregando administracao...');
-  adminRenderTicket = scheduleIdleRender(() => {
-    adminRenderTicket = null;
+  try {
     legacyRenderDiagnostics();
     legacyRenderUsers();
     legacyRenderAdminSchoolTools();
-  }, { timeout: 1000, delay: 80 });
+  } catch (error) {
+    console.error('Falha ao carregar administracao', error);
+    renderDeferredPlaceholders([
+      '#diagnosticList',
+      '#userList',
+      '#adminSchoolList'
+    ], 'Nao foi possivel carregar a administracao. Atualize a pagina.');
+  }
 }

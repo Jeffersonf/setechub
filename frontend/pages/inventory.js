@@ -69,20 +69,13 @@ function renderAssets() {
   cancelIdleRender(inventoryRenderTicket);
   renderInventoryQuickHeader();
   renderInventorySelectsQuickly();
-  renderDeferredPlaceholders([
-    '#inventoryTypeStrip',
-    '#inventoryFocusPanel',
-    '#inventoryIssuesList',
-    '#inventorySchoolRanking',
-    '#inventoryDetailTable',
-    '#inventoryCategoryTable',
-    '#assetMonitorCards',
-    '#assetComparisonTable',
-    '#assetTypeTable',
-    '#schoolAssetList'
-  ], 'Carregando inventario...');
-  inventoryRenderTicket = scheduleIdleRender(() => {
-    inventoryRenderTicket = null;
+  try {
     legacyRenderAssets();
-  }, { timeout: 1200, delay: 90 });
+  } catch (error) {
+    console.error('Falha ao carregar inventario', error);
+    renderDeferredPlaceholders([
+      '#inventoryDetailTable',
+      '#schoolAssetList'
+    ], 'Nao foi possivel carregar o inventario. Atualize a pagina.');
+  }
 }
