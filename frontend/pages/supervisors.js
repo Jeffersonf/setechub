@@ -83,6 +83,12 @@ function supervisorWeeklyMatrixStatusClass(status) {
   return 'matrix-wait';
 }
 
+function supervisorWeeklyMatrixIcon(count, status) {
+  if (count > 0) return '&#9989;';
+  if (status === 'aguardando') return '&#9203;';
+  return '&#10060;';
+}
+
 function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
   const panel = document.getElementById('supervisorRecordWeeklyMatrix');
   if (!panel) return;
@@ -128,7 +134,8 @@ function renderSupervisorWeeklyMatrixForRecord(selectedStat, visits) {
                 ${cells.map((cell) => `
                   <td class="${cell.count > 0 ? 'visited' : statusClass}">
                     <strong>${esc(String(cell.count))}</strong>
-                    <span>${cell.count > 0 ? 'visita(s)' : status === 'aguardando' ? 'aguardando' : 'sem visita'}</span>
+                    <span class="matrix-cell-icon">${supervisorWeeklyMatrixIcon(cell.count, status)}</span>
+                    <small>${cell.count > 0 ? 'visita(s)' : status === 'aguardando' ? 'aguardando' : 'sem visita'}</small>
                   </td>
                 `).join('')}
               </tr>

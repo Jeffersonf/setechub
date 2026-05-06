@@ -30,7 +30,7 @@
   top: 0;
   z-index: 2;
   padding: 8px 10px;
-  border: 1px solid var(--bd);
+  border: 1px solid rgba(255,255,255,.06);
   border-radius: 8px;
   background: var(--sf);
   color: var(--mt);
@@ -54,7 +54,7 @@
 
 .supervisor-weekly-matrix td {
   padding: 10px 12px;
-  border: 1px solid var(--bd);
+  border: 1px solid rgba(255,255,255,.045);
   border-radius: 8px;
   background: rgba(255,255,255,.025);
   vertical-align: middle;
@@ -83,6 +83,12 @@
   line-height: 1.25;
 }
 
+.supervisor-weekly-matrix .matrix-cell-icon {
+  margin: 4px 0 2px;
+  font-size: 14px;
+  line-height: 1;
+}
+
 .supervisor-weekly-matrix .week-col strong {
   font-size: 12px;
   text-transform: uppercase;
@@ -99,7 +105,7 @@
 }
 
 .supervisor-weekly-matrix td.visited {
-  border-color: color-mix(in srgb, var(--ok) 34%, var(--bd));
+  border-color: color-mix(in srgb, var(--ok) 26%, rgba(255,255,255,.045));
   background: color-mix(in srgb, var(--ok) 11%, transparent);
 }
 
@@ -112,7 +118,7 @@
 }
 
 .supervisor-weekly-matrix td.matrix-red {
-  border-color: color-mix(in srgb, var(--er) 26%, var(--bd));
+  border-color: color-mix(in srgb, var(--er) 20%, rgba(255,255,255,.045));
   background: color-mix(in srgb, var(--er) 7%, transparent);
 }
 
