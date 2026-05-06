@@ -116,6 +116,9 @@ function requireEditAccess() {
 
 function exportJson() {
   if (!canManageUsers()) return;
+  state.lastBackupAt = new Date().toISOString();
+  saveState();
+  renderDiagnostics();
   downloadFile('setechub-backup.json', JSON.stringify(state, null, 2), 'application/json');
 }
 
@@ -156,12 +159,50 @@ async function toggleSupervisorPanelFullscreen() {
   updateSupervisorFullscreenButton();
 }
 
+async function prepareSupervisorPresentation() {
+  const input = document.getElementById('supervisorPresentationMonth');
+  const monthKey = input?.value || viewMonthValue();
+  const [year, month] = String(monthKey || '').split('-').map(Number);
+  if (year && month) currentViewDate = new Date(year, month - 1, 1);
+  showPage('supervisors');
+  const currentMonthKey = viewMonthValue(new Date());
+  const button = document.getElementById('prepareSupervisorPresentationBtn');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Preparando...';
+  }
+  try {
+    if (monthKey === currentMonthKey) {
+      await syncSupervisorVisitSources({ silent: true });
+    } else {
+      const link = supervisorMonthlySheetLinks().find((item) => item.monthKey === monthKey);
+      if (link) await syncSupervisorMonthlySheet(link.id);
+      else refreshAll();
+    }
+    const panel = document.getElementById('painelSupervisor');
+    if (panel) panel.classList.add('supervisor-presentation-mode');
+    if (panel && document.fullscreenElement !== panel && !panel.classList.contains('supervisor-panel-fullscreen')) {
+      await toggleSupervisorPanelFullscreen();
+    }
+    showToast('Painel de supervisores pronto para apresentacao.', 'success');
+  } catch (error) {
+    console.warn('Nao foi possivel preparar a apresentacao de supervisores.', error);
+    showToast('Nao foi possivel preparar a apresentacao.', 'error');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Preparar apresentacao';
+    }
+  }
+}
+
 function updateSupervisorFullscreenButton() {
   const button = document.getElementById('supervisorFullscreenBtn');
   const panel = document.getElementById('painelSupervisor');
   if (!button || !panel) return;
   const active = document.fullscreenElement === panel || panel.classList.contains('supervisor-panel-fullscreen');
   button.textContent = active ? 'Sair da tela cheia' : 'Tela cheia';
+  if (!active) panel.classList.remove('supervisor-presentation-mode');
 }
 
 function toggleUserActive(id) {
@@ -1884,6 +1925,7 @@ function setupEventListeners() {
   document.getElementById('checkSupabaseBtn')?.addEventListener('click', checkSupabaseConnection);
   document.getElementById('seedSupervisorVisitsBtn')?.addEventListener('click', addSupervisorTestVisits);
   document.getElementById('syncSupervisorSourcesBtn')?.addEventListener('click', syncSupervisorVisitSources);
+  document.getElementById('prepareSupervisorPresentationBtn')?.addEventListener('click', prepareSupervisorPresentation);
   document.getElementById('supervisorFullscreenBtn')?.addEventListener('click', toggleSupervisorPanelFullscreen);
   document.getElementById('refreshSupervisorSheetBtn')?.addEventListener('click', syncCurrentSupervisorVisitSource);
   document.getElementById('randomUserPinBtn')?.addEventListener('click', fillRandomUserPin);

@@ -824,6 +824,7 @@ function createDefaults() {
   return {
     stateVersion: STATE_VERSION,
     lastUpdatedAt: new Date().toISOString(),
+    lastBackupAt: '',
     inventoryUpdatedAt: new Date().toISOString(),
     inventoryUpdatedBySchool: {},
     profile: {
@@ -1020,6 +1021,7 @@ function mergeState(saved) {
   const repaired = deepRepairStrings(saved);
   const savedVersion = Number(repaired.stateVersion || 1);
   const lastUpdatedAt = repaired.lastUpdatedAt || new Date().toISOString();
+  const lastBackupAt = repaired.lastBackupAt || '';
   const inventoryUpdatedAt = repaired.inventoryUpdatedAt || lastUpdatedAt;
   const inventoryUpdatedBySchool = repaired.inventoryUpdatedBySchool && typeof repaired.inventoryUpdatedBySchool === 'object'
     ? Object.fromEntries(Object.entries(repaired.inventoryUpdatedBySchool)
@@ -1076,6 +1078,7 @@ function mergeState(saved) {
     ...base,
     stateVersion: Math.max(STATE_VERSION, savedVersion),
     lastUpdatedAt,
+    lastBackupAt,
     inventoryUpdatedAt,
     inventoryUpdatedBySchool,
     profile: { ...base.profile, ...(repaired.profile || {}) },

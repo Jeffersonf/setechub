@@ -724,19 +724,11 @@ function renderInventoryWorkspace() {
   const totalSchools = visibleSchools().length || 1;
   const coveragePct = Math.round((coveredSchools / totalSchools) * 100);
   const issuePct = totalUnits ? Math.round((alertUnits / totalUnits) * 100) : 0;
-  const inventorySchoolUpdatedAt = (schoolName) => {
-    const canonical = canonicalSchoolName(schoolName) || schoolName;
-    return state.inventoryUpdatedBySchool?.[canonical] || state.inventoryUpdatedAt || '';
-  };
-  const inventorySchoolUpdatedLabel = (schoolName) => {
-    const value = inventorySchoolUpdatedAt(schoolName);
-    return value ? timestampLabel(new Date(value)) : 'Nao registrada';
-  };
   const updatedAtNode = document.getElementById('inventoryUpdatedAtMeta');
   if (updatedAtNode) {
     updatedAtNode.textContent = regionalView
       ? `Ultima atualizacao geral do inventario: ${state.inventoryUpdatedAt ? timestampLabel(new Date(state.inventoryUpdatedAt)) : 'nao registrada'}`
-      : `Ultima atualizacao desta escola: ${inventorySchoolUpdatedLabel(focusSchool)}`;
+      : `Ultima atualizacao desta escola: ${inventoryUpdatedLabelForSchool(focusSchool)}`;
   }
   const schoolListAssets = state.schoolAssets.filter((item) => {
     if (!canViewSchool(item.school)) return false;
@@ -961,7 +953,7 @@ function renderInventoryWorkspace() {
         <div class="inventory-school-row-main">
           <div>
             <strong>${esc(item.school)}</strong>
-            <div class="sync-meta">CIE ${esc(item.cie || '--')} | ${esc(item.zone || '--')} | atualizado ${esc(inventorySchoolUpdatedLabel(item.school))}</div>
+            <div class="sync-meta">CIE ${esc(item.cie || '--')} | ${esc(item.zone || '--')} | atualizado ${esc(inventoryUpdatedLabelForSchool(item.school))}</div>
           </div>
           <div class="inventory-school-row-metrics">
             <span><strong>${esc(String(item.totalUnits))}</strong> total</span>
@@ -1013,7 +1005,7 @@ function renderInventoryWorkspace() {
           <div class="inventory-matrix-row">
             <button class="inventory-matrix-school" type="button" onclick="openSchoolRecord('${esc(row.school.name)}')">
               <span class="school-widget-avatar mini" style="${schoolAvatarStyle(row.school)}">${esc(schoolAvatarInitials(row.school.name))}</span>
-              <span><strong>${esc(row.school.name)}</strong><small>Atualizado ${esc(inventorySchoolUpdatedLabel(row.school.name))}</small></span>
+              <span><strong>${esc(row.school.name)}</strong><small>Atualizado ${esc(inventoryUpdatedLabelForSchool(row.school.name))}</small></span>
             </button>
             ${row.cells.map((cell) => `
               <button class="inventory-matrix-cell ${cell.units ? 'has-value' : ''} ${cell.alertUnits ? 'has-alert' : ''}" type="button" onclick="openInventoryCategory('todos', '${esc(cell.category)}', '${esc(row.school.name)}')" ${cell.units ? '' : 'disabled'}>
@@ -1039,6 +1031,16 @@ function renderInventoryWorkspace() {
         </button>
       `).join('') : '<div class="sync-empty">Sem tipos para resumir neste recorte.</div>';
   }
+}
+
+function inventoryUpdatedAtForSchool(schoolName) {
+  const canonical = canonicalSchoolName(schoolName) || schoolName;
+  return state.inventoryUpdatedBySchool?.[canonical] || state.inventoryUpdatedAt || '';
+}
+
+function inventoryUpdatedLabelForSchool(schoolName) {
+  const value = inventoryUpdatedAtForSchool(schoolName);
+  return value ? timestampLabel(new Date(value)) : 'Nao registrada';
 }
 
 function renderSetupStats() {
@@ -1465,6 +1467,7 @@ function renderSchoolDetail() {
           ${school.fixedName ? '<span class="diag-pill">Oficial</span>' : ''}
           <span class="diag-pill ${situationTone}">${esc(situationLabel)}</span>
           <span class="diag-pill">${esc(responsibleSupervisorText)}</span>
+          <span class="diag-pill">Inventario atualizado ${esc(inventoryUpdatedLabelForSchool(currentSchoolDetail))}</span>
         </div>
       </div>
       <div class="school-record-hero-actions">
@@ -1721,6 +1724,8 @@ function renderSupervisors() {
   const averageCoverage = stats.length
     ? Math.round(stats.reduce((sum, item) => sum + item.coverage, 0) / stats.length)
     : 0;
+  const presentationMonth = document.getElementById('supervisorPresentationMonth');
+  if (presentationMonth && presentationMonth.value !== viewMonthKey) presentationMonth.value = viewMonthKey;
 
   if (metricCount) metricCount.textContent = String(stats.length);
   const metricSchools = document.getElementById('supervisorMetricSchools');
@@ -2861,6 +2866,12 @@ function renderDiagnostics() {
     : 'Nenhum estado legado encontrado no navegador atual.';
   const serverMeta = document.getElementById('serverHealthMeta');
   if (serverMeta) serverMeta.textContent = serverStatus.message;
+  const backupMeta = document.getElementById('backupStatusMeta');
+  if (backupMeta) {
+    backupMeta.textContent = state.lastBackupAt
+      ? `Ultimo backup exportado: ${timestampLabel(new Date(state.lastBackupAt))}`
+      : 'Backup ainda nao exportado neste navegador.';
+  }
   const importInfo = document.getElementById('adminImportInfo');
   if (importInfo) {
     importInfo.innerHTML = [

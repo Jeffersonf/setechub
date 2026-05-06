@@ -2797,6 +2797,15 @@ textarea {
   font-size: 12px;
 }
 
+#painelSupervisor.supervisor-presentation-mode .cs,
+#painelSupervisor.supervisor-presentation-mode .mini-actions {
+  display: none;
+}
+
+#painelSupervisor.supervisor-presentation-mode .supervisor-sheet-table {
+  min-width: 1180px;
+}
+
 #painelSupervisor:fullscreen .supervisor-sheet-panel,
 #painelSupervisor.supervisor-panel-fullscreen .supervisor-sheet-panel {
   min-height: 0;

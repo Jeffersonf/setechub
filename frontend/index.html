@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css?v=20260505-login-refresh">
-<link rel="stylesheet" href="./setechub.css?v=20260505-supervisor-name-font">
+<link rel="stylesheet" href="./setechub.css?v=20260506-presentation-db">
 </head>
 <body>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
@@ -400,8 +400,10 @@
       <div class="bh">
         <div><div class="ct">Painel de supervisores</div><div class="cs">Resumo mensal das visitas, metas e indicadores da planilha oficial.</div></div>
         <div class="mini-actions">
+          <input class="fi btn-sm" id="supervisorPresentationMonth" type="month" aria-label="Mes em apresentacao">
           <a class="btn btn-g btn-sm" href="https://docs.google.com/spreadsheets/d/1AaHF-kDf-3RVd4euAACBCMVB7AsrsVwMkLnDhpg-LnM/edit?gid=1507846737#gid=1507846737" target="_blank" rel="noreferrer">Abrir planilha</a>
           <button class="btn btn-p btn-sm" id="syncSupervisorSourcesBtn" type="button">Atualizar planilha</button>
+          <button class="btn btn-p btn-sm" id="prepareSupervisorPresentationBtn" type="button">Preparar apresentacao</button>
           <button class="btn btn-g btn-sm" id="supervisorFullscreenBtn" type="button">Tela cheia</button>
         </div>
       </div>
@@ -855,6 +857,7 @@
         <label class="btn btn-g" for="restoreInput">Importar backup</label>
         <input id="restoreInput" type="file" accept=".json" hidden>
         <button class="btn btn-d" id="resetBtn" type="button">Redefinir base local</button>
+        <div class="sync-meta" id="backupStatusMeta">Backup ainda nao exportado nesta sessao.</div>
       </div>
     </div>
     <div class="box admin-module">
@@ -911,11 +914,11 @@
 <datalist id="officialSchoolOptions"></datalist>
 
 <script src="./school-data.js?v=20260505-login-refresh"></script>
-<script src="./storage.js?v=20260505-inventory-school-updates"></script>
+<script src="./storage.js?v=20260506-presentation-db"></script>
 <script src="./app.js?v=20260505-supervisor-indicators"></script>
-<script src="./render.js?v=20260505-supervisor-name-font"></script>
+<script src="./render.js?v=20260506-presentation-db"></script>
 <script src="./api.js?v=20260505-supervisor-indicators"></script>
-<script src="./actions.js?v=20260505-inventory-school-updates"></script>
+<script src="./actions.js?v=20260506-presentation-db"></script>
 <script src="./bootstrap.js?v=20260505-login-refresh"></script>
 </body>
 </html>
