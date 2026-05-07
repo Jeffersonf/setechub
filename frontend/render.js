@@ -98,7 +98,7 @@ function renderDashboardHero() {
   `;
 
   statsNode.innerHTML = [
-    { label: template.metrics[0]?.label || 'Escolas em atenção', value: template.metrics[0]?.value ?? String(attentionSchools), tone: template.metrics[0]?.tone || (attentionSchools ? 'pill-warn' : 'pill-ok') },
+    { label: template.metrics[0]?.label || 'Escolas', value: template.metrics[0]?.value ?? String(schools.length), tone: template.metrics[0]?.tone || 'pill-info' },
     { label: template.metrics[1]?.label || 'Inventário alerta', value: template.metrics[1]?.value ?? String(alertAssets), tone: template.metrics[1]?.tone || (alertAssets ? 'pill-danger' : 'pill-ok') },
     { label: template.metrics[2]?.label || 'Pendências', value: template.metrics[2]?.value ?? String(pendingItems), tone: template.metrics[2]?.tone || (pendingItems ? 'pill-info' : 'pill-ok') },
     { label: template.metrics[3]?.label || 'Cobertura fichas', value: template.metrics[3]?.value ?? `${coverage.profileCoverage}%`, tone: template.metrics[3]?.tone || (coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn') }
@@ -135,7 +135,7 @@ function dashboardTemplateForRole() {
     actions: [baseActions.schools, baseActions.inventory, baseActions.agenda],
     metrics: [
       { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
-      { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+      { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
       { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
       { label: 'Inventário', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
     ]
@@ -177,7 +177,7 @@ function dashboardTemplateForRole() {
       metrics: [
         { label: 'Minhas escolas', value: String(schools.length), tone: 'pill-info' },
         { label: 'Visitas mês', value: String(monthlyVisits), tone: monthlyVisits ? 'pill-ok' : 'pill-warn' },
-        { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+        { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
         { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
       ]
     };
@@ -191,7 +191,7 @@ function dashboardTemplateForRole() {
       metrics: [
         { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
         { label: 'Manut./defeito', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
-        { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+        { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
         { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
       ]
     };
@@ -299,7 +299,7 @@ function renderDashboardAccess() {
     const inventoryAlertCount = state.schoolAssets.filter((item) => item.status !== 'ok').length;
     const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
     const allModules = [
-      { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades | ${schoolAlertCount} em atenção`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+      { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades | base consistente`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
       { icon: '&#128187;', title: 'Inventário', meta: `${inventoryAlertCount} alerta(s)`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
       { icon: '&#129517;', title: 'Supervisores', meta: `${visibleSupervisors().length} no painel`, action: `showPage('supervisors')`, page: 'supervisors', tone: 'blue', priority: 'primary' },
       { icon: '&#128736;', title: 'Técnicos CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
@@ -349,7 +349,7 @@ function renderDashboardAccess() {
   const unresolvedCalls = state.calls.filter((item) => item.status === 'aberto').length;
   const routeCalls = state.calls.filter((item) => item.status === 'em_rota').length;
   const categories = [
-    { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases | ${schoolAlertCount} em atenção`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+    { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases | base consistente`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
     { icon: '&#128187;', title: 'Inventário', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} manut./defeito`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
     { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
     { icon: '&#128247;', title: 'Câmeras', meta: `${cameraSchoolCount} escolas com câmeras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
@@ -397,7 +397,7 @@ function renderDashboardAccess() {
   }
   if (drilldownNode) {
     const cards = [
-      { title: 'Escolas em atenção', meta: `${attentionSchools} escola(s)`, action: `openSchoolCategory('atencao')`, page: 'schools', tone: 'red' },
+      { title: 'Base consistente', meta: `${schools.length} escola(s)`, action: `showPage('schools')`, page: 'schools', tone: 'lime' },
       { title: 'Escolas sem ficha', meta: `${noProfileSchools} escola(s)`, action: `openSchoolCategory('sem_ficha')`, page: 'schools', tone: 'amber' },
       { title: 'Escolas com alerta', meta: `${schoolAlertCount} escola(s)`, action: `openSchoolCategory('com_alerta')`, page: 'schools', tone: 'lime' },
       { title: 'Inventário com defeito', meta: `${aggregateInventoryItems(state.schoolAssets).filter((item) => item.defectUnits > 0).length} tipo(s)`, action: `openInventoryCategory('criticos')`, page: 'assets', tone: 'red' },

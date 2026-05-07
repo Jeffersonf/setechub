@@ -1693,13 +1693,13 @@ function buildSummaryPreview() {
   if (cache.summaryPreview) return cache.summaryPreview;
   const done = state.tasks.filter((item) => item.done).length;
   const openCalls = state.calls.filter((item) => item.status !== 'resolvido').length;
-  const attentionSchools = visibleSchools().filter((item) => item.status !== 'estavel').length;
   const alertAssets = state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length;
   const focus = nextFocusTask();
+  const health = dashboardHealth();
   cache.summaryPreview = [
     `${done}/${state.tasks.length} tarefas concluidas`,
     `${openCalls} chamados ativos`,
-    `${attentionSchools} escolas em atencao`,
+    health.label,
     `${alertAssets} ativos em manutenção/defeito`,
     focus ? `proximo foco: ${focus.title}` : 'sem tarefa aberta'
   ].join(' | ');

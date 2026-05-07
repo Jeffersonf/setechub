@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-dashboard-trim-1">
-<link rel="stylesheet" href="./setechub.css?v=20260507-dashboard-trim-1">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-dashboard-trim-1">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-dashboard-trim-1">
-<script defer src="./school-data.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./storage.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./app.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./render.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./utils/defer.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./components/avatar.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./components/school-card.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./pages/schools.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./pages/school-record.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./pages/inventory.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./pages/supervisors.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./pages/admin.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./api.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./actions.js?v=20260507-dashboard-trim-1"></script>
-<script defer src="./bootstrap.js?v=20260507-dashboard-trim-1"></script>
+<link rel="stylesheet" href="./styles.css?v=20260507-dashboard-base-1">
+<link rel="stylesheet" href="./setechub.css?v=20260507-dashboard-base-1">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260507-dashboard-base-1">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-dashboard-base-1">
+<script defer src="./school-data.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./storage.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./app.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./render.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./utils/defer.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./components/avatar.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./components/school-card.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./pages/schools.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./pages/school-record.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./pages/inventory.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./pages/supervisors.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./pages/admin.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./api.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./actions.js?v=20260507-dashboard-base-1"></script>
+<script defer src="./bootstrap.js?v=20260507-dashboard-base-1"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -145,12 +145,12 @@
     <section class="dashboard-role-grid attention" id="dashboardAttentionCards" hidden></section>
     <section class="dashboard-ops-grid" data-v1-dashboard-secondary hidden>
       <div class="box"><div class="bh"><div><div class="ct">Saúde operacional</div><div class="cs">Sinais para decidir o próximo movimento.</div></div></div><div id="opsHealthPanel"></div><div id="coverageGrid" class="setechub-monitor-grid compact-grid"></div></div>
-      <div class="box"><div class="bh"><div><div class="ct">Sinais por escola</div><div class="cs">Unidades que pedem atenção primeiro.</div></div></div><div id="opsSignalList" class="stack-list"></div></div>
+      <div class="box"><div class="bh"><div><div class="ct">Sinais por escola</div><div class="cs">Base consistente para consulta rápida.</div></div></div><div id="opsSignalList" class="stack-list"></div></div>
       <div class="box"><div class="bh"><div><div class="ct">Ações sugeridas</div><div class="cs">Fila prática para a rotina.</div></div></div><div id="opsSuggestionList" class="stack-list"></div></div>
     </section>
     <section class="dashboard-v1-grid">
       <div class="box" id="dashboardCategoryBox"><div class="bh"><div><div class="ct">Módulos</div><div class="cs">Entrada rápida por área.</div></div></div><div id="dashboardCategoryGrid" class="dashboard-category-grid"></div></div>
-      <div class="box"><div class="bh"><div><div class="ct">Atenção agora</div><div class="cs">Fila curta para decidir o próximo passo.</div></div></div><div id="pendingQueueList" class="stack-list"></div></div>
+      <div class="box"><div class="bh"><div><div class="ct">Base consistente</div><div class="cs">Fila curta para decidir o próximo passo.</div></div></div><div id="pendingQueueList" class="stack-list"></div></div>
       <div class="box" id="dashboardQuickBox" data-v1-dashboard-secondary hidden><div class="bh"><div><div class="ct">Atalhos vivos</div><div class="cs">Escolas, inventário e chamados em destaque.</div></div></div><div id="dashboardQuickLinks" class="stack-list"></div></div>
       <div class="box" id="dashboardDrilldownBox" data-v1-dashboard-secondary hidden><div class="bh"><div><div class="ct">Recortes</div><div class="cs">Filtros prontos para investigar.</div></div></div><div id="dashboardDrilldownGrid" class="dashboard-drill-grid"></div></div>
     </section>
