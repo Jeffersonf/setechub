@@ -3130,8 +3130,7 @@ textarea {
 
 .supervisor-sheet-table .diag-pill,
 .supervisor-list-card .diag-pill,
-#supervisorRecordProfile .diag-pill,
-#supervisorRecordMetrics .diag-pill {
+#supervisorRecordProfile .diag-pill {
   min-width: 96px;
   justify-content: center;
   border-width: 1px;
@@ -3394,10 +3393,12 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 7px;
+  margin-top: 6px;
   color: var(--mt);
-  font-size: 12px;
-  font-weight: 700;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .supervisor-profile-meta a,
@@ -3428,7 +3429,13 @@ textarea {
 .supervisor-goal-grid .setechub-command-score {
   display: grid;
   align-content: space-between;
-  min-height: 150px;
+  gap: 12px;
+  min-height: 118px;
+  padding: 16px;
+}
+
+.supervisor-goal-grid .setechub-command-score > div {
+  width: 100%;
 }
 
 .supervisor-goal-head {
@@ -3438,10 +3445,42 @@ textarea {
   gap: 10px;
 }
 
-.supervisor-goal-head .diag-pill {
-  min-width: 118px;
-  min-height: 28px;
+.supervisor-goal-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  min-width: 104px;
+  min-height: 24px;
   padding: 0 14px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.supervisor-goal-status.pill-ok {
+  color: #7ee8a2;
+  border-color: rgba(74,222,128,.24);
+  background: rgba(74,222,128,.10);
+}
+
+.supervisor-goal-status.pill-warn {
+  color: #f5c85a;
+  border-color: rgba(245,200,90,.25);
+  background: rgba(245,200,90,.11);
+}
+
+.supervisor-goal-status.pill-danger {
+  color: #f5705a;
+  border-color: rgba(245,112,90,.25);
+  background: rgba(245,112,90,.11);
 }
 
 .supervisor-goal-caption {
@@ -4124,7 +4163,7 @@ textarea {
 }
 
 #supervisorRecordMetrics .supervisor-metric-card {
-  min-height: 118px;
+  min-height: 112px;
   padding: 16px;
   border-radius: 14px;
   background:
@@ -4134,36 +4173,37 @@ textarea {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
 }
 
+#supervisorRecordMetrics .supervisor-metric-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
 #supervisorRecordMetrics .supervisor-metric-label {
   color: var(--mt);
+  font-family: inherit;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1.25;
 }
 
 #supervisorRecordMetrics .supervisor-metric-card strong {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 24px;
+  line-height: 1;
 }
 
 #supervisorRecordMetrics .supervisor-metric-note {
   align-self: end;
   color: var(--mt);
+  font-family: inherit;
   font-size: 11px;
   font-weight: 800;
   line-height: 1.25;
   text-transform: none;
-}
-
-#supervisorRecordMetrics .supervisor-metric-note.pill-ok {
-  color: #7ee8a2;
-}
-
-#supervisorRecordMetrics .supervisor-metric-note.pill-warn {
-  color: #f5c85a;
-}
-
-#supervisorRecordMetrics .supervisor-metric-note.pill-danger {
-  color: #f5705a;
 }
 
 .setechub-clickable {
@@ -4903,6 +4943,10 @@ textarea {
 .urole {
   color: var(--mt);
   font-size: 12px;
+}
+
+.acct-btn .urole::before {
+  content: none;
 }
 
 .ct {

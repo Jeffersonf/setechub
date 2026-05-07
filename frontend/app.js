@@ -67,7 +67,7 @@ const ROLE_LABELS = {
   dirigente: 'Dirigente',
   seintec: 'SEINTEC',
   seom: 'SEOM',
-  ctc: 'CTC',
+  ctc: 'Técnicos CTC',
   pec: 'PEC',
   supervisor: 'Supervisor'
 };

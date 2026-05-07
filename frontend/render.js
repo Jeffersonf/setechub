@@ -2028,11 +2028,9 @@ function renderSupervisors() {
           <div>
             <strong>${esc(selectedStat.supervisor.name)}</strong>
             <div class="sync-meta">${esc(selectedStat.supervisor.email || '')} | ${esc(selectedStat.supervisor.phone || '')}</div>
-            ${selectedStat.supervisor.visitSourceUrl ? `<div class="sync-meta">Fonte principal: ${esc(selectedStat.supervisor.visitSourceLabel || 'Planilha Google')}${selectedStat.supervisor.sourceSyncedAt ? ` | atualizada em ${esc(timestampLabel(new Date(selectedStat.supervisor.sourceSyncedAt)))}` : ''}</div>` : ''}
           </div>
           <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${goalMet ? 'Meta cumprida' : 'Meta pendente'}</span>
         </div>
-        ${selectedStat.supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(selectedStat.supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a></div>` : ''}
       </div>
       <div class="school-overview-kpis">
         <div><span>Escolas</span><strong>${esc(String(selectedStat.assignedSchools.length))}</strong></div>
@@ -2257,7 +2255,7 @@ function renderSupervisorRecord() {
   if (visitCorrectionSubtitle) visitCorrectionSubtitle.textContent = 'Use este aviso quando uma visita estiver errada ou faltando.';
   const refreshButton = document.getElementById('refreshSupervisorSheetBtn');
   if (refreshButton) {
-    refreshButton.hidden = !supervisor.visitSourceUrl || !canImportData();
+    refreshButton.hidden = true;
     refreshButton.disabled = false;
     refreshButton.textContent = 'Atualizar planilha';
   }
@@ -2275,7 +2273,6 @@ function renderSupervisorRecord() {
         </div>
         <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
       </div>
-      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a>${canImportData() ? '<button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar</button>' : ''}</div>` : ''}
     </div>
   `;
 
@@ -2285,7 +2282,7 @@ function renderSupervisorRecord() {
         <div>
           <div class="supervisor-goal-head">
             <span class="sync-meta">Meta semanal</span>
-            <span class="diag-pill ${supervisorIndicatorClass(weeklyIndicator)}">${esc(supervisorIndicatorText(weeklyIndicator))}</span>
+            <span class="supervisor-goal-status ${supervisorIndicatorClass(weeklyIndicator)}">${esc(supervisorIndicatorText(weeklyIndicator))}</span>
           </div>
           <strong>${esc(String(weeklyVisitCount))}/${esc(weeklyGoalLabel)}</strong>
         </div>
@@ -2296,7 +2293,7 @@ function renderSupervisorRecord() {
         <div>
           <div class="supervisor-goal-head">
             <span class="sync-meta">Meta mensal</span>
-            <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
+            <span class="supervisor-goal-status ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
           </div>
           <strong>${esc(String(monthlyVisitCount))}/${esc(monthlyGoalLabel)}</strong>
         </div>
@@ -2315,9 +2312,11 @@ function renderSupervisorRecord() {
     { label: 'Historico', value: String(allVisits.length), note: 'Ver registros', target: 'supervisorRecordVisitTable' }
   ].map((item) => `
     <div class="setechub-monitor-card compact supervisor-metric-card ${item.target ? 'setechub-clickable' : ''}" ${item.target ? `onclick="document.getElementById('${esc(item.target)}')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"` : ''}>
-      <div class="supervisor-metric-label">${esc(item.label)}</div>
+      <div class="supervisor-metric-head">
+        <div class="supervisor-metric-label">${esc(item.label)}</div>
+      </div>
       <strong>${esc(item.value)}</strong>
-      <div class="supervisor-metric-note ${item.tone ? supervisorIndicatorClass(item.tone) : ''}">${esc(item.note)}</div>
+      <div class="supervisor-metric-note">${esc(item.note)}</div>
     </div>
   `).join('');
 
@@ -2330,7 +2329,6 @@ function renderSupervisorRecord() {
         <strong>Visita errada ou faltando?</strong>
         <span>Confira a escola, a data e o supervisor na planilha oficial. Se a divergencia continuar, entre em contato com o gabinete para correcao do registro.</span>
         <div class="mini-actions">
-          ${supervisor.visitSourceUrl ? `<a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a>` : ''}
           <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordVisitTable">Ver registros</button>
         </div>
       </div>
