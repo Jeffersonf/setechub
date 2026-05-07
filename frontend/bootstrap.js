@@ -4,6 +4,7 @@ applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
 setupEventListeners();
 restoreUiContext();
 restorePageFromHash();
+showPage(currentPage || sessionStorage.getItem(PAGE_KEY) || 'dashboard', { render: false });
 updateSupabaseStatus(
   supabaseConfig().url && supabaseConfig().anonKey
     ? 'Supabase configurado neste navegador.'
@@ -54,8 +55,10 @@ function restoreLoginState() {
 
 (async () => {
   await initializeSupabaseState();
-  refreshAll();
+  restoreUiContext();
+  restorePageFromHash();
   showPage(currentPage || sessionStorage.getItem(PAGE_KEY) || 'dashboard', { render: false });
+  refreshAll();
   if (typeof applyFunAdsMode === 'function') applyFunAdsMode();
   restoreLoginState();
   supabaseAutoSaveReady = true;
@@ -66,6 +69,8 @@ function restoreLoginState() {
       await syncFromServerIfUseful();
       await loadServerSnapshots();
       await syncSupervisorVisitSources({ silent: true });
+      const aprilSheet = supervisorMonthlySheetLinks().find((item) => item.monthKey === '2026-04');
+      if (aprilSheet) await syncSupervisorMonthlySheet(aprilSheet.id, { silent: true, preserveView: true });
       await refreshServerHealth();
     } catch (error) {
       console.warn('Sincronização em segundo plano não concluída.', error);

@@ -122,6 +122,14 @@ const SUPERVISOR_VISIT_SOURCES = [
   }
 ];
 
+const APRIL_SUPERVISOR_SHEET_LINK = {
+  label: 'Planilha supervisores - abril de 2026',
+  url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4b4nZ79Ev8139wvRESOX9YNedCB4PwNiqU2i-UbYUI3c4oKYrmuXjuiMS742RTluOFv94eGK0qMwd/pub?output=csv',
+  category: 'supervisor-sheet',
+  monthKey: '2026-04',
+  panelGid: ''
+};
+
 const SUPERVISOR_SOURCE_ALIASES = {
   adilson: ['Adilson Manoel', 'Adilson Fogaca'],
   daiane: ['Daiane Aparecida', 'Daiane Aparecida de Oliveira Ribeiro'],
@@ -666,6 +674,18 @@ function defaultSupervisors(schools) {
   });
 }
 
+function normalizeOfficialLinks(links) {
+  const source = Array.isArray(links) ? links : [];
+  const normalized = source.filter((item) =>
+    !(item.category === 'supervisor-sheet' && item.monthKey === APRIL_SUPERVISOR_SHEET_LINK.monthKey)
+  );
+  normalized.unshift({
+    id: source.find((item) => item.category === 'supervisor-sheet' && item.monthKey === APRIL_SUPERVISOR_SHEET_LINK.monthKey)?.id || uid(),
+    ...APRIL_SUPERVISOR_SHEET_LINK
+  });
+  return normalized;
+}
+
 function defaultSupervisorVisits(supervisors) {
   const currentYear = new Date().getFullYear();
   return supervisors.flatMap((supervisor, supervisorIndex) =>
@@ -1081,11 +1101,7 @@ function createDefaults() {
     officialLinks: [
       {
         id: uid(),
-        label: 'Planilha supervisores - abril de 2026',
-        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4b4nZ79Ev8139wvRESOX9YNedCB4PwNiqU2i-UbYUI3c4oKYrmuXjuiMS742RTluOFv94eGK0qMwd/pub?output=csv',
-        category: 'supervisor-sheet',
-        monthKey: '2026-04',
-        panelGid: ''
+        ...APRIL_SUPERVISOR_SHEET_LINK
       },
       { id: uid(), label: 'Portal da Diretoria de Ensino de Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/' },
       { id: uid(), label: 'Escolas da URE Itapeva', url: 'https://deitapeva.educacao.sp.gov.br/escolas/' },
@@ -1244,7 +1260,7 @@ function mergeState(saved) {
     municipalities: mergeUniqueBy(base.municipalities, savedMunicipalities, (item) => normalizeKey(item.name)),
     sectors: mergeUniqueBy(base.sectors, savedSectors, (item) => normalizeKey(item.code || item.name)),
     directoryContacts: mergeDirectoryContacts(base.directoryContacts, savedDirectoryContacts),
-    officialLinks: mergeUniqueBy(base.officialLinks, savedOfficialLinks, (item) => normalizeKey(item.url || item.label)),
+    officialLinks: normalizeOfficialLinks(mergeUniqueBy(base.officialLinks, savedOfficialLinks, (item) => normalizeKey(item.url || item.label))),
     checklist: Array.isArray(repaired.checklist) ? repaired.checklist : base.checklist,
     tasks: savedTasks,
     calls: savedCalls,
