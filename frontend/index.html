@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-supervisor-detail-5">
-<link rel="stylesheet" href="./setechub.css?v=20260507-supervisor-detail-5">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-supervisor-detail-5">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-supervisor-detail-5">
-<script defer src="./school-data.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./storage.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./app.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./render.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./utils/defer.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./components/avatar.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./components/school-card.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./pages/schools.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./pages/school-record.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./pages/inventory.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./pages/supervisors.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./pages/admin.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./api.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./actions.js?v=20260507-supervisor-detail-5"></script>
-<script defer src="./bootstrap.js?v=20260507-supervisor-detail-5"></script>
+<link rel="stylesheet" href="./styles.css?v=20260507-no-fab-4">
+<link rel="stylesheet" href="./setechub.css?v=20260507-no-fab-4">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260507-no-fab-4">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-no-fab-4">
+<script defer src="./school-data.js?v=20260507-no-fab-4"></script>
+<script defer src="./storage.js?v=20260507-no-fab-4"></script>
+<script defer src="./app.js?v=20260507-no-fab-4"></script>
+<script defer src="./render.js?v=20260507-no-fab-4"></script>
+<script defer src="./utils/defer.js?v=20260507-no-fab-4"></script>
+<script defer src="./components/avatar.js?v=20260507-no-fab-4"></script>
+<script defer src="./components/school-card.js?v=20260507-no-fab-4"></script>
+<script defer src="./pages/schools.js?v=20260507-no-fab-4"></script>
+<script defer src="./pages/school-record.js?v=20260507-no-fab-4"></script>
+<script defer src="./pages/inventory.js?v=20260507-no-fab-4"></script>
+<script defer src="./pages/supervisors.js?v=20260507-no-fab-4"></script>
+<script defer src="./pages/admin.js?v=20260507-no-fab-4"></script>
+<script defer src="./api.js?v=20260507-no-fab-4"></script>
+<script defer src="./actions.js?v=20260507-no-fab-4"></script>
+<script defer src="./bootstrap.js?v=20260507-no-fab-4"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -47,17 +47,6 @@
     </div>
     <div id="commandResults" class="command-results"></div>
   </div>
-</div>
-<div class="quick-action-shell" id="quickActionShell">
-  <div class="quick-action-menu" id="quickActionMenu">
-    <button type="button" data-quick-action="supervisors">Ver supervisores</button>
-    <button type="button" data-quick-action="school">Abrir escola</button>
-    <button type="button" data-quick-action="inventory">Inventário crítico</button>
-    <button type="button" data-quick-action="agenda">Ver agenda</button>
-    <button type="button" data-quick-action="import" data-v1-admin-import>Importar dados</button>
-    <button type="button" data-quick-action="command">Buscar tudo</button>
-  </div>
-  <button type="button" class="quick-action-fab" id="quickActionFab" aria-expanded="false" aria-controls="quickActionMenu">+</button>
 </div>
 <div id="setup" class="setup-screen" aria-labelledby="loginTitle">
   <div class="setup-box setup-shell login-only">
@@ -115,7 +104,7 @@
     <button class="nav-item" type="button" data-page="schools"><span class="ico">&#127979;</span>Escolas</button>
     <button class="nav-item" type="button" data-page="assets"><span class="ico">&#128187;</span>Inventário</button>
     <button class="nav-item" type="button" data-page="supervisors"><span class="ico">&#129517;</span>Supervisores</button>
-    <button class="nav-item" type="button" data-page="ctc"><span class="ico">&#128736;</span>CTC</button>
+    <button class="nav-item" type="button" data-page="ctc"><span class="ico">&#128736;</span>Técnicos CTC</button>
     <button class="nav-item fn" type="button" data-page="reports"><span class="ico">&#128204;</span>Relatórios</button>
     <button class="nav-item sl-n" type="button" data-page="info"><span class="ico">&#9742;</span>Contatos</button>
   </nav>
@@ -208,13 +197,13 @@
   <div class="page" id="page-ctc">
     <div class="ph">
       <div>
-        <div class="pt">CTC</div>
-        <div class="ps">Agenda de visitas programadas da equipe CTC.</div>
+        <div class="pt">Técnicos CTC</div>
+        <div class="ps">Agenda de visitas programadas da equipe de técnicos CTC.</div>
       </div>
     </div>
     <div class="box">
       <div class="bh">
-        <div><div class="ct">Nova visita CTC</div><div class="cs">Admin: agendamento manual preservado fora do fluxo V1.</div></div>
+        <div><div class="ct">Nova visita Técnicos CTC</div><div class="cs">Admin: agendamento manual preservado fora do fluxo V1.</div></div>
       </div>
       <form id="ctcVisitForm" class="setechub-form setechub-form-wide">
         <select class="fi" id="ctcVisitOwner" aria-label="Responsável pela visita CTC">
@@ -276,7 +265,7 @@
           <option value="Carro oficial">Carro oficial</option>
           <option value="Visita">Visita</option>
           <option value="Suporte">Suporte</option>
-          <option value="CTC">CTC - visita programada</option>
+          <option value="CTC">Técnicos CTC - visita programada</option>
           <option value="Relatorio">Relatorio</option>
           <option value="Administrativo">Administrativo</option>
         </select>
@@ -301,7 +290,7 @@
         <button class="btn btn-g btn-sm" data-task-filter="abertas" type="button">Abertas</button>
         <button class="btn btn-g btn-sm" data-task-filter="alta" type="button">Alta</button>
         <button class="btn btn-g btn-sm" data-task-filter="visita" type="button">Visita</button>
-        <button class="btn btn-g btn-sm" data-task-filter="ctc" type="button">CTC / visitas</button>
+        <button class="btn btn-g btn-sm" data-task-filter="ctc" type="button">Técnicos CTC / visitas</button>
       </div>
       <div id="agendaCalendarGrid" class="supervisor-calendar-grid agenda-calendar-grid" data-v2-heavy hidden></div>
       <div id="taskList" class="stack-list"></div>
@@ -873,7 +862,7 @@
         <button class="btn btn-p" id="userSubmitBtn" type="submit">Criar usuário</button>
         <button class="btn btn-g" id="cancelUserEditBtn" type="button" hidden>Cancelar edição</button>
       </form>
-      <div class="admin-panel-note">Supervisor enxerga Supervisores e Escolas do próprio vínculo. SEOM consulta Escolas e Inventário. PEC e Dirigente visualizam a base. SEINTEC, CTC e administrador podem editar dados.</div>
+      <div class="admin-panel-note">Supervisor enxerga Supervisores e Escolas do próprio vínculo. SEOM consulta Escolas e Inventário. PEC e Dirigente visualizam a base. SEINTEC, Técnicos CTC e administrador podem editar dados.</div>
       <div id="userList" class="stack-list"></div>
     </div>
     <div class="box admin-module" data-admin-only data-v1-hide>

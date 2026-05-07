@@ -1,7 +1,7 @@
 'use strict';
 
 let funAdsPopupTimer = null;
-const FUN_AD_LAYER_VERSION = '20260507-supervisor-detail-5';
+const FUN_AD_LAYER_VERSION = '20260507-no-fab-4';
 const FUN_AD_SESSION_KEY = 'setechub_fun_ads_enabled';
 const FUN_AD_POPUPS = [
   {
@@ -303,7 +303,7 @@ function logSchoolEvent(school, kind, text) {
 
 function requireEditAccess() {
   if (canEditData()) return true;
-  alert('Seu perfil tem acesso de leitura. Edicao liberada apenas para SEINTEC, CTC e administrador.');
+  alert('Seu perfil tem acesso de leitura. Edicao liberada apenas para SEINTEC, Técnicos CTC e administrador.');
   return false;
 }
 
@@ -2028,10 +2028,6 @@ function setupEventListeners() {
   document.getElementById('sidebarSearch')?.addEventListener('input', (event) => {
     handleSearch(event.target.value);
   });
-  document.getElementById('quickActionFab')?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    toggleQuickActions();
-  });
   document.getElementById('commandInput')?.addEventListener('input', (event) => {
     clearTimeout(commandSearchTimer);
     const value = event.target.value;
@@ -2080,12 +2076,6 @@ function setupEventListeners() {
     document.getElementById(focusButton.dataset.focusTarget)?.focus();
   });
   document.addEventListener('click', (event) => {
-    const quickButton = event.target.closest('[data-quick-action]');
-    if (!quickButton) return;
-    event.preventDefault();
-    handleQuickAction(quickButton.dataset.quickAction);
-  });
-  document.addEventListener('click', (event) => {
     const commandButton = event.target.closest('[data-command-action]');
     if (!commandButton) return;
     event.preventDefault();
@@ -2093,7 +2083,6 @@ function setupEventListeners() {
   });
   document.addEventListener('click', (event) => {
     if (!event.target.closest('.acct-area')) closeAccountMenu();
-    if (!event.target.closest('#quickActionShell')) toggleQuickActions(false);
   });
   document.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -2104,7 +2093,6 @@ function setupEventListeners() {
     if (event.key === 'Escape') {
       closeAccountMenu();
       closeCommandPalette();
-      toggleQuickActions(false);
     }
   });
   document.getElementById('resetBtn').addEventListener('click', () => {

@@ -1256,40 +1256,6 @@ function runCommandAction(type, value) {
   }
 }
 
-function toggleQuickActions(forceOpen = null) {
-  const shell = document.getElementById('quickActionShell');
-  const fab = document.getElementById('quickActionFab');
-  if (!shell || !fab) return;
-  const nextOpen = forceOpen === null ? !shell.classList.contains('open') : Boolean(forceOpen);
-  shell.classList.toggle('open', nextOpen);
-  fab.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
-}
-
-function handleQuickAction(action) {
-  toggleQuickActions(false);
-  if (action === 'supervisors' || action === 'visit') {
-    showPage('supervisors');
-    return;
-  }
-  if (action === 'school') {
-    openCommandPalette('');
-    return;
-  }
-  if (action === 'inventory') {
-    openInventoryCategory('criticos');
-    return;
-  }
-  if (action === 'agenda') {
-    showPage('agenda');
-    return;
-  }
-  if (action === 'import') {
-    if (canImportData()) showPage('admin');
-    return;
-  }
-  if (action === 'command') openCommandPalette('');
-}
-
 function saveUiContext() {
   try {
     const payload = JSON.stringify({
@@ -1955,7 +1921,7 @@ const SYSTEM_TITLE_ICONS = {
   'Painel': '📊',
   'Agenda compartilhada': '🗓️',
   'Agenda pessoal': '⭐',
-  'Nova visita CTC': '🚗',
+  'Nova visita Técnicos CTC': '🚗',
   'Agenda': '📅',
   'Novo agendamento': '➕',
   'Escolas': '🏫',

@@ -82,7 +82,7 @@ function renderDashboardHero() {
     : `${buildSummaryPreview()} | cobertura ${coverage.profileCoverage}%`;
 
   const actionItems = [
-    { label: 'Abrir CTC', action: `openCtcAgenda()`, page: 'ctc', tone: 'primary', role: 'ctc' },
+    { label: 'Abrir Técnicos CTC', action: `openCtcAgenda()`, page: 'ctc', tone: 'primary', role: 'ctc' },
     { label: 'Abrir escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
     { label: 'Inventário com manutenção/defeito', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
     { label: 'Sem rede/câmeras', action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: '' },
@@ -203,7 +203,7 @@ function renderDashboardAccess() {
       { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades | ${schoolAlertCount} em atenção`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
       { icon: '&#128187;', title: 'Inventário', meta: `${inventoryAlertCount} alerta(s)`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
       { icon: '&#129517;', title: 'Supervisores', meta: `${visibleSupervisors().length} no painel`, action: `showPage('supervisors')`, page: 'supervisors', tone: 'blue', priority: 'primary' },
-      { icon: '&#128736;', title: 'CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
+      { icon: '&#128736;', title: 'Técnicos CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
       { icon: '&#128197;', title: 'Agenda', meta: 'compromissos e frota', action: `showPage('agenda')`, page: 'agenda', tone: 'slate', priority: 'secondary' },
       { icon: '&#9881;', title: 'Admin', meta: 'backup e importações', action: `showPage('admin')`, page: 'admin', tone: 'red', priority: 'secondary' }
     ].filter((item) => canAccessPage(item.page));
@@ -241,7 +241,7 @@ function renderDashboardAccess() {
     { icon: '&#128187;', title: 'Inventário', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} manut./defeito`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
     { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
     { icon: '&#128247;', title: 'Câmeras', meta: `${cameraSchoolCount} escolas com câmeras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
-    { icon: '&#128736;', title: 'CTC', meta: `${ctcUsers.length} usuários | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
+    { icon: '&#128736;', title: 'Técnicos CTC', meta: `${ctcUsers.length} usuários | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
     { icon: '&#127891;', title: 'PECs', meta: 'módulo dormente', page: 'pecs', tone: 'blue', priority: 'secondary', inactive: true },
     { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
     { icon: '&#9201;', title: 'Ponto', meta: 'pausado por enquanto', page: 'agenda', tone: 'slate', priority: 'secondary', inactive: true },
@@ -484,7 +484,7 @@ function renderRoleDashboard(profileNode, roleCardsNode, attentionNode) {
       action: `openInventoryCategory()`
     },
     {
-      title: 'CTC',
+      title: 'Técnicos CTC',
       meta: ctcOpen ? `${ctcOpen} visita(s) pendente(s)` : 'agenda de visitas',
       value: String(ctcOpen),
       tone: 'teal',
@@ -548,7 +548,7 @@ function renderRoleDashboard(profileNode, roleCardsNode, attentionNode) {
       action: `openInventoryCategory('criticos')`
     },
     {
-      title: 'Agenda CTC',
+      title: 'Agenda Técnicos CTC',
       meta: ctcOpen ? `${ctcOpen} visita(s) pendente(s)` : 'sem pendência CTC',
       value: String(ctcOpen),
       tone: ctcOpen ? 'amber' : 'teal',
