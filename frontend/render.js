@@ -2230,10 +2230,13 @@ function renderSupervisorRecord() {
   const monthlyVisitCount = sheetMetrics.monthlyVisits;
   const weeklyVisitCount = sheetMetrics.weeklyVisits;
   const goalPct = monthlyGoal ? Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100)) : 0;
+  const weeklyGoalPct = weeklyGoal ? Math.min(100, Math.round((weeklyVisitCount / weeklyGoal) * 100)) : 0;
   const goalMet = monthlyGoal > 0 && monthlyVisitCount >= monthlyGoal;
+  const weeklyGoalMet = weeklyGoal > 0 && weeklyVisitCount >= weeklyGoal;
   const monthlyGoalLabel = monthlyGoal ? String(monthlyGoal) : '--';
   const monthlyIndicator = sheetMetrics.monthlyIndicator;
   const weeklyIndicator = sheetMetrics.weeklyIndicator;
+  const sourceUpdatedLabel = supervisor.sourceSyncedAt ? timestampLabel(new Date(supervisor.sourceSyncedAt)) : 'Sem leitura recente';
 
   if (select) {
     select.innerHTML = stats.map((item) => `<option value="${esc(item.supervisor.name)}">${esc(item.supervisor.name)}</option>`).join('');
@@ -2244,6 +2247,14 @@ function renderSupervisorRecord() {
   const subtitle = document.getElementById('supervisorRecordSubtitle');
   if (title) title.textContent = supervisor.name;
   if (subtitle) subtitle.textContent = `${sheetMetrics.assigned} escola(s) | ${monthlyVisitCount}/${monthlyGoalLabel} visita(s) em ${viewMonthLabel} | ${monthlyGoal ? (goalMet ? 'meta cumprida' : 'meta pendente') : 'meta aguardando planilha'}.`;
+  const goalTitle = document.querySelector('#supervisorRecordGoal')?.closest('.box')?.querySelector('.ct');
+  const goalSubtitle = document.querySelector('#supervisorRecordGoal')?.closest('.box')?.querySelector('.cs');
+  if (goalTitle) goalTitle.textContent = 'Metas do supervisor';
+  if (goalSubtitle) goalSubtitle.textContent = 'Acompanhamento semanal e mensal da planilha oficial.';
+  const visitCorrectionTitle = document.querySelector('#supervisorRecordVisitForm .ct');
+  const visitCorrectionSubtitle = document.querySelector('#supervisorRecordVisitForm .cs');
+  if (visitCorrectionTitle) visitCorrectionTitle.textContent = 'Correcao de visitas';
+  if (visitCorrectionSubtitle) visitCorrectionSubtitle.textContent = 'Use este aviso quando uma visita estiver errada ou faltando.';
   const refreshButton = document.getElementById('refreshSupervisorSheetBtn');
   if (refreshButton) {
     refreshButton.hidden = !supervisor.visitSourceUrl || !canImportData();
@@ -2256,43 +2267,75 @@ function renderSupervisorRecord() {
       <div class="setechub-head">
         <div>
           <strong>${esc(supervisor.name)}</strong>
-          <div class="sync-meta">${esc(supervisor.email || '')} | ${esc(supervisor.phone || '')}</div>
-          <div class="sync-meta">${esc(supervisor.visitSourceUrl ? `${supervisor.visitSourceLabel || 'Planilha Google'} como fonte principal.` : supervisor.source === 'teste' ? 'Distribuicao teste ate chegada do CSV oficial.' : 'Distribuicao oficial.')}</div>
-          ${supervisor.sourceSyncedAt ? `<div class="sync-meta">Ultima leitura online: ${esc(timestampLabel(new Date(supervisor.sourceSyncedAt)))}</div>` : ''}
+          <div class="supervisor-profile-meta">
+            ${supervisor.email ? `<a href="mailto:${esc(supervisor.email)}">${esc(supervisor.email)}</a>` : ''}
+            ${supervisor.phone ? `<span>${esc(supervisor.phone)}</span>` : ''}
+            <span>${esc(sourceUpdatedLabel)}</span>
+          </div>
         </div>
         <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
       </div>
-      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha principal</a>${canImportData() ? '<button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar planilha</button>' : ''}</div>` : ''}
+      ${supervisor.visitSourceUrl ? `<div class="mini-actions"><a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a>${canImportData() ? '<button class="btn btn-p btn-sm" type="button" onclick="syncCurrentSupervisorVisitSource()">Atualizar</button>' : ''}</div>` : ''}
     </div>
   `;
 
   document.getElementById('supervisorRecordGoal').innerHTML = `
-    <div class="setechub-command-score supervisor-goal-score">
-      <div>
-        <div class="sync-meta">Meta mensal</div>
-        <strong>${esc(String(monthlyVisitCount))}/${esc(monthlyGoalLabel)}</strong>
+    <div class="supervisor-goal-grid">
+      <div class="setechub-command-score supervisor-goal-score">
+        <div>
+          <div class="supervisor-goal-head">
+            <span class="sync-meta">Meta semanal</span>
+            <span class="diag-pill ${supervisorIndicatorClass(weeklyIndicator)}">${esc(supervisorIndicatorText(weeklyIndicator))}</span>
+          </div>
+          <strong>${esc(String(weeklyVisitCount))}/${esc(weeklyGoalLabel)}</strong>
+        </div>
+        <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, weeklyGoalPct)))}%"></span></div>
+        <div class="supervisor-goal-caption">${weeklyGoal ? (weeklyGoalMet ? `Semana ${esc(String(selectedWeek))} concluida.` : `Faltam ${esc(String(Math.max(0, weeklyGoal - weeklyVisitCount)))} visita(s) na semana ${esc(String(selectedWeek))}.`) : 'Meta semanal aguardando planilha.'}</div>
       </div>
-      <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${monthlyGoal ? `${esc(String(goalPct))}%` : '--'}</span>
+      <div class="setechub-command-score supervisor-goal-score">
+        <div>
+          <div class="supervisor-goal-head">
+            <span class="sync-meta">Meta mensal</span>
+            <span class="diag-pill ${supervisorIndicatorClass(monthlyIndicator)}">${esc(supervisorIndicatorText(monthlyIndicator))}</span>
+          </div>
+          <strong>${esc(String(monthlyVisitCount))}/${esc(monthlyGoalLabel)}</strong>
+        </div>
+        <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, goalPct)))}%"></span></div>
+        <div class="supervisor-goal-caption">${monthlyGoal ? (goalMet ? `Meta de ${esc(viewMonthLabel)} concluida.` : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) em ${esc(viewMonthLabel)}.`) : 'Meta mensal aguardando planilha.'}</div>
+      </div>
     </div>
-    <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, goalPct)))}%"></span></div>
-    <div class="sync-meta">${monthlyGoal ? (goalMet ? `Meta de visitas cumprida em ${esc(viewMonthLabel)}.` : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta de ${esc(viewMonthLabel)}.`) : 'Meta mensal aguardando leitura da planilha oficial.'}</div>
   `;
 
   document.getElementById('supervisorRecordMetrics').innerHTML = [
-    { label: 'Escolas', value: String(sheetMetrics.assigned), note: 'Vindo da planilha' },
-    { label: 'Semana', value: `${weeklyVisitCount}/${weeklyGoalLabel}`, note: supervisorIndicatorText(weeklyIndicator) },
-    { label: 'Visitadas', value: String(visitedSchoolSet.size), note: viewMonthLabel },
-    { label: 'Faltantes', value: monthlyGoal ? String(sheetMetrics.pendingMonth) : '--', note: 'Meta mensal' },
-    { label: 'Chamados', value: String(selectedStat.openCalls), note: 'Ativos vinculados' },
-    { label: 'Indicador mes', value: supervisorIndicatorText(monthlyIndicator), note: `${monthlyVisitCount}/${monthlyGoalLabel} visita(s)` },
-    { label: 'Historico', value: String(allVisits.length), note: 'Importados' }
+    { label: 'Escolas', value: String(sheetMetrics.assigned), note: `${visitedSchoolSet.size} visitada(s) no mes`, target: 'supervisorRecordSchoolMatrix' },
+    { label: 'Semana atual', value: `${weeklyVisitCount}/${weeklyGoalLabel}`, note: supervisorIndicatorText(weeklyIndicator), tone: weeklyIndicator, target: 'supervisorRecordGoal' },
+    { label: 'Mes atual', value: `${monthlyVisitCount}/${monthlyGoalLabel}`, note: supervisorIndicatorText(monthlyIndicator), tone: monthlyIndicator, target: 'supervisorRecordGoal' },
+    { label: 'Faltantes', value: monthlyGoal ? String(sheetMetrics.pendingMonth) : '--', note: 'Abrir lista', target: 'supervisorRecordPending' },
+    { label: 'Chamados', value: String(selectedStat.openCalls), note: 'Pendencias das escolas', target: 'supervisorRecordSchoolMatrix' },
+    { label: 'Historico', value: String(allVisits.length), note: 'Ver registros', target: 'supervisorRecordVisitTable' }
   ].map((item) => `
-    <div class="setechub-monitor-card compact supervisor-metric-card">
+    <div class="setechub-monitor-card compact supervisor-metric-card ${item.target ? 'setechub-clickable' : ''}" ${item.target ? `onclick="document.getElementById('${esc(item.target)}')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"` : ''}>
       <div class="supervisor-metric-label">${esc(item.label)}</div>
       <strong>${esc(item.value)}</strong>
-      <div class="supervisor-metric-note">${esc(item.note)}</div>
+      <div class="supervisor-metric-note ${item.tone ? supervisorIndicatorClass(item.tone) : ''}">${esc(item.note)}</div>
     </div>
   `).join('');
+
+  const visitForm = document.getElementById('supervisorRecordVisitFormElement');
+  if (visitForm) visitForm.hidden = true;
+  const visitNoticeHost = document.getElementById('supervisorRecordVisitNotice') || document.getElementById('supervisorRecordVisitForm');
+  if (visitNoticeHost) {
+    visitNoticeHost.innerHTML = `
+      <div class="supervisor-visit-notice-card">
+        <strong>Visita errada ou faltando?</strong>
+        <span>Confira a escola, a data e o supervisor na planilha oficial. Se a divergencia continuar, entre em contato com o gabinete para correcao do registro.</span>
+        <div class="mini-actions">
+          ${supervisor.visitSourceUrl ? `<a class="btn btn-g btn-sm" href="${esc(supervisor.visitSourceUrl)}" target="_blank" rel="noreferrer">Abrir planilha</a>` : ''}
+          <button class="btn btn-g btn-sm" type="button" data-scroll-target="supervisorRecordVisitTable">Ver registros</button>
+        </div>
+      </div>
+    `;
+  }
 
   const weeklyMatrixBox = document.getElementById('supervisorRecordWeeklyMatrixBox');
   if (weeklyMatrixBox && !weeklyMatrixBox.hidden && typeof renderSupervisorWeeklyMatrixForRecord === 'function') {
