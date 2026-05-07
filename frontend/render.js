@@ -1256,23 +1256,22 @@ function directorySectorFilterValue(sector) {
 }
 
 function directoryFilterForContact(item) {
-  return directorySectorFilterValue(item?.sector || '');
+  return typeof directoryCategoryForContact === 'function'
+    ? directoryCategoryForContact(item)
+    : directorySectorFilterValue(item?.sector || '');
 }
 
 function renderDirectoryFilterBar() {
   const filterBar = document.getElementById('directoryFilterBar');
   if (!filterBar) return;
-  const sectors = [...new Set((state.directoryContacts || []).map((item) => item.sector || 'Sem setor'))]
-    .sort((a, b) => a.localeCompare(b));
-  const values = ['todos', ...sectors.map(directorySectorFilterValue)];
+  const filters = Array.isArray(DIRECTORY_FILTERS) && DIRECTORY_FILTERS.length
+    ? DIRECTORY_FILTERS
+    : [{ value: 'todos', label: 'Todos', color: '#b8c2d8' }];
+  const values = filters.map((filter) => filter.value);
   if (!values.includes(currentDirectoryFilter)) currentDirectoryFilter = 'todos';
-  filterBar.innerHTML = [
-    `<button class="btn btn-g btn-sm ${currentDirectoryFilter === 'todos' ? 'active-filter' : ''}" data-directory-filter="todos" type="button" style="--directory-filter-color:#b8c2d8">Todos</button>`,
-    ...sectors.map((sector) => {
-      const value = directorySectorFilterValue(sector);
-      return `<button class="btn btn-g btn-sm ${currentDirectoryFilter === value ? 'active-filter' : ''}" data-directory-filter="${esc(value)}" type="button" style="${contactAvatarStyle({ sector }).replaceAll('directory-avatar', 'directory-filter')}--directory-filter-color:var(--directory-filter-a);">${esc(sector)}</button>`;
-    })
-  ].join('');
+  filterBar.innerHTML = filters.map((filter) =>
+    `<button class="btn btn-g btn-sm ${currentDirectoryFilter === filter.value ? 'active-filter' : ''}" data-directory-filter="${esc(filter.value)}" type="button" style="--directory-filter-color:${esc(filter.color || '#b8c2d8')}">${esc(filter.label)}</button>`
+  ).join('');
 }
 
 function renderSectors() {

@@ -5,6 +5,11 @@ setupEventListeners();
 restoreUiContext();
 restorePageFromHash();
 showPage(currentPage || sessionStorage.getItem(PAGE_KEY) || 'dashboard', { render: false });
+if (currentPage === 'info') {
+  renderCurrentPage('info');
+  applySystemIcons();
+  applyPrivacy();
+}
 updateSupabaseStatus(
   supabaseConfig().url && supabaseConfig().anonKey
     ? 'Supabase configurado neste navegador.'

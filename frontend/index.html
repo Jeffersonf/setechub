@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-no-fab-4">
-<link rel="stylesheet" href="./setechub.css?v=20260507-no-fab-4">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-no-fab-4">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-no-fab-4">
-<script defer src="./school-data.js?v=20260507-no-fab-4"></script>
-<script defer src="./storage.js?v=20260507-no-fab-4"></script>
-<script defer src="./app.js?v=20260507-no-fab-4"></script>
-<script defer src="./render.js?v=20260507-no-fab-4"></script>
-<script defer src="./utils/defer.js?v=20260507-no-fab-4"></script>
-<script defer src="./components/avatar.js?v=20260507-no-fab-4"></script>
-<script defer src="./components/school-card.js?v=20260507-no-fab-4"></script>
-<script defer src="./pages/schools.js?v=20260507-no-fab-4"></script>
-<script defer src="./pages/school-record.js?v=20260507-no-fab-4"></script>
-<script defer src="./pages/inventory.js?v=20260507-no-fab-4"></script>
-<script defer src="./pages/supervisors.js?v=20260507-no-fab-4"></script>
-<script defer src="./pages/admin.js?v=20260507-no-fab-4"></script>
-<script defer src="./api.js?v=20260507-no-fab-4"></script>
-<script defer src="./actions.js?v=20260507-no-fab-4"></script>
-<script defer src="./bootstrap.js?v=20260507-no-fab-4"></script>
+<link rel="stylesheet" href="./styles.css?v=20260507-contacts-categories-1">
+<link rel="stylesheet" href="./setechub.css?v=20260507-contacts-categories-1">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260507-contacts-categories-1">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-contacts-categories-1">
+<script defer src="./school-data.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./storage.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./app.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./render.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./utils/defer.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./components/avatar.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./components/school-card.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./pages/schools.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./pages/school-record.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./pages/inventory.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./pages/supervisors.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./pages/admin.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./api.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./actions.js?v=20260507-contacts-categories-1"></script>
+<script defer src="./bootstrap.js?v=20260507-contacts-categories-1"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -83,7 +83,7 @@
   <button class="fn-item" type="button" data-page="schools"><span class="fni">&#127979;</span>Escolas</button>
   <button class="fn-item" type="button" data-page="assets"><span class="fni">&#128187;</span>Invent.</button>
   <button class="fn-item" type="button" data-page="supervisors"><span class="fni">&#129517;</span>Superv.</button>
-  <button class="fn-item sl-n" type="button" data-page="info"><span class="fni">&#9742;</span>Contatos</button>
+  <button class="fn-item sl-n" type="button" data-page="info"><span class="fni">&#128101;</span>Contatos</button>
   <button class="fn-item fn-logout logout-action" type="button"><span class="fni">&#8617;</span>Sair</button>
 </nav>
 
@@ -106,7 +106,7 @@
     <button class="nav-item" type="button" data-page="supervisors"><span class="ico">&#129517;</span>Supervisores</button>
     <button class="nav-item" type="button" data-page="ctc"><span class="ico">&#128736;</span>Técnicos CTC</button>
     <button class="nav-item fn" type="button" data-page="reports"><span class="ico">&#128204;</span>Relatórios</button>
-    <button class="nav-item sl-n" type="button" data-page="info"><span class="ico">&#9742;</span>Contatos</button>
+    <button class="nav-item sl-n" type="button" data-page="info"><span class="ico">&#128101;</span>Contatos</button>
   </nav>
   <div class="sb-bottom">
     <div class="conn-wrap"></div>
@@ -782,14 +782,6 @@
         <div><div class="ct">Ramais e contatos</div><div class="cs">Lista importada da URE Itapeva para consulta rápida.</div></div>
       </div>
       <div class="setechub-toolbar" id="directoryFilterBar">
-        <button class="btn btn-g btn-sm active-filter" data-directory-filter="todos" type="button">Todos</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="supervisao" type="button">Supervisão</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="tecnologia" type="button">Tecnologia</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="obras" type="button">Obras</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="financas" type="button">Finanças</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="rh" type="button">RH</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="pedagogico" type="button">Pedagógico</button>
-        <button class="btn btn-g btn-sm" data-directory-filter="gestao" type="button">Gestão</button>
       </div>
       <div id="directoryContactsList" class="stack-list"></div>
     </div>

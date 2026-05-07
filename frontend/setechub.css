@@ -4447,13 +4447,13 @@ textarea {
 }
 
 #directoryFilterBar [data-directory-filter="todos"] { --directory-filter-color: #b8c2d8; }
-#directoryFilterBar [data-directory-filter="supervisao"] { --directory-filter-color: #5ac8f5; }
 #directoryFilterBar [data-directory-filter="tecnologia"] { --directory-filter-color: #5af5c8; }
+#directoryFilterBar [data-directory-filter="gabinete"] { --directory-filter-color: #f5a85a; }
 #directoryFilterBar [data-directory-filter="obras"] { --directory-filter-color: #f5c85a; }
-#directoryFilterBar [data-directory-filter="financas"] { --directory-filter-color: #78b4ff; }
+#directoryFilterBar [data-directory-filter="compras"] { --directory-filter-color: #78b4ff; }
+#directoryFilterBar [data-directory-filter="pagamento"] { --directory-filter-color: #5ac8f5; }
 #directoryFilterBar [data-directory-filter="rh"] { --directory-filter-color: #a78bfa; }
 #directoryFilterBar [data-directory-filter="pedagogico"] { --directory-filter-color: #c8f55a; }
-#directoryFilterBar [data-directory-filter="gestao"] { --directory-filter-color: #f5a85a; }
 
 .directory-lines {
   display: flex;

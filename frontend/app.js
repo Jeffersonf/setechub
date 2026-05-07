@@ -50,6 +50,16 @@ const PERF_LOG = localStorage.getItem('setechub_perf') === '1';
 const PAUSED_NAV_PAGES = new Set(['calls']);
 const DORMANT_NAV_PAGES = new Set(['pecs']);
 const DISABLED_NAV_PAGES = new Set(['reports']);
+const DIRECTORY_FILTERS = [
+  { value: 'todos', label: 'Todos', color: '#b8c2d8' },
+  { value: 'tecnologia', label: 'Tecnologia', color: '#5af5c8' },
+  { value: 'gabinete', label: 'Gabinete', color: '#f5a85a' },
+  { value: 'obras', label: 'Obras', color: '#f5c85a' },
+  { value: 'compras', label: 'Compras', color: '#78b4ff' },
+  { value: 'pagamento', label: 'Pagamento', color: '#5ac8f5' },
+  { value: 'rh', label: 'RH', color: '#a78bfa' },
+  { value: 'pedagogico', label: 'Pedagógico', color: '#c8f55a' }
+];
 
 function measurePerf(label, fn, threshold = 12) {
   if (!PERF_LOG || typeof performance === 'undefined') return fn();
@@ -718,6 +728,9 @@ function filteredDirectoryContacts(scopeToCurrentPec = true) {
     return pecContacts.filter((item) => normalizeKey(item.name) === normalizeKey(user?.name));
   }
   if (currentDirectoryFilter === 'todos') return state.directoryContacts;
+  if (DIRECTORY_FILTERS.some((filter) => filter.value === currentDirectoryFilter)) {
+    return state.directoryContacts.filter((item) => directoryCategoryForContact(item) === currentDirectoryFilter);
+  }
   if (currentDirectoryFilter.startsWith('sector:')) {
     const selectedSector = currentDirectoryFilter.slice('sector:'.length);
     return state.directoryContacts.filter((item) => normalizeKey(item.sector || 'sem setor') === selectedSector);
@@ -747,6 +760,22 @@ function filteredDirectoryContacts(scopeToCurrentPec = true) {
     return state.directoryContacts.filter((item) => /pec|curriculo|currículo|especialista/i.test(`${item.role} ${item.name}`));
   }
   return state.directoryContacts;
+}
+
+function directoryContactText(item) {
+  return normalizeKey(`${item?.name || ''} ${item?.role || ''} ${item?.sector || ''} ${item?.email || ''} ${item?.sectorEmail || ''}`);
+}
+
+function directoryCategoryForContact(item) {
+  const text = directoryContactText(item);
+  if (/site|suporte|prodesp|seintec|setec|tecnologia|ctc/.test(text)) return 'tecnologia';
+  if (/gab|gabinete|asure|dirigente|executiva|assistente/.test(text)) return 'gabinete';
+  if (/seom|obras|manutencao|manut/.test(text)) return 'obras';
+  if (/sefrep|frequencia|pagamento/.test(text)) return 'pagamento';
+  if (/crh|sepes|seape|pessoas|pessoal|recursos humanos|rh/.test(text)) return 'rh';
+  if (/pec|eec|curriculo|pedagogico|especialista/.test(text)) return 'pedagogico';
+  if (/seafin|sefin|secomse|sefisc|financas|financeiro|compras|servicos|fiscalizacao|protocolo/.test(text)) return 'compras';
+  return 'gabinete';
 }
 
 function filteredAssets() {
@@ -1970,6 +1999,11 @@ const SYSTEM_TITLE_ICONS = {
   'Diagnóstico local': '🧪',
   'Importações da base': '📥'
 };
+
+SYSTEM_TITLE_ICONS['Contatos'] = '👥';
+SYSTEM_TITLE_ICONS['Ramais e contatos'] = '👥';
+SYSTEM_TITLE_ICONS['Supervisores'] = '🧭';
+SYSTEM_TITLE_ICONS['Painel de supervisores'] = '🧭';
 
 function applySystemIcons() {
   document.querySelectorAll('.pt, .ct, #inventoryHeroTitle').forEach((node) => {
