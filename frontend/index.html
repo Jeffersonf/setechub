@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-fun-ads-8">
-<link rel="stylesheet" href="./setechub.css?v=20260507-fun-ads-8">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-fun-ads-8">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-fun-ads-8">
-<script defer src="./school-data.js?v=20260507-fun-ads-8"></script>
-<script defer src="./storage.js?v=20260507-fun-ads-8"></script>
-<script defer src="./app.js?v=20260507-fun-ads-8"></script>
-<script defer src="./render.js?v=20260507-fun-ads-8"></script>
-<script defer src="./utils/defer.js?v=20260507-fun-ads-8"></script>
-<script defer src="./components/avatar.js?v=20260507-fun-ads-8"></script>
-<script defer src="./components/school-card.js?v=20260507-fun-ads-8"></script>
-<script defer src="./pages/schools.js?v=20260507-fun-ads-8"></script>
-<script defer src="./pages/school-record.js?v=20260507-fun-ads-8"></script>
-<script defer src="./pages/inventory.js?v=20260507-fun-ads-8"></script>
-<script defer src="./pages/supervisors.js?v=20260507-fun-ads-8"></script>
-<script defer src="./pages/admin.js?v=20260507-fun-ads-8"></script>
-<script defer src="./api.js?v=20260507-fun-ads-8"></script>
-<script defer src="./actions.js?v=20260507-fun-ads-8"></script>
-<script defer src="./bootstrap.js?v=20260507-fun-ads-8"></script>
+<link rel="stylesheet" href="./styles.css?v=20260507-stability-1">
+<link rel="stylesheet" href="./setechub.css?v=20260507-stability-1">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260507-stability-1">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-stability-1">
+<script defer src="./school-data.js?v=20260507-stability-1"></script>
+<script defer src="./storage.js?v=20260507-stability-1"></script>
+<script defer src="./app.js?v=20260507-stability-1"></script>
+<script defer src="./render.js?v=20260507-stability-1"></script>
+<script defer src="./utils/defer.js?v=20260507-stability-1"></script>
+<script defer src="./components/avatar.js?v=20260507-stability-1"></script>
+<script defer src="./components/school-card.js?v=20260507-stability-1"></script>
+<script defer src="./pages/schools.js?v=20260507-stability-1"></script>
+<script defer src="./pages/school-record.js?v=20260507-stability-1"></script>
+<script defer src="./pages/inventory.js?v=20260507-stability-1"></script>
+<script defer src="./pages/supervisors.js?v=20260507-stability-1"></script>
+<script defer src="./pages/admin.js?v=20260507-stability-1"></script>
+<script defer src="./api.js?v=20260507-stability-1"></script>
+<script defer src="./actions.js?v=20260507-stability-1"></script>
+<script defer src="./bootstrap.js?v=20260507-stability-1"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -936,17 +936,17 @@
       <div class="setechub-action-col">
         <button class="btn btn-p" id="saveSupabaseBtn" type="button">Salvar agora no Supabase</button>
         <button class="btn btn-g" id="loadSupabaseBtn" type="button">Carregar do Supabase</button>
-        <button class="btn btn-g" id="checkSupabaseBtn" type="button">Testar conexao</button>
+        <button class="btn btn-g" id="checkSupabaseBtn" type="button">Testar conexão</button>
         <div class="sync-meta" id="supabaseStatusMeta">Supabase não verificado.</div>
       </div>
     </div>
-    <div class="box admin-module" data-admin-only>
+    <div class="box admin-module" data-admin-only data-fun-ads-dev hidden>
       <div class="bh">
-        <div><div class="ct">Modo anuncios</div><div class="cs">Brincadeira visual: popups falsos e banners sem links reais.</div></div>
+        <div><div class="ct">Modo anúncios</div><div class="cs">Brincadeira visual de desenvolvimento. Ative com <code>?debugAds=1</code>.</div></div>
       </div>
       <label class="fun-toggle-row" for="funAdsToggle">
         <span>
-          <strong>Ativar caos publicitario</strong>
+          <strong>Ativar caos publicitário</strong>
           <small id="funAdsStatus">Desativado</small>
         </span>
         <input id="funAdsToggle" type="checkbox" role="switch" aria-label="Ativar anuncios falsos">
@@ -1007,6 +1007,7 @@
 
 </body>
 </html>
+
 
 
 

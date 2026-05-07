@@ -553,7 +553,9 @@ function applyAccessControl() {
     node.hidden = !canEditData();
   });
   document.querySelectorAll('[data-admin-only]').forEach((node) => {
-    node.hidden = !canManageUsers();
+    const devOnly = node.hasAttribute('data-fun-ads-dev');
+    const devAllowed = !devOnly || (typeof funAdsDeveloperMode === 'function' && funAdsDeveloperMode());
+    node.hidden = !canManageUsers() || !devAllowed;
   });
   document.querySelectorAll('[data-v1-admin-import]').forEach((node) => {
     node.hidden = !canImportData();

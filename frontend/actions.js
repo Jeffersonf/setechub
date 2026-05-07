@@ -1,7 +1,7 @@
 'use strict';
 
 let funAdsPopupTimer = null;
-const FUN_AD_LAYER_VERSION = '20260507-fun-ads-8';
+const FUN_AD_LAYER_VERSION = '20260507-stability-1';
 const FUN_AD_SESSION_KEY = 'setechub_fun_ads_enabled';
 const FUN_AD_POPUPS = [
   {
@@ -35,10 +35,22 @@ const FUN_AD_POPUPS = [
 ];
 
 function funAdsEnabled() {
-  return Boolean(canManageUsers() && sessionStorage.getItem(FUN_AD_SESSION_KEY) === '1');
+  return Boolean(funAdsDeveloperMode() && canManageUsers() && sessionStorage.getItem(FUN_AD_SESSION_KEY) === '1');
+}
+
+function funAdsDeveloperMode() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('debugAds') === '1' || localStorage.getItem('setechub_debug_ads') === '1';
+  } catch {
+    return false;
+  }
 }
 
 function renderFunAdsStatus() {
+  document.querySelectorAll('[data-fun-ads-dev]').forEach((node) => {
+    node.hidden = !funAdsDeveloperMode();
+  });
   const toggle = document.getElementById('funAdsToggle');
   const status = document.getElementById('funAdsStatus');
   if (toggle) toggle.checked = funAdsEnabled();
@@ -169,6 +181,12 @@ function applyFunAdsMode() {
 }
 
 function toggleFunAdsMode(enabled) {
+  if (enabled && !funAdsDeveloperMode()) {
+    sessionStorage.removeItem(FUN_AD_SESSION_KEY);
+    applyFunAdsMode();
+    showToast('Modo anuncios disponivel apenas com debugAds=1.', 'info');
+    return;
+  }
   if (enabled) sessionStorage.setItem(FUN_AD_SESSION_KEY, '1');
   else sessionStorage.removeItem(FUN_AD_SESSION_KEY);
   applyFunAdsMode();
@@ -2364,4 +2382,5 @@ function setupEventListeners() {
     renderAssets();
   });
 }
+
 
