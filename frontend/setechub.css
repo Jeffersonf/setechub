@@ -3428,6 +3428,7 @@ textarea {
 
 .supervisor-goal-grid .setechub-command-score {
   display: grid;
+  position: relative;
   align-content: space-between;
   gap: 12px;
   min-height: 118px;
@@ -3439,25 +3440,26 @@ textarea {
 }
 
 .supervisor-goal-head {
-  display: flex;
+  display: block;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  min-width: 0;
+  padding-right: 128px;
 }
 
 .supervisor-goal-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: auto;
-  min-width: 104px;
-  min-height: 24px;
-  padding: 0 14px;
-  flex: 0 0 auto;
+  width: 112px;
+  min-height: 28px;
+  padding: 0 12px;
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 999px;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
