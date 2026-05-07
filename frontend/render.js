@@ -78,8 +78,8 @@ function renderDashboardHero() {
 
   title.textContent = template.title;
   text.textContent = focus
-    ? `${template.subtitle} Próximo: ${focus.title} | ${focus.place || 'sem local'} | ${focus.time || 'sem horário'}`
-    : `${template.subtitle} ${buildSummaryPreview()} | cobertura ${coverage.profileCoverage}%`;
+    ? `${template.subtitle} Proximo compromisso: ${focus.title} | ${focus.place || 'sem local'} | ${focus.time || 'sem horario'}.`
+    : `${template.subtitle} Dados consolidados para escolas, inventario, supervisao e calendario da URE.`;
 
   const actionItems = template.actions
     .filter((item) => canAccessPage(item.page) && (!item.role || item.role === currentUserRole()) && (item.tone !== 'edit' || canEditData()));
@@ -93,9 +93,9 @@ function renderDashboardHero() {
 
   statsNode.innerHTML = [
     { label: template.metrics[0]?.label || 'Escolas', value: template.metrics[0]?.value ?? String(visibleSchools().length), tone: template.metrics[0]?.tone || 'pill-info' },
-    { label: template.metrics[1]?.label || 'Inventário alerta', value: template.metrics[1]?.value ?? String(alertAssets), tone: template.metrics[1]?.tone || (alertAssets ? 'pill-danger' : 'pill-ok') },
-    { label: template.metrics[2]?.label || 'Pendências', value: template.metrics[2]?.value ?? String(pendingItems), tone: template.metrics[2]?.tone || (pendingItems ? 'pill-info' : 'pill-ok') },
-    { label: template.metrics[3]?.label || 'Cobertura fichas', value: template.metrics[3]?.value ?? `${coverage.profileCoverage}%`, tone: template.metrics[3]?.tone || (coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn') }
+    { label: template.metrics[1]?.label || 'Inventario', value: template.metrics[1]?.value ?? String(alertAssets), tone: template.metrics[1]?.tone || (alertAssets ? 'pill-danger' : 'pill-ok') },
+    { label: template.metrics[2]?.label || 'Agenda URE', value: template.metrics[2]?.value ?? String(pendingItems), tone: template.metrics[2]?.tone || 'pill-info' },
+    { label: template.metrics[3]?.label || 'Fichas', value: template.metrics[3]?.value ?? `${coverage.profileCoverage}%`, tone: template.metrics[3]?.tone || (coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn') }
   ].map((item) => `
     <div class="dashboard-hero-stat">
       <span>${esc(item.label)}</span>
@@ -114,6 +114,7 @@ function dashboardTemplateForRole() {
   const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
   const sharedAgenda = (state.tasks || []).filter((item) => !item.done && (item.scope === 'ure' || item.scope === 'carro')).length;
   const monthlyVisits = supervisorRows.reduce((sum, item) => sum + Number(item.supervisor.monthlyVisits || item.visits || 0), 0);
+  const activeCalls = (state.calls || []).filter((item) => item.status !== 'resolvido' && canViewSchool(item.school)).length;
   const baseActions = {
     schools: { label: 'Abrir escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
     inventory: { label: 'Abrir inventário', action: `openInventoryCategory()`, page: 'assets', tone: 'primary' },
@@ -129,7 +130,7 @@ function dashboardTemplateForRole() {
     actions: [baseActions.schools, baseActions.inventory, baseActions.agenda],
     metrics: [
       { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
-      { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
+      { label: 'Supervisores', value: String(supervisorRows.length), tone: 'pill-info' },
       { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
       { label: 'Inventário', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
     ]
@@ -142,9 +143,9 @@ function dashboardTemplateForRole() {
       actions: [baseActions.schools, baseActions.inventory, baseActions.supervisors, baseActions.agenda, baseActions.admin],
       metrics: [
         { label: 'Escolas', value: String(state.schools.length), tone: 'pill-info' },
-        { label: 'Inventário alerta', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
+        { label: 'Inventario', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
         { label: 'Supervisores', value: String(supervisorRows.length), tone: 'pill-info' },
-        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
+        { label: 'Agenda URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
       ]
     };
   }
@@ -157,8 +158,8 @@ function dashboardTemplateForRole() {
       metrics: [
         { label: 'Visitas CTC', value: String(ctcTasks), tone: ctcTasks ? 'pill-warn' : 'pill-ok' },
         { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
-        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
-        { label: 'Inventário alerta', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
+        { label: 'Agenda URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
+        { label: 'Inventario', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
       ]
     };
   }
@@ -171,7 +172,7 @@ function dashboardTemplateForRole() {
       metrics: [
         { label: 'Minhas escolas', value: String(schools.length), tone: 'pill-info' },
         { label: 'Visitas mês', value: String(monthlyVisits), tone: monthlyVisits ? 'pill-ok' : 'pill-warn' },
-        { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
+        { label: 'Inventario', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
         { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
       ]
     };
@@ -185,7 +186,7 @@ function dashboardTemplateForRole() {
       metrics: [
         { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
         { label: 'Manut./defeito', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
-        { label: 'Base', value: 'Consistente', tone: 'pill-ok' },
+        { label: 'Chamados', value: String(activeCalls), tone: activeCalls ? 'pill-warn' : 'pill-ok' },
         { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
       ]
     };
@@ -293,8 +294,10 @@ function renderDashboardAccess() {
     const inventoryAlertCount = state.schoolAssets.filter((item) => item.status !== 'ok').length;
     const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
     const allModules = [
-      { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades | base consistente`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+      { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades cadastradas`, action: `showPage('schools')`, page: 'schools', key: 'schools', tone: 'lime', priority: 'primary' },
       { icon: '&#128187;', title: 'Inventário', meta: `${inventoryAlertCount} alerta(s)`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
+      { icon: '&#127760;', title: 'Redes', meta: `${state.schoolNetworks.length} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', key: 'networks', tone: 'amber', priority: 'primary' },
+      { icon: '&#128247;', title: 'Cameras', meta: 'levantamento por escola', action: `showPage('schools')`, page: 'schools', key: 'cameras', tone: 'blue', priority: 'primary' },
       { icon: '&#129517;', title: 'Supervisores', meta: `${visibleSupervisors().length} no painel`, action: `showPage('supervisors')`, page: 'supervisors', tone: 'blue', priority: 'primary' },
       { icon: '&#128736;', title: 'Técnicos CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
       { icon: '&#128197;', title: 'Agenda', meta: 'compromissos e frota', action: `showPage('agenda')`, page: 'agenda', tone: 'slate', priority: 'secondary' },
@@ -317,7 +320,7 @@ function renderDashboardAccess() {
     if (categoryBox) categoryBox.hidden = !modules.length;
     if (categoryNode) {
       categoryNode.innerHTML = modules.map((item) => `
-        <button class="dashboard-category-card category-${esc(item.page)} ${item.tone} ${item.priority}" type="button" onclick="${item.action}">
+        <button class="dashboard-category-card category-${esc(item.key || item.page)} ${item.tone} ${item.priority}" type="button" onclick="${item.action}">
           <strong><span class="category-emoji">${item.icon}</span>${esc(item.title)}</strong>
           <span>${esc(item.meta)}</span>
         </button>
@@ -343,10 +346,10 @@ function renderDashboardAccess() {
   const unresolvedCalls = state.calls.filter((item) => item.status === 'aberto').length;
   const routeCalls = state.calls.filter((item) => item.status === 'em_rota').length;
   const categories = [
-    { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases | base consistente`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
+    { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases cadastradas`, action: `showPage('schools')`, page: 'schools', key: 'schools', tone: 'lime', priority: 'primary' },
     { icon: '&#128187;', title: 'Inventário', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} manut./defeito`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
-    { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: 'amber', priority: 'primary' },
-    { icon: '&#128247;', title: 'Câmeras', meta: `${cameraSchoolCount} escolas com câmeras`, action: `showPage('schools')`, page: 'schools', tone: 'blue', priority: 'secondary' },
+    { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', key: 'networks', tone: 'amber', priority: 'primary' },
+    { icon: '&#128247;', title: 'Cameras', meta: `${cameraSchoolCount} escolas com cameras`, action: `showPage('schools')`, page: 'schools', key: 'cameras', tone: 'blue', priority: 'secondary' },
     { icon: '&#128736;', title: 'Técnicos CTC', meta: `${ctcUsers.length} usuários | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
     { icon: '&#127891;', title: 'PECs', meta: 'módulo dormente', page: 'pecs', tone: 'blue', priority: 'secondary', inactive: true },
     { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
@@ -356,7 +359,7 @@ function renderDashboardAccess() {
   if (categoryBox) categoryBox.hidden = !categories.length;
   if (categoryNode) {
     categoryNode.innerHTML = categories.map((item) => `
-      <button class="dashboard-category-card category-${esc(item.page)} ${item.tone} ${item.priority} ${item.inactive ? 'is-inactive' : ''}" type="button" ${item.inactive ? 'disabled' : `onclick="${item.action}"`}>
+      <button class="dashboard-category-card category-${esc(item.key || item.page)} ${item.tone} ${item.priority} ${item.inactive ? 'is-inactive' : ''}" type="button" ${item.inactive ? 'disabled' : `onclick="${item.action}"`}>
         <strong><span class="category-emoji">${item.icon}</span>${esc(item.title)}</strong>
         <span>${esc(item.meta)}</span>
       </button>
@@ -530,7 +533,6 @@ function renderRoleDashboard(profileNode, roleCardsNode, attentionNode) {
     .filter((item) => canViewSchool(item.school) && item.alertUnits > 0);
   const ctcOpen = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
   const supervisorStatsRows = supervisorStats();
-  const activeCalls = state.calls.filter((item) => item.status !== 'resolvido' && canViewSchool(item.school)).length;
   const pendingItems = pendingQueueItems(99).length;
   const adminImports = state.schoolImports || [];
 
