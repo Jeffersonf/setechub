@@ -71,23 +71,19 @@ function renderDashboardHero() {
   const health = dashboardHealth();
   const coverage = operationalCoverage();
   const focus = nextFocusTask();
+  const template = dashboardTemplateForRole();
   const openCalls = state.calls.filter((item) => item.status !== 'resolvido').length;
   const attentionSchools = visibleSchools().filter((item) => item.status !== 'estavel').length;
   const alertAssets = state.assets.filter((item) => item.status !== 'ok').length + state.schoolAssets.filter((item) => item.status !== 'ok').length;
   const pendingItems = pendingQueueItems(99).length;
 
-  title.textContent = focus ? focus.title : 'Mesa de operação pronta para o próximo movimento.';
+  title.textContent = template.title;
   text.textContent = focus
-    ? `${focus.place || 'Sem local definido'} | ${focus.category || 'Rotina'} | ${focus.time || 'sem horário definido'}`
-    : `${buildSummaryPreview()} | cobertura ${coverage.profileCoverage}%`;
+    ? `${template.subtitle} Próximo: ${focus.title} | ${focus.place || 'sem local'} | ${focus.time || 'sem horário'}`
+    : `${template.subtitle} ${buildSummaryPreview()} | cobertura ${coverage.profileCoverage}%`;
 
-  const actionItems = [
-    { label: 'Abrir Técnicos CTC', action: `openCtcAgenda()`, page: 'ctc', tone: 'primary', role: 'ctc' },
-    { label: 'Abrir escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
-    { label: 'Inventário com manutenção/defeito', action: `openInventoryCategory('alerta')`, page: 'assets', tone: '' },
-    { label: 'Sem rede/câmeras', action: `openSchoolCategory('sem_rede')`, page: 'schools', tone: '' },
-    { label: 'Nova tarefa', action: `showPage('agenda')`, page: 'agenda', tone: 'edit' }
-  ].filter((item) => canAccessPage(item.page) && (!item.role || item.role === currentUserRole()) && (item.tone !== 'edit' || canEditData()));
+  const actionItems = template.actions
+    .filter((item) => canAccessPage(item.page) && (!item.role || item.role === currentUserRole()) && (item.tone !== 'edit' || canEditData()));
 
   actions.innerHTML = actionItems.map((item) => `
     <button class="btn ${item.tone === 'primary' ? 'btn-p' : 'btn-g'} btn-sm" type="button" onclick="${item.action}">${item.label}</button>
@@ -102,10 +98,10 @@ function renderDashboardHero() {
   `;
 
   statsNode.innerHTML = [
-    { label: 'Escolas em atenção', value: String(attentionSchools), tone: attentionSchools ? 'pill-warn' : 'pill-ok' },
-    { label: 'Inventário alerta', value: String(alertAssets), tone: alertAssets ? 'pill-danger' : 'pill-ok' },
-    { label: 'Pendências', value: String(pendingItems), tone: pendingItems ? 'pill-info' : 'pill-ok' },
-    { label: 'Cobertura fichas', value: `${coverage.profileCoverage}%`, tone: coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn' }
+    { label: template.metrics[0]?.label || 'Escolas em atenção', value: template.metrics[0]?.value ?? String(attentionSchools), tone: template.metrics[0]?.tone || (attentionSchools ? 'pill-warn' : 'pill-ok') },
+    { label: template.metrics[1]?.label || 'Inventário alerta', value: template.metrics[1]?.value ?? String(alertAssets), tone: template.metrics[1]?.tone || (alertAssets ? 'pill-danger' : 'pill-ok') },
+    { label: template.metrics[2]?.label || 'Pendências', value: template.metrics[2]?.value ?? String(pendingItems), tone: template.metrics[2]?.tone || (pendingItems ? 'pill-info' : 'pill-ok') },
+    { label: template.metrics[3]?.label || 'Cobertura fichas', value: template.metrics[3]?.value ?? `${coverage.profileCoverage}%`, tone: template.metrics[3]?.tone || (coverage.profileCoverage >= 65 ? 'pill-ok' : 'pill-warn') }
   ].map((item) => `
     <div class="dashboard-hero-stat">
       <span>${esc(item.label)}</span>
@@ -113,6 +109,108 @@ function renderDashboardHero() {
       <i class="diag-pill ${item.tone}"></i>
     </div>
   `).join('');
+}
+
+function dashboardTemplateForRole() {
+  const role = currentUserRole();
+  const schools = visibleSchools();
+  const supervisorRows = supervisorStats();
+  const schoolAlerts = schools.filter((school) => school.status !== 'estavel' || schoolAlertUnits(school.name) > 0).length;
+  const inventoryAlerts = aggregateInventoryItems(state.schoolAssets).filter((item) => canViewSchool(item.school) && item.alertUnits > 0).length;
+  const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
+  const sharedAgenda = (state.tasks || []).filter((item) => !item.done && (item.scope === 'ure' || item.scope === 'carro')).length;
+  const monthlyVisits = supervisorRows.reduce((sum, item) => sum + Number(item.supervisor.monthlyVisits || item.visits || 0), 0);
+  const baseActions = {
+    schools: { label: 'Abrir escolas', action: `showPage('schools')`, page: 'schools', tone: 'primary' },
+    inventory: { label: 'Abrir inventário', action: `openInventoryCategory()`, page: 'assets', tone: 'primary' },
+    supervisors: { label: 'Abrir supervisão', action: `showPage('supervisors')`, page: 'supervisors', tone: 'primary' },
+    ctc: { label: 'Abrir Técnicos CTC', action: `openCtcAgenda()`, page: 'ctc', tone: 'primary', role: 'ctc' },
+    agenda: { label: 'Ver calendário URE', action: `showPage('agenda')`, page: 'agenda', tone: '' },
+    contacts: { label: 'Abrir contatos', action: `showPage('info')`, page: 'info', tone: '' },
+    admin: { label: 'Administração', action: `showPage('admin')`, page: 'admin', tone: 'edit' }
+  };
+  const common = {
+    title: `Painel ${roleDisplay(role)}`,
+    subtitle: 'Visão operacional conforme seu perfil.',
+    actions: [baseActions.schools, baseActions.inventory, baseActions.agenda],
+    metrics: [
+      { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
+      { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+      { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
+      { label: 'Inventário', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
+    ]
+  };
+  if (role === 'admin' || role === 'seintec') {
+    return {
+      ...common,
+      title: role === 'admin' ? 'Painel de gestão regional' : 'Painel SEINTEC',
+      subtitle: 'Controle amplo de escolas, inventário, supervisão, técnicos e calendário geral da URE.',
+      actions: [baseActions.schools, baseActions.inventory, baseActions.supervisors, baseActions.agenda, baseActions.admin],
+      metrics: [
+        { label: 'Escolas', value: String(state.schools.length), tone: 'pill-info' },
+        { label: 'Inventário alerta', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
+        { label: 'Supervisores', value: String(supervisorRows.length), tone: 'pill-info' },
+        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
+      ]
+    };
+  }
+  if (role === 'ctc') {
+    return {
+      ...common,
+      title: 'Painel Técnicos CTC',
+      subtitle: 'Agenda técnica, escolas consultáveis e calendário geral da URE no mesmo lugar.',
+      actions: [baseActions.ctc, baseActions.agenda, baseActions.schools, baseActions.contacts],
+      metrics: [
+        { label: 'Visitas CTC', value: String(ctcTasks), tone: ctcTasks ? 'pill-warn' : 'pill-ok' },
+        { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
+        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
+        { label: 'Inventário alerta', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' }
+      ]
+    };
+  }
+  if (role === 'supervisor') {
+    return {
+      ...common,
+      title: 'Painel de supervisão',
+      subtitle: 'Resumo das escolas vinculadas, visitas, metas e calendário geral da URE.',
+      actions: [baseActions.supervisors, baseActions.schools, baseActions.agenda, baseActions.contacts],
+      metrics: [
+        { label: 'Minhas escolas', value: String(schools.length), tone: 'pill-info' },
+        { label: 'Visitas mês', value: String(monthlyVisits), tone: monthlyVisits ? 'pill-ok' : 'pill-warn' },
+        { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
+      ]
+    };
+  }
+  if (role === 'seom') {
+    return {
+      ...common,
+      title: 'Painel SEOM',
+      subtitle: 'Foco em escolas, manutenção, inventário de infraestrutura e calendário geral da URE.',
+      actions: [baseActions.schools, baseActions.inventory, baseActions.agenda, baseActions.contacts],
+      metrics: [
+        { label: 'Escolas', value: String(schools.length), tone: 'pill-info' },
+        { label: 'Manut./defeito', value: String(inventoryAlerts), tone: inventoryAlerts ? 'pill-danger' : 'pill-ok' },
+        { label: 'Atenção', value: String(schoolAlerts), tone: schoolAlerts ? 'pill-warn' : 'pill-ok' },
+        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' }
+      ]
+    };
+  }
+  if (role === 'pec') {
+    return {
+      ...common,
+      title: 'Painel PEC',
+      subtitle: 'Acesso rápido aos contatos e calendário geral da URE.',
+      actions: [baseActions.contacts, baseActions.agenda],
+      metrics: [
+        { label: 'Contatos', value: String(filteredDirectoryContacts(true).length), tone: 'pill-info' },
+        { label: 'Calendário URE', value: String(sharedAgenda), tone: sharedAgenda ? 'pill-info' : 'pill-ok' },
+        { label: 'Perfil', value: 'PEC', tone: 'pill-ok' },
+        { label: 'Consulta', value: 'URE', tone: 'pill-info' }
+      ]
+    };
+  }
+  return common;
 }
 
 function renderOperationsCenter() {
@@ -187,7 +285,7 @@ function renderDashboardAccess() {
   const drilldownBox = document.getElementById('dashboardDrilldownBox');
 
   if (VIEWER_MODE_V1) {
-    [profileNode, roleCardsNode, attentionNode, quickBox, drilldownBox].forEach((node) => {
+    [attentionNode, quickBox, drilldownBox].forEach((node) => {
       if (!node) return;
       node.hidden = true;
       node.innerHTML = '';
@@ -195,18 +293,54 @@ function renderDashboardAccess() {
     if (linksNode) linksNode.innerHTML = '';
     if (drilldownNode) drilldownNode.innerHTML = '';
 
+    const template = dashboardTemplateForRole();
+    const role = currentUserRole();
     const schools = visibleSchools();
     const schoolAlertCount = schools.filter((item) => item.status !== 'estavel').length;
     const inventoryAlertCount = state.schoolAssets.filter((item) => item.status !== 'ok').length;
     const ctcTasks = (state.tasks || []).filter((item) => normalizeKey(item.category).includes('ctc') && !item.done).length;
-    const modules = [
+    const allModules = [
       { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades | ${schoolAlertCount} em atenção`, action: `showPage('schools')`, page: 'schools', tone: 'lime', priority: 'primary' },
       { icon: '&#128187;', title: 'Inventário', meta: `${inventoryAlertCount} alerta(s)`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
       { icon: '&#129517;', title: 'Supervisores', meta: `${visibleSupervisors().length} no painel`, action: `showPage('supervisors')`, page: 'supervisors', tone: 'blue', priority: 'primary' },
       { icon: '&#128736;', title: 'Técnicos CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
       { icon: '&#128197;', title: 'Agenda', meta: 'compromissos e frota', action: `showPage('agenda')`, page: 'agenda', tone: 'slate', priority: 'secondary' },
+      { icon: '&#128101;', title: 'Contatos', meta: 'ramais e setores', action: `showPage('info')`, page: 'info', tone: 'slate', priority: 'secondary' },
       { icon: '&#9881;', title: 'Admin', meta: 'backup e importações', action: `showPage('admin')`, page: 'admin', tone: 'red', priority: 'secondary' }
-    ].filter((item) => canAccessPage(item.page));
+    ];
+    const rolePages = {
+      admin: ['schools', 'assets', 'supervisors', 'ctc', 'agenda', 'admin'],
+      seintec: ['schools', 'assets', 'supervisors', 'agenda', 'admin'],
+      ctc: ['ctc', 'agenda', 'schools', 'info'],
+      supervisor: ['supervisors', 'schools', 'agenda', 'info'],
+      seom: ['schools', 'assets', 'agenda', 'info'],
+      dirigente: ['schools', 'assets', 'supervisors', 'ctc', 'agenda', 'info'],
+      pec: ['info', 'agenda']
+    };
+    const modules = allModules
+      .filter((item) => (rolePages[role] || rolePages.admin).includes(item.page))
+      .filter((item) => canAccessPage(item.page));
+
+    if (profileNode) {
+      profileNode.hidden = false;
+      profileNode.innerHTML = template.metrics.map((item) => `
+        <div class="dashboard-profile-card">
+          <span>${esc(item.label)}</span>
+          <strong>${esc(item.value)}</strong>
+          <small>${esc(template.title)}</small>
+        </div>
+      `).join('');
+    }
+    if (roleCardsNode) {
+      roleCardsNode.hidden = false;
+      roleCardsNode.innerHTML = modules.slice(0, 4).map((item) => dashboardRoleCard({
+        title: item.title,
+        value: item.meta.split('|')[0].trim(),
+        meta: item.meta,
+        tone: item.tone,
+        action: item.action
+      })).join('');
+    }
 
     if (categoryBox) categoryBox.hidden = !modules.length;
     if (categoryNode) {
@@ -311,6 +445,8 @@ function renderDashboardOperationalLists() {
   const personalAgendaNode = document.getElementById('dashboardPersonalAgenda');
   const sharedAgendaListNode = document.getElementById('dashboardSharedAgendaList');
   const personalAgendaListNode = document.getElementById('dashboardPersonalAgendaList');
+  document.querySelector('.dashboard-calendar-head')?.removeAttribute('hidden');
+  document.querySelector('.dashboard-calendar-panel')?.removeAttribute('hidden');
   const inventoryRows = topInventoryAlerts(5);
   const callRows = topOpenCalls(5);
   const renderAgendaRows = (rows, emptyText) => rows.slice(0, 6).map((task) => `

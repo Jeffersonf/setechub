@@ -1889,6 +1889,7 @@ function renderCurrentPage(page = currentPage) {
       measurePerf('renderDashboardHero', renderDashboardHero, 8);
       measurePerf('renderDashboardAccess', renderDashboardAccess, 8);
       measurePerf('renderPendingQueue', renderPendingQueue, 8);
+      measurePerf('renderDashboardOperationalLists', renderDashboardOperationalLists, 8);
       return;
     }
     clearTimeout(dashboardDeferredTimer);

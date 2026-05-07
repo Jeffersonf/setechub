@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-inventory-school-card-1">
-<link rel="stylesheet" href="./setechub.css?v=20260507-inventory-school-card-1">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-inventory-school-card-1">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-inventory-school-card-1">
-<script defer src="./school-data.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./storage.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./app.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./render.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./utils/defer.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./components/avatar.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./components/school-card.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./pages/schools.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./pages/school-record.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./pages/inventory.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./pages/supervisors.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./pages/admin.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./api.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./actions.js?v=20260507-inventory-school-card-1"></script>
-<script defer src="./bootstrap.js?v=20260507-inventory-school-card-1"></script>
+<link rel="stylesheet" href="./styles.css?v=20260507-role-dashboard-1">
+<link rel="stylesheet" href="./setechub.css?v=20260507-role-dashboard-1">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260507-role-dashboard-1">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-role-dashboard-1">
+<script defer src="./school-data.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./storage.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./app.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./render.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./utils/defer.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./components/avatar.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./components/school-card.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./pages/schools.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./pages/school-record.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./pages/inventory.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./pages/supervisors.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./pages/admin.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./api.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./actions.js?v=20260507-role-dashboard-1"></script>
+<script defer src="./bootstrap.js?v=20260507-role-dashboard-1"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -158,10 +158,10 @@
       <div class="box"><div class="bh"><div><div class="ct">Inventário crítico</div><div class="cs">Itens de manutenção/defeito.</div></div></div><div id="dashboardInventoryAlerts" class="stack-list"></div></div>
       <div class="box"><div class="bh"><div><div class="ct">Chamados ativos</div><div class="cs">Fila operacional em aberto.</div></div></div><div id="dashboardCallQueue" class="stack-list"></div></div>
     </section>
-    <div class="ph" data-v1-dashboard-secondary hidden>
+    <div class="ph dashboard-calendar-head" hidden>
       <div>
-        <div class="pt">Painel</div>
-        <div class="ps">Calendários compartilhado e pessoal para acompanhar os compromissos do mês.</div>
+        <div class="pt">Calendário geral da URE</div>
+        <div class="ps">Agenda compartilhada do mês para eventos, carros oficiais e compromissos da unidade.</div>
       </div>
       <div class="page-actions">
         <div class="month-view-control" data-month-view-control>
@@ -173,10 +173,10 @@
       </div>
     </div>
 
-    <section class="dashboard-finanza-grid dashboard-agenda-stack" data-v1-dashboard-secondary hidden>
+    <section class="dashboard-finanza-grid dashboard-agenda-stack dashboard-calendar-panel" hidden>
       <div class="box dashboard-focus-box">
         <div class="bh">
-        <div><div class="ct">Agenda compartilhada</div><div class="cs">Carros oficiais e eventos da URE.</div></div>
+        <div><div class="ct">Calendário geral da URE</div><div class="cs">Carros oficiais e eventos da URE.</div></div>
           <button class="btn btn-g btn-sm" type="button" onclick="showPage('agenda')">Abrir agenda</button>
         </div>
         <div id="dashboardSharedAgenda" class="dashboard-mini-calendar"></div>
