@@ -232,6 +232,7 @@ function applyLockedSupervisorAssignments(supervisors, schools = SCHOOL_MASTER) 
     if (!locked) return supervisor;
     usedKeys.add(locked.key);
     const assignedSchools = canonicalizeSchools(locked.schools);
+    const sheetSynced = supervisor.source === 'google-sheet' || Boolean(supervisor.sourceSyncedAt);
     return {
       ...supervisor,
       name: locked.name,
@@ -239,9 +240,10 @@ function applyLockedSupervisorAssignments(supervisors, schools = SCHOOL_MASTER) 
       phone: supervisor.phone || locked.phone,
       sourceAliases: supervisorSourceAliases(locked.name),
       schools: assignedSchools,
-      assignedSchoolCount: assignedSchools.length,
-      monthlyGoal: assignedSchools.length || Number(supervisor.monthlyGoal || 1),
-      source: 'lista oficial travada'
+      assignedSchoolCount: sheetSynced ? Number(supervisor.assignedSchoolCount || 0) : assignedSchools.length,
+      weeklyGoal: Number(supervisor.weeklyGoal || 0),
+      monthlyGoal: Number(supervisor.monthlyGoal || 0),
+      source: supervisor.source === 'google-sheet' ? supervisor.source : 'lista oficial travada'
     };
   });
   LOCKED_SUPERVISOR_ASSIGNMENTS.forEach((locked) => {
@@ -259,7 +261,8 @@ function applyLockedSupervisorAssignments(supervisors, schools = SCHOOL_MASTER) 
       sourceAliases: supervisorSourceAliases(locked.name),
       schools: assignedSchools,
       assignedSchoolCount: assignedSchools.length,
-      monthlyGoal: assignedSchools.length || 1,
+      weeklyGoal: 0,
+      monthlyGoal: 0,
       source: 'lista oficial travada'
     });
   });
@@ -656,7 +659,8 @@ function defaultSupervisors(schools) {
     sourceAliases: supervisorSourceAliases(supervisor.name),
     schools: assignedSchools,
     assignedSchoolCount: assignedSchools.length,
-    monthlyGoal: Math.max(1, assignedSchools.length),
+    weeklyGoal: 0,
+    monthlyGoal: 0,
     source: 'lista oficial travada'
   });
   });

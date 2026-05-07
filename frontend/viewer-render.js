@@ -295,7 +295,7 @@ function supervisorSheetMetrics(item) {
   const supervisor = item.supervisor || {};
   const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools?.length || 0);
   const weeklyGoal = Number(supervisor.weeklyGoal || 0);
-  const monthlyGoal = Number(supervisor.monthlyGoal || assigned || 1);
+  const monthlyGoal = Number(supervisor.monthlyGoal || 0);
   const weeklyVisits = supervisorWeeklyVisitsForView(supervisor, Number(item.weeklyVisitFallback || 0));
   const monthlyVisits = supervisorMonthlyVisitsForView(supervisor, Number(item.monthlyVisitFallback ?? item.visits ?? 0));
   return {

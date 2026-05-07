@@ -1744,7 +1744,7 @@ function supervisorSheetMetrics(item) {
   const supervisor = item.supervisor || item;
   const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools?.length || supervisor.schools?.length || 0);
   const weeklyGoal = Number(supervisor.weeklyGoal || 0);
-  const monthlyGoal = Number(supervisor.monthlyGoal || assigned || 1);
+  const monthlyGoal = Number(supervisor.monthlyGoal || 0);
   const fallbackWeeklyVisits = Number.isFinite(Number(item.weeklyVisitFallback)) ? Number(item.weeklyVisitFallback) : 0;
   const weeklyVisits = supervisorWeeklyVisitsForView(supervisor, fallbackWeeklyVisits);
   const fallbackVisits = Number.isFinite(Number(item.monthlyVisitFallback)) ? Number(item.monthlyVisitFallback) : item.visits || 0;
@@ -1825,7 +1825,7 @@ function renderSupervisors() {
       const localWeekCount = weekVisitCounts.get(`${supervisor.name}|${currentWeek}`) || 0;
       const assigned = Number(supervisor.assignedSchoolCount || item.assignedSchools.length || 0);
       const weeklyGoal = Number(supervisor.weeklyGoal || 0);
-      const monthlyGoal = Number(supervisor.monthlyGoal || item.assignedSchools.length || 1);
+      const monthlyGoal = Number(supervisor.monthlyGoal || 0);
       const weeklyVisits = supervisorWeeklyVisitsForView(supervisor, localWeekCount);
       const monthlyVisits = supervisorMonthlyVisitsForView(supervisor, localCount);
       const weeklyIndicator = supervisorViewMonthIsCurrent() ? supervisor.weeklyIndicator || 'aviso' : supervisorIndicatorFromGoal(weeklyVisits, weeklyGoal);
@@ -1935,8 +1935,8 @@ function renderSupervisors() {
 
   const overviewPanel = document.getElementById('supervisorOverviewPanel');
   if (overviewPanel) {
-    const totalGoal = stats.reduce((sum, item) => sum + Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 0), 0);
-    const metGoals = stats.filter((item) => item.visits >= Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1)).length;
+    const totalGoal = stats.reduce((sum, item) => sum + Number(item.supervisor.monthlyGoal || 0), 0);
+    const metGoals = stats.filter((item) => Number(item.supervisor.monthlyGoal || 0) > 0 && item.visits >= Number(item.supervisor.monthlyGoal || 0)).length;
     overviewPanel.innerHTML = `
       <div class="school-overview-kpis">
         <div><span>Meta total</span><strong>${esc(String(totalGoal))}</strong></div>
@@ -1950,14 +1950,14 @@ function renderSupervisors() {
   const attentionList = document.getElementById('supervisorAttentionList');
   if (attentionList) {
     attentionList.innerHTML = stats
-      .filter((item) => item.visits < Number(item.supervisor.monthlyGoal || item.assignedSchools.length || 1))
+      .filter((item) => Number(item.supervisor.monthlyGoal || 0) > 0 && item.visits < Number(item.supervisor.monthlyGoal || 0))
       .slice(0, 6)
       .map((item) => `
         <div class="setechub-item setechub-clickable" onclick="openSupervisorRecord('${esc(item.supervisor.name)}')">
           <div class="setechub-head">
             <div>
               <strong>${esc(item.supervisor.name)}</strong>
-              <div class="sync-meta">${esc(String(item.visits))}/${esc(String(item.supervisor.monthlyGoal || item.assignedSchools.length || 1))} visita(s) no periodo de teste</div>
+              <div class="sync-meta">${esc(String(item.visits))}/${esc(String(item.supervisor.monthlyGoal || '--'))} visita(s) no periodo de teste</div>
             </div>
             <span class="diag-pill pill-warn">Meta pendente</span>
           </div>
@@ -2006,10 +2006,11 @@ function renderSupervisors() {
   const pendingSchools = selectedStat
     ? selectedStat.assignedSchools.filter((school) => !visitedSchoolSet.has(school))
     : [];
-  const monthlyGoal = selectedStat ? Number(selectedStat.supervisor.monthlyGoal || selectedStat.assignedSchools.length || 1) : 1;
+  const monthlyGoal = selectedStat ? Number(selectedStat.supervisor.monthlyGoal || 0) : 0;
   const monthlyVisitCount = selectedVisits.length;
-  const goalPct = selectedStat ? Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100)) : 0;
-  const goalMet = selectedStat && monthlyVisitCount >= monthlyGoal;
+  const goalPct = selectedStat && monthlyGoal ? Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100)) : 0;
+  const goalMet = selectedStat && monthlyGoal > 0 && monthlyVisitCount >= monthlyGoal;
+  const monthlyGoalLabel = monthlyGoal ? String(monthlyGoal) : '--';
 
   const profilePanel = document.getElementById('supervisorProfilePanel');
   if (profilePanel) {
@@ -2040,12 +2041,12 @@ function renderSupervisors() {
       <div class="setechub-command-score supervisor-goal-score">
         <div>
           <div class="sync-meta">Meta mensal</div>
-          <strong>${esc(String(monthlyVisitCount))}/${esc(String(monthlyGoal))}</strong>
+          <strong>${esc(String(monthlyVisitCount))}/${esc(monthlyGoalLabel)}</strong>
         </div>
-        <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${esc(String(goalPct))}%</span>
+        <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${monthlyGoal ? `${esc(String(goalPct))}%` : '--'}</span>
       </div>
       <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, goalPct)))}%"></span></div>
-      <div class="sync-meta">${goalMet ? 'Supervisor ja atingiu a meta de visitas no mes atual.' : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta do mes.`}</div>
+      <div class="sync-meta">${monthlyGoal ? (goalMet ? 'Supervisor ja atingiu a meta de visitas no mes atual.' : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta do mes.`) : 'Meta mensal aguardando leitura da planilha oficial.'}</div>
     ` : '<div class="sync-empty">Sem meta calculada.</div>';
   }
 
@@ -2219,8 +2220,9 @@ function renderSupervisorRecord() {
   const weeklyGoal = sheetMetrics.weeklyGoal;
   const monthlyVisitCount = sheetMetrics.monthlyVisits;
   const weeklyVisitCount = sheetMetrics.weeklyVisits;
-  const goalPct = Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100));
-  const goalMet = monthlyVisitCount >= monthlyGoal;
+  const goalPct = monthlyGoal ? Math.min(100, Math.round((monthlyVisitCount / monthlyGoal) * 100)) : 0;
+  const goalMet = monthlyGoal > 0 && monthlyVisitCount >= monthlyGoal;
+  const monthlyGoalLabel = monthlyGoal ? String(monthlyGoal) : '--';
   const monthlyIndicator = sheetMetrics.monthlyIndicator;
   const weeklyIndicator = sheetMetrics.weeklyIndicator;
 
@@ -2232,7 +2234,7 @@ function renderSupervisorRecord() {
   const title = document.getElementById('supervisorRecordTitle');
   const subtitle = document.getElementById('supervisorRecordSubtitle');
   if (title) title.textContent = supervisor.name;
-  if (subtitle) subtitle.textContent = `${sheetMetrics.assigned} escola(s) | ${monthlyVisitCount}/${monthlyGoal} visita(s) em ${viewMonthLabel} | ${goalMet ? 'meta cumprida' : 'meta pendente'}.`;
+  if (subtitle) subtitle.textContent = `${sheetMetrics.assigned} escola(s) | ${monthlyVisitCount}/${monthlyGoalLabel} visita(s) em ${viewMonthLabel} | ${monthlyGoal ? (goalMet ? 'meta cumprida' : 'meta pendente') : 'meta aguardando planilha'}.`;
   const refreshButton = document.getElementById('refreshSupervisorSheetBtn');
   if (refreshButton) {
     refreshButton.hidden = !supervisor.visitSourceUrl || !canImportData();
@@ -2259,21 +2261,21 @@ function renderSupervisorRecord() {
     <div class="setechub-command-score supervisor-goal-score">
       <div>
         <div class="sync-meta">Meta mensal</div>
-        <strong>${esc(String(monthlyVisitCount))}/${esc(String(monthlyGoal))}</strong>
+        <strong>${esc(String(monthlyVisitCount))}/${esc(monthlyGoalLabel)}</strong>
       </div>
-      <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${esc(String(goalPct))}%</span>
+      <span class="diag-pill ${goalMet ? 'pill-ok' : 'pill-warn'}">${monthlyGoal ? `${esc(String(goalPct))}%` : '--'}</span>
     </div>
     <div class="setechub-bar"><span style="width:${esc(String(Math.max(4, goalPct)))}%"></span></div>
-    <div class="sync-meta">${goalMet ? `Meta de visitas cumprida em ${esc(viewMonthLabel)}.` : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta de ${esc(viewMonthLabel)}.`}</div>
+    <div class="sync-meta">${monthlyGoal ? (goalMet ? `Meta de visitas cumprida em ${esc(viewMonthLabel)}.` : `Faltam ${esc(String(Math.max(0, monthlyGoal - monthlyVisitCount)))} visita(s) para cumprir a meta de ${esc(viewMonthLabel)}.`) : 'Meta mensal aguardando leitura da planilha oficial.'}</div>
   `;
 
   document.getElementById('supervisorRecordMetrics').innerHTML = [
     { label: 'Escolas', value: String(sheetMetrics.assigned), note: 'Vindo da planilha' },
     { label: 'Semana', value: weeklyGoal ? `${weeklyVisitCount}/${weeklyGoal}` : String(weeklyVisitCount), note: supervisorIndicatorText(weeklyIndicator) },
     { label: 'Visitadas', value: String(visitedSchoolSet.size), note: viewMonthLabel },
-    { label: 'Faltantes', value: String(sheetMetrics.pendingMonth), note: 'Meta mensal' },
+    { label: 'Faltantes', value: monthlyGoal ? String(sheetMetrics.pendingMonth) : '--', note: 'Meta mensal' },
     { label: 'Chamados', value: String(selectedStat.openCalls), note: 'Ativos vinculados' },
-    { label: 'Indicador mes', value: supervisorIndicatorText(monthlyIndicator), note: `${monthlyVisitCount}/${monthlyGoal} visita(s)` },
+    { label: 'Indicador mes', value: supervisorIndicatorText(monthlyIndicator), note: `${monthlyVisitCount}/${monthlyGoalLabel} visita(s)` },
     { label: 'Historico', value: String(allVisits.length), note: 'Importados' }
   ].map((item) => `
     <div class="setechub-monitor-card compact supervisor-metric-card">

@@ -710,7 +710,7 @@ function mergeSupervisorPanelRows(source, rows) {
   const importedAt = new Date().toISOString();
   let updatedCount = 0;
   state.supervisors = (state.supervisors || []).map((supervisor) => {
-    const row = rows.find((item) => supervisorForSourceRow(csvValue(item, ['Supervisor']), source)?.name === supervisor.name);
+    const row = rows.find((item) => supervisorForSourceRow(rowSupervisorName(item) || csvValue(item, ['Supervisor']), source)?.name === supervisor.name);
     if (!row) return supervisor;
     updatedCount += 1;
     const assignedSchoolCount = parseVisitCount(csvValue(row, ['Escolas Atribuidas', 'Escolas Atribuídas']));
@@ -723,12 +723,12 @@ function mergeSupervisorPanelRows(source, rows) {
     const monthlyIndicator = indicatorTone(csvValue(row, ['Indicador Mensal']));
     return {
       ...supervisor,
-      assignedSchoolCount: assignedSchoolCount || supervisor.assignedSchoolCount,
-      weeklyGoal: weeklyGoal || supervisor.weeklyGoal,
-      monthlyGoal: monthlyGoal || supervisor.monthlyGoal,
-      currentWeek: currentWeek || supervisor.currentWeek,
-      weeklyVisits: Number.isFinite(weeklyVisits) ? weeklyVisits : supervisor.weeklyVisits,
-      monthlyVisits: Number.isFinite(monthlyVisits) ? monthlyVisits : supervisor.monthlyVisits,
+      assignedSchoolCount,
+      weeklyGoal,
+      monthlyGoal,
+      currentWeek,
+      weeklyVisits,
+      monthlyVisits,
       weeklyIndicator: weeklyIndicator || supervisor.weeklyIndicator,
       monthlyIndicator: monthlyIndicator || supervisor.monthlyIndicator,
       visitSourceId: source.id,
@@ -895,7 +895,7 @@ async function syncSupervisorSourceList(sources, options = {}) {
 }
 
 async function syncSupervisorVisitSources(options = {}) {
-  if (!canImportData()) return;
+  if (!canImportData() && options.silent !== true) return;
   const sources = Array.isArray(SUPERVISOR_VISIT_SOURCES) ? SUPERVISOR_VISIT_SOURCES : [];
   if (!sources.length) return;
   const silent = options.silent === true;
