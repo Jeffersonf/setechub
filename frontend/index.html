@@ -14,25 +14,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20260507-dashboard-presentation-1">
-<link rel="stylesheet" href="./setechub.css?v=20260507-dashboard-presentation-1">
-<link rel="stylesheet" href="./setechub-theme.css?v=20260507-dashboard-presentation-1">
-<link rel="stylesheet" href="./pages/supervisors.css?v=20260507-dashboard-presentation-1">
-<script defer src="./school-data.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./storage.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./app.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./render.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./utils/defer.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./components/avatar.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./components/school-card.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./pages/schools.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./pages/school-record.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./pages/inventory.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./pages/supervisors.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./pages/admin.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./api.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./actions.js?v=20260507-dashboard-presentation-1"></script>
-<script defer src="./bootstrap.js?v=20260507-dashboard-presentation-1"></script>
+<link rel="stylesheet" href="./styles.css?v=20260508-networks-page-1">
+<link rel="stylesheet" href="./setechub.css?v=20260508-networks-page-1">
+<link rel="stylesheet" href="./setechub-theme.css?v=20260508-networks-page-1">
+<link rel="stylesheet" href="./pages/supervisors.css?v=20260508-networks-page-1">
+<script defer src="./school-data.js?v=20260508-networks-page-1"></script>
+<script defer src="./storage.js?v=20260508-networks-page-1"></script>
+<script defer src="./app.js?v=20260508-networks-page-1"></script>
+<script defer src="./render.js?v=20260508-networks-page-1"></script>
+<script defer src="./utils/defer.js?v=20260508-networks-page-1"></script>
+<script defer src="./components/avatar.js?v=20260508-networks-page-1"></script>
+<script defer src="./components/school-card.js?v=20260508-networks-page-1"></script>
+<script defer src="./pages/schools.js?v=20260508-networks-page-1"></script>
+<script defer src="./pages/school-record.js?v=20260508-networks-page-1"></script>
+<script defer src="./pages/inventory.js?v=20260508-networks-page-1"></script>
+<script defer src="./pages/supervisors.js?v=20260508-networks-page-1"></script>
+<script defer src="./pages/admin.js?v=20260508-networks-page-1"></script>
+<script defer src="./api.js?v=20260508-networks-page-1"></script>
+<script defer src="./actions.js?v=20260508-networks-page-1"></script>
+<script defer src="./bootstrap.js?v=20260508-networks-page-1"></script>
 </head>
 <body>
 <div class="command-overlay" id="commandOverlay" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
@@ -102,6 +102,7 @@
   <nav aria-label="Navegação principal">
     <button class="nav-item" type="button" data-page="dashboard"><span class="ico">&#128202;</span>Painel</button>
     <button class="nav-item" type="button" data-page="schools"><span class="ico">&#127979;</span>Escolas</button>
+    <button class="nav-item" type="button" data-page="networks"><span class="ico">&#127760;</span>Redes e Cameras</button>
     <button class="nav-item" type="button" data-page="assets"><span class="ico">&#128187;</span>Inventário</button>
     <button class="nav-item" type="button" data-page="supervisors"><span class="ico">&#129517;</span>Supervisores</button>
     <button class="nav-item" type="button" data-page="ctc"><span class="ico">&#128736;</span>Técnicos CTC</button>
@@ -361,6 +362,8 @@
         <button class="btn btn-g btn-sm" data-school-filter="com_alerta" type="button">Com alerta</button>
         <button class="btn btn-g btn-sm" data-school-filter="sem_ficha" type="button">Sem ficha</button>
         <button class="btn btn-g btn-sm" data-school-filter="sem_rede" type="button">Sem rede</button>
+        <button class="btn btn-g btn-sm" data-school-filter="com_rede" type="button">Com rede</button>
+        <button class="btn btn-g btn-sm" data-school-filter="com_cameras" type="button">Com cameras</button>
         <button class="btn btn-g btn-sm" data-school-filter="sem_inventario" type="button">Sem inventario</button>
       </div>
       <div id="schoolList" class="school-directory-list"></div>
@@ -442,6 +445,22 @@
         <div><div class="ct">Histórico da escola</div><div class="cs">Alterações, confirmações e movimentos relevantes desta unidade.</div></div>
       </div>
       <div id="schoolEventHistory" class="stack-list"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-networks">
+    <div class="ph">
+      <div>
+        <div class="pt">Redes e Cameras</div>
+        <div class="ps">Consulta por escola com informacoes de rede, IPs e cameras importadas.</div>
+      </div>
+    </div>
+    <section class="dashboard-profile-grid network-summary-grid" id="networkSummaryGrid"></section>
+    <div class="box">
+      <div class="bh">
+        <div><div class="ct">Mapa de redes e cameras</div><div class="cs">Tabela consolidada por unidade escolar.</div></div>
+      </div>
+      <div id="networkTable" class="supervisor-sheet-table-wrap"></div>
     </div>
   </div>
 

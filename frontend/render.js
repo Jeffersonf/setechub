@@ -296,8 +296,7 @@ function renderDashboardAccess() {
     const allModules = [
       { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} unidades cadastradas`, action: `showPage('schools')`, page: 'schools', key: 'schools', tone: 'lime', priority: 'primary' },
       { icon: '&#128187;', title: 'Inventário', meta: `${inventoryAlertCount} alerta(s)`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
-      { icon: '&#127760;', title: 'Redes', meta: `${state.schoolNetworks.length} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', key: 'networks', tone: 'amber', priority: 'primary' },
-      { icon: '&#128247;', title: 'Cameras', meta: 'levantamento por escola', action: `showPage('schools')`, page: 'schools', key: 'cameras', tone: 'blue', priority: 'primary' },
+      { icon: '&#127760;', title: 'Redes e Cameras', meta: `${state.schoolNetworks.length} escolas com dados`, action: `showPage('networks')`, page: 'networks', key: 'networks', tone: 'amber', priority: 'primary' },
       { icon: '&#129517;', title: 'Supervisores', meta: `${visibleSupervisors().length} no painel`, action: `showPage('supervisors')`, page: 'supervisors', tone: 'blue', priority: 'primary' },
       { icon: '&#128736;', title: 'Técnicos CTC', meta: ctcTasks ? `${ctcTasks} visita(s)` : 'agenda de visitas', action: `openCtcAgenda()`, page: 'ctc', tone: 'amber', priority: 'secondary' },
       { icon: '&#128197;', title: 'Agenda', meta: 'compromissos e frota', action: `showPage('agenda')`, page: 'agenda', tone: 'slate', priority: 'secondary' },
@@ -348,8 +347,7 @@ function renderDashboardAccess() {
   const categories = [
     { icon: '&#127979;', title: 'Escolas', meta: `${schools.length} bases cadastradas`, action: `showPage('schools')`, page: 'schools', key: 'schools', tone: 'lime', priority: 'primary' },
     { icon: '&#128187;', title: 'Inventário', meta: `${state.schoolAssets.length} linhas | ${inventoryAlertCount} manut./defeito`, action: `openInventoryCategory()`, page: 'assets', tone: 'teal', priority: 'primary' },
-    { icon: '&#127760;', title: 'Redes', meta: `${networkCount} escolas com dados`, action: `openSchoolCategory('sem_rede')`, page: 'schools', key: 'networks', tone: 'amber', priority: 'primary' },
-    { icon: '&#128247;', title: 'Cameras', meta: `${cameraSchoolCount} escolas com cameras`, action: `showPage('schools')`, page: 'schools', key: 'cameras', tone: 'blue', priority: 'secondary' },
+    { icon: '&#127760;', title: 'Redes e Cameras', meta: `${networkCount} escolas com dados | ${cameraSchoolCount} com cameras`, action: `showPage('networks')`, page: 'networks', key: 'networks', tone: 'amber', priority: 'primary' },
     { icon: '&#128736;', title: 'Técnicos CTC', meta: `${ctcUsers.length} usuários | ${ctcTasks} visita(s) programada(s)`, action: `openCtcAgenda()`, page: 'ctc', tone: 'teal', priority: 'secondary', alwaysVisible: true },
     { icon: '&#127891;', title: 'PECs', meta: 'módulo dormente', page: 'pecs', tone: 'blue', priority: 'secondary', inactive: true },
     { icon: '&#128222;', title: 'Atendimentos', meta: 'pausado por enquanto', page: 'calls', tone: 'red', priority: 'secondary', inactive: true },
@@ -411,6 +409,97 @@ function renderDashboardAccess() {
       </button>
     `).join('') || '<div class="sync-empty">Nenhum recorte disponível para este perfil.</div>';
   }
+}
+
+function networkCredentialAccess() {
+  return ['admin', 'seintec', 'ctc'].includes(currentUserRole()) || canManageUsers();
+}
+
+function networkValue(value) {
+  const text = Array.isArray(value) ? value.filter(Boolean).join(', ') : String(value || '').trim();
+  return text || '--';
+}
+
+function renderNetworksPage() {
+  const summaryNode = document.getElementById('networkSummaryGrid');
+  const tableNode = document.getElementById('networkTable');
+  if (!summaryNode || !tableNode) return;
+
+  const schools = visibleSchools().slice().sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }));
+  const rows = schools.map((school) => ({ school, network: schoolNetworkRecord(school.name) }));
+  const withNetwork = rows.filter((row) => row.network).length;
+  const withCameras = rows.filter((row) => row.network && (Number(row.network.cameraInstalled || 0) > 0 || row.network.cameraInstalledLabel)).length;
+  const withIssue = rows.filter((row) => row.network && row.network.status && row.network.status !== 'ok').length;
+  const canSeeCredentials = networkCredentialAccess();
+
+  summaryNode.innerHTML = [
+    { label: 'Escolas', value: String(schools.length), note: 'base visivel' },
+    { label: 'Com rede', value: String(withNetwork), note: 'dados importados' },
+    { label: 'Com cameras', value: String(withCameras), note: 'DVR/cameras informados' },
+    { label: 'Pendencias', value: String(withIssue), note: 'status diferente de ok' }
+  ].map((item) => `
+    <div class="dashboard-profile-card">
+      <span>${esc(item.label)}</span>
+      <strong>${esc(item.value)}</strong>
+      <small>${esc(item.note)}</small>
+    </div>
+  `).join('');
+
+  tableNode.innerHTML = `
+    <table class="supervisor-sheet-table network-sheet-table">
+      <thead>
+        <tr>
+          <th>Escola</th>
+          <th>Redes</th>
+          <th>IPs</th>
+          <th>Cameras</th>
+          ${canSeeCredentials ? '<th>Acesso DVR</th>' : ''}
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(({ school, network }) => {
+          const installed = network?.cameraInstalledLabel || (network?.cameraInstalled ? `${network.cameraInstalled} instaladas` : '--');
+          const working = network?.cameraWorkingLabel || (network?.cameraWorking ? `${network.cameraWorking} funcionando` : '--');
+          return `
+            <tr>
+              <td>
+                <strong>${esc(school.name)}</strong>
+                <div class="sync-meta">${esc(school.zone || '--')} | CIE ${esc(school.cie || network?.cie || '--')}</div>
+              </td>
+              <td>
+                <strong>ADM ${esc(networkValue(network?.adminNetwork))}</strong>
+                <div class="sync-meta">PED ${esc(networkValue(network?.pedNetwork))}</div>
+                <div class="sync-meta">Banda ${esc(networkValue(network?.bandwidth))} | Firewall ${esc(networkValue(network?.firewallModel))}</div>
+              </td>
+              <td>
+                <div class="sync-meta">Gateway ADM ${esc(networkValue(network?.adminGateway))}</div>
+                <div class="sync-meta">Gateway PED ${esc(networkValue(network?.pedGateway))}</div>
+                <div class="sync-meta">DNS ${esc(networkValue([network?.dnsPrimary, network?.dnsSecondary]))}</div>
+                <div class="sync-meta">DVR ${esc(networkValue([network?.videoDvr1, network?.videoDvr2, network?.videoDvr3]))}</div>
+              </td>
+              <td>
+                <strong>${esc(installed)}</strong>
+                <div class="sync-meta">${esc(working)}</div>
+                <div class="sync-meta">Marca ${esc(networkValue(network?.dvrBrand))}</div>
+              </td>
+              ${canSeeCredentials ? `
+                <td>
+                  <strong>${esc(networkValue(network?.dvrUser))}</strong>
+                  <div class="sync-meta">${esc(networkValue(network?.password))}</div>
+                </td>
+              ` : ''}
+              <td>
+                <span class="diag-pill ${toneBySchool(network?.status === 'defeito' ? 'critico' : network?.status === 'manutencao' ? 'atencao' : 'estavel')}">${esc(network ? badgeText(network.status || 'ok') : 'sem dados')}</span>
+                <div class="sync-meta">${esc(networkValue(network?.mirroringDate))}</div>
+                <div class="sync-meta">${esc(networkValue(network?.technicians))}</div>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 function renderDashboardOperationalLists() {

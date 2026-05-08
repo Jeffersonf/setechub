@@ -487,6 +487,9 @@ function visibleNavigationPages() {
       ? new Set(['dashboard', 'agenda', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings'])
         : new Set(['dashboard', 'agenda', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings']);
   DORMANT_NAV_PAGES.forEach((page) => pages.delete(page));
+  if (pages.has('schools') || canEditData()) {
+    pages.add('networks');
+  }
   if (canManageUsers()) pages.add('admin');
   return pages;
 }
@@ -713,6 +716,11 @@ function filteredSchools() {
     if (currentSchoolFilter === 'sem_ficha') return schoolProfileCompletion(item.name) < 35;
     if (currentSchoolFilter === 'sem_inventario') return schoolAssetTotals(item.name).units === 0;
     if (currentSchoolFilter === 'sem_rede') return !schoolNetworkRecord(item.name);
+    if (currentSchoolFilter === 'com_rede') return !!schoolNetworkRecord(item.name);
+    if (currentSchoolFilter === 'com_cameras') {
+      const network = schoolNetworkRecord(item.name);
+      return !!network && (Number(network.cameraInstalled || 0) > 0 || Boolean(network.cameraInstalledLabel));
+    }
     if (currentSchoolFilter === 'com_alerta') return schoolAlertUnits(item.name) > 0;
     if (currentSchoolFilter === 'com_importacao') return schoolImportCount(item.name) > 0;
     if (currentSchoolFilter === 'com_chamado') return state.calls.some((call) => call.school === item.name && call.status !== 'resolvido');
@@ -1912,6 +1920,10 @@ function renderCurrentPage(page = currentPage) {
     }
     if (page === 'schools') {
       renderSchools();
+      return;
+    }
+    if (page === 'networks') {
+      renderNetworksPage();
       return;
     }
     if (page === 'school-record') {

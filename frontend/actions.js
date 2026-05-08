@@ -1,7 +1,7 @@
 'use strict';
 
 let funAdsPopupTimer = null;
-const FUN_AD_LAYER_VERSION = '20260507-dashboard-presentation-1';
+const FUN_AD_LAYER_VERSION = '20260508-networks-page-1';
 const FUN_AD_SESSION_KEY = 'setechub_fun_ads_enabled';
 const FUN_AD_POPUPS = [
   {
@@ -958,6 +958,10 @@ function openInventoryCategory(status = 'todos', category = 'todas', school = 't
 }
 
 function openMainNavigationPage(page) {
+  if (page === 'networks') {
+    showPage('networks');
+    return;
+  }
   if (page === 'assets') {
     currentInventorySchool = 'todas';
     currentInventoryZone = 'todas';

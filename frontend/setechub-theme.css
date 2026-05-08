@@ -1937,8 +1937,26 @@ body.app-stage-v3 .dashboard-category-card.category-cameras::after {
   background: linear-gradient(90deg, #78b4ff, #c8f55a);
 }
 
+body.app-stage-v3 .network-summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.app-stage-v3 .network-sheet-table td {
+  vertical-align: top;
+}
+
+body.app-stage-v3 .network-sheet-table td:nth-child(2),
+body.app-stage-v3 .network-sheet-table td:nth-child(3),
+body.app-stage-v3 .network-sheet-table td:nth-child(4) {
+  min-width: 180px;
+}
+
 @media (max-width: 1180px) {
   body.app-stage-v3 .dashboard-category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.app-stage-v3 .network-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
