@@ -488,7 +488,7 @@ function visibleNavigationPages() {
       ? new Set(['dashboard', 'agenda', 'ctc', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings'])
         : new Set(['dashboard', 'agenda', 'schools', 'school-record', 'supervisors', 'supervisor-record', 'assets', 'reports', 'info', 'settings']);
   DORMANT_NAV_PAGES.forEach((page) => pages.delete(page));
-  if (pages.has('schools') || canEditData()) {
+  if (['admin', 'seintec', 'ctc', 'dirigente'].includes(currentUserRole())) {
     pages.add('networks');
   }
   if (canManageUsers()) pages.add('admin');
