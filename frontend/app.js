@@ -24,6 +24,7 @@ let currentInventorySearch = '';
 let currentSchoolSearch = '';
 let currentSchoolDetail = '';
 let currentSupervisorDetail = '';
+let currentNetworkSchool = '';
 let currentSearchQuery = '';
 let currentViewDate = new Date();
 let serverStatus = { available: false, message: 'Servidor local nao verificado.' };

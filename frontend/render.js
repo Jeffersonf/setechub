@@ -420,10 +420,23 @@ function networkValue(value) {
   return text || '--';
 }
 
+function networkWidget(title, value, meta = '', tone = '') {
+  return `
+    <div class="network-widget ${tone}">
+      <span>${esc(title)}</span>
+      <strong>${esc(networkValue(value))}</strong>
+      ${meta ? `<small>${esc(meta)}</small>` : ''}
+    </div>
+  `;
+}
+
 function renderNetworksPage() {
   const summaryNode = document.getElementById('networkSummaryGrid');
   const tableNode = document.getElementById('networkTable');
-  if (!summaryNode || !tableNode) return;
+  const selectNode = document.getElementById('networkSchoolSelect');
+  const detailNode = document.getElementById('networkDetailGrid');
+  const emptyNode = document.getElementById('networkEmptyState');
+  if (!summaryNode || !tableNode || !selectNode || !detailNode || !emptyNode) return;
 
   const schools = visibleSchools().slice().sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }));
   const rows = schools.map((school) => ({ school, network: schoolNetworkRecord(school.name) }));
@@ -444,6 +457,78 @@ function renderNetworksPage() {
       <small>${esc(item.note)}</small>
     </div>
   `).join('');
+
+  if (!currentNetworkSchool || !schools.some((school) => school.name === currentNetworkSchool)) {
+    currentNetworkSchool = rows.find((row) => row.network)?.school.name || schools[0]?.name || '';
+  }
+  selectNode.innerHTML = schools.map((school) => `<option value="${esc(school.name)}">${esc(school.name)} | ${esc(school.zone || '--')}</option>`).join('');
+  selectNode.value = currentNetworkSchool;
+
+  const selectedSchool = schools.find((school) => school.name === currentNetworkSchool) || schools[0] || null;
+  const network = selectedSchool ? schoolNetworkRecord(selectedSchool.name) : null;
+  emptyNode.hidden = !!network;
+  emptyNode.textContent = network ? '' : 'Esta escola ainda nao tem dados importados de redes e cameras.';
+  detailNode.innerHTML = selectedSchool ? `
+    <section class="network-focus-hero">
+      <div>
+        <span class="dashboard-command-kicker">Unidade selecionada</span>
+        <h2>${esc(selectedSchool.name)}</h2>
+        <p>${esc(selectedSchool.zone || '--')} | CIE ${esc(selectedSchool.cie || network?.cie || '--')}</p>
+      </div>
+      <span class="diag-pill ${toneBySchool(network?.status === 'defeito' ? 'critico' : network?.status === 'manutencao' ? 'atencao' : 'estavel')}">${esc(network ? badgeText(network.status || 'ok') : 'sem dados')}</span>
+    </section>
+    <section class="network-widget-grid">
+      ${networkWidget('Rede ADM', network?.adminNetwork, `Gateway ${networkValue(network?.adminGateway)} | Mascara ${networkValue(network?.adminMask)}`, 'lime')}
+      ${networkWidget('Rede PED', network?.pedNetwork, `Gateway ${networkValue(network?.pedGateway)} | Mascara ${networkValue(network?.pedMask)}`, 'teal')}
+      ${networkWidget('Banda', network?.bandwidth, `Firewall ${networkValue(network?.firewallModel)}`, 'blue')}
+      ${networkWidget('Wi-Fi', network?.wifi, `Tecnico ${networkValue(network?.technicians)}`, 'slate')}
+    </section>
+    <section class="network-info-layout">
+      <div class="box network-info-card">
+        <div class="bh"><div><div class="ct">Informacoes sobre IPs</div><div class="cs">Gateways, DNS e enderecos dos DVRs.</div></div></div>
+        <div class="network-chip-list">
+          <span>DNS primario <strong>${esc(networkValue(network?.dnsPrimary))}</strong></span>
+          <span>DNS secundario <strong>${esc(networkValue(network?.dnsSecondary))}</strong></span>
+          <span>DVR ADM 1 <strong>${esc(networkValue(network?.videoDvr1))}</strong></span>
+          <span>DVR ADM 2 <strong>${esc(networkValue(network?.videoDvr2))}</strong></span>
+          <span>DVR ADM 3 <strong>${esc(networkValue(network?.videoDvr3))}</strong></span>
+          <span>Alarme ADM <strong>${esc(networkValue(network?.videoAlarm))}</strong></span>
+          <span>DVR PED 1 <strong>${esc(networkValue(network?.pedVideoDvr1))}</strong></span>
+          <span>DVR PED 2 <strong>${esc(networkValue(network?.pedVideoDvr2))}</strong></span>
+          <span>DVR PED 3 <strong>${esc(networkValue(network?.pedVideoDvr3))}</strong></span>
+          <span>Alarme PED <strong>${esc(networkValue(network?.pedVideoAlarm))}</strong></span>
+        </div>
+      </div>
+      <div class="box network-info-card">
+        <div class="bh"><div><div class="ct">Informacoes sobre cameras</div><div class="cs">DVR, funcionamento e acesso.</div></div></div>
+        <div class="network-camera-panel">
+          <div>
+            <span>Cameras instaladas</span>
+            <strong>${esc(networkValue(network?.cameraInstalledLabel || network?.cameraInstalled))}</strong>
+          </div>
+          <div>
+            <span>Cameras funcionando</span>
+            <strong>${esc(networkValue(network?.cameraWorkingLabel || network?.cameraWorking))}</strong>
+          </div>
+          <div>
+            <span>Marca DVR</span>
+            <strong>${esc(networkValue(network?.dvrBrand))}</strong>
+          </div>
+          ${networkCredentialAccess() ? `
+            <div>
+              <span>Usuario DVR</span>
+              <strong>${esc(networkValue(network?.dvrUser))}</strong>
+            </div>
+            <div>
+              <span>Senha DVR</span>
+              <strong>${esc(networkValue(network?.password))}</strong>
+            </div>
+          ` : ''}
+          <small>Espelhamento: ${esc(networkValue(network?.mirroringDate))}</small>
+        </div>
+      </div>
+    </section>
+  ` : '';
 
   tableNode.innerHTML = `
     <table class="supervisor-sheet-table network-sheet-table">

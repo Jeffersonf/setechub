@@ -1951,12 +1951,125 @@ body.app-stage-v3 .network-sheet-table td:nth-child(4) {
   min-width: 180px;
 }
 
+body.app-stage-v3 .network-selector-card {
+  margin-bottom: 14px;
+}
+
+body.app-stage-v3 .network-detail-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+body.app-stage-v3 .network-focus-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--bd) 78%, transparent);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--ac2) 10%, transparent), transparent 34%),
+    color-mix(in srgb, var(--sf-solid) 94%, transparent);
+}
+
+body.app-stage-v3 .network-focus-hero h2 {
+  margin: 0;
+  font-size: clamp(26px, 3.5vw, 44px);
+  line-height: 1;
+}
+
+body.app-stage-v3 .network-focus-hero p {
+  margin: 8px 0 0;
+  color: var(--mt);
+}
+
+body.app-stage-v3 .network-widget-grid,
+body.app-stage-v3 .network-info-layout {
+  display: grid;
+  gap: 12px;
+}
+
+body.app-stage-v3 .network-widget-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.app-stage-v3 .network-info-layout {
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+}
+
+body.app-stage-v3 .network-widget {
+  min-height: 128px;
+  display: grid;
+  align-content: space-between;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--bd) 76%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sf2) 88%, transparent);
+}
+
+body.app-stage-v3 .network-widget span,
+body.app-stage-v3 .network-camera-panel span {
+  color: var(--mt);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+body.app-stage-v3 .network-widget strong {
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+body.app-stage-v3 .network-widget small,
+body.app-stage-v3 .network-camera-panel small {
+  color: var(--mt);
+  line-height: 1.35;
+}
+
+body.app-stage-v3 .network-chip-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+body.app-stage-v3 .network-chip-list span,
+body.app-stage-v3 .network-camera-panel > div {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--bd) 72%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sf-solid) 86%, transparent);
+}
+
+body.app-stage-v3 .network-chip-list strong,
+body.app-stage-v3 .network-camera-panel strong {
+  color: var(--tx);
+  overflow-wrap: anywhere;
+}
+
+body.app-stage-v3 .network-camera-panel {
+  display: grid;
+  gap: 8px;
+}
+
+body.app-stage-v3 .network-table-card {
+  display: none;
+}
+
 @media (max-width: 1180px) {
   body.app-stage-v3 .dashboard-category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   body.app-stage-v3 .network-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.app-stage-v3 .network-widget-grid,
+  body.app-stage-v3 .network-info-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -2029,7 +2142,10 @@ body.app-stage-v3 .school-record-nav {
   body.app-stage-v3 .dashboard-command-stats,
   body.app-stage-v3 .school-record-metric-grid,
   body.app-stage-v3 .setechub-monitor-grid,
-  body.app-stage-v3 .inventory-filter-grid {
+  body.app-stage-v3 .inventory-filter-grid,
+  body.app-stage-v3 .network-widget-grid,
+  body.app-stage-v3 .network-info-layout,
+  body.app-stage-v3 .network-chip-list {
     grid-template-columns: 1fr;
   }
 
