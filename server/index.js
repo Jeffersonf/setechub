@@ -56,18 +56,49 @@ function sendText(res, statusCode, text) {
   res.end(text);
 }
 
-function sharePointListApiUrl(url) {
-  const parsed = new URL(url);
+function assertSharePointUrl(parsed) {
   if (!/\.sharepoint\.com$/i.test(parsed.hostname)) {
     throw new Error('Somente listas SharePoint sao aceitas.');
   }
-  const match = parsed.pathname.match(/^(.*)\/Lists\/([^/]+)\/AllItems\.aspx$/i);
-  if (!match) return parsed.toString();
+}
+
+function fallbackSharedListViewUrl(parsed, listName = 'ReservasVeiculos') {
+  const match = parsed.pathname.match(/^\/:l:\/[^/]+\/personal\/([^/]+)\//i);
+  if (!match) return '';
+  const sitePath = `/personal/${match[1]}`;
+  return `${parsed.origin}${sitePath}/Lists/${encodeURIComponent(listName)}/AllItems.aspx`;
+}
+
+function sharePointListApiUrl(url) {
+  const parsed = new URL(url);
+  assertSharePointUrl(parsed);
+  const sourceUrl = fallbackSharedListViewUrl(parsed) || parsed.toString();
+  const source = new URL(sourceUrl);
+  const match = source.pathname.match(/^(.*)\/Lists\/([^/]+)\/AllItems\.aspx$/i);
+  if (!match) return source.toString();
   const sitePath = match[1];
   const listName = decodeURIComponent(match[2]);
   const listPath = `${decodeURIComponent(sitePath)}/Lists/${listName}`.replace(/'/g, "''");
   const query = new URLSearchParams({ '$top': '5000' });
-  return `${parsed.origin}${sitePath}/_api/web/GetList('${listPath}')/items?${query}`;
+  return `${source.origin}${sitePath}/_api/web/GetList('${listPath}')/items?${query}`;
+}
+
+async function resolveSharePointListApiUrl(url) {
+  const parsed = new URL(url);
+  assertSharePointUrl(parsed);
+  if (!/^\/:l:\//i.test(parsed.pathname)) return sharePointListApiUrl(parsed.toString());
+
+  try {
+    const response = await fetch(parsed.toString(), { redirect: 'manual' });
+    const location = response.headers.get('location');
+    if (location) {
+      const resolved = new URL(location, parsed);
+      assertSharePointUrl(resolved);
+      return sharePointListApiUrl(resolved.toString());
+    }
+  } catch {}
+
+  return sharePointListApiUrl(parsed.toString());
 }
 
 function unwrapSharePointItems(payload) {
@@ -346,7 +377,7 @@ const server = http.createServer(async (req, res) => {
         sendJson(res, 400, { error: 'URL da lista nao informada.' });
         return;
       }
-      const response = await fetch(sharePointListApiUrl(sourceUrl), {
+      const response = await fetch(await resolveSharePointListApiUrl(sourceUrl), {
         headers: { Accept: 'application/json;odata=nometadata' }
       });
       if (!response.ok) {
@@ -385,5 +416,6 @@ if (require.main === module) {
 
 module.exports = {
   safeResolve,
+  sharePointListApiUrl,
   validateStateShape
 };

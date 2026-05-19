@@ -591,13 +591,17 @@ function parseSourceTime(value) {
 
 function sharePointListApiUrl(url) {
   const parsed = new URL(url, window.location.href);
-  const match = parsed.pathname.match(/^(.*)\/Lists\/([^/]+)\/AllItems\.aspx$/i);
-  if (!match) return url;
+  const sharedMatch = parsed.pathname.match(/^\/:l:\/[^/]+\/personal\/([^/]+)\//i);
+  const source = sharedMatch
+    ? new URL(`${parsed.origin}/personal/${sharedMatch[1]}/Lists/ReservasVeiculos/AllItems.aspx`)
+    : parsed;
+  const match = source.pathname.match(/^(.*)\/Lists\/([^/]+)\/AllItems\.aspx$/i);
+  if (!match) return source.toString();
   const sitePath = match[1];
   const listName = decodeURIComponent(match[2]);
   const listPath = `${decodeURIComponent(sitePath)}/Lists/${listName}`.replace(/'/g, "''");
   const query = new URLSearchParams({ '$top': '5000' });
-  return `${parsed.origin}${sitePath}/_api/web/GetList('${listPath}')/items?${query}`;
+  return `${source.origin}${sitePath}/_api/web/GetList('${listPath}')/items?${query}`;
 }
 
 function normalizeSourceRecord(row) {

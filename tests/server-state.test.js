@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { safeResolve, validateStateShape } = require('../server/index.js');
+const { safeResolve, sharePointListApiUrl, validateStateShape } = require('../server/index.js');
 
 test('validateStateShape accepts a minimal valid state', () => {
   assert.equal(validateStateShape({
@@ -35,4 +35,15 @@ test('safeResolve keeps app entry access and blocks traversal', () => {
   assert.match(safeResolve('/'), /index\.html$/i);
   assert.match(safeResolve('/login'), /index\.html$/i);
   assert.equal(safeResolve('/../../Windows/system32'), null);
+});
+
+test('sharePointListApiUrl maps list views and shared list links to REST items', () => {
+  const classic = sharePointListApiUrl('https://seesp-my.sharepoint.com/personal/site/Lists/ReservasVeiculos/AllItems.aspx');
+  assert.equal(
+    classic,
+    "https://seesp-my.sharepoint.com/personal/site/_api/web/GetList('/personal/site/Lists/ReservasVeiculos')/items?%24top=5000"
+  );
+
+  const shared = sharePointListApiUrl('https://seesp-my.sharepoint.com/:l:/g/personal/site/abc?e=123');
+  assert.equal(shared, classic);
 });
